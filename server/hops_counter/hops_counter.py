@@ -1,5 +1,5 @@
 from flask import Flask
-from src.utils import *
+from utils import *
 
 app = Flask('hops_counter')
 HOPS = 0

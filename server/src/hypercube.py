@@ -1,15 +1,17 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from src.config import HYPERCUBE_SIZE
-from src.utils import create_binary_id, NODES
+from config import HYPERCUBE_SIZE
+from utils import create_binary_id, NODES
 
-LABELS = {tuple(int(j) for j in create_binary_id(i)): create_binary_id(i) for i in range(0, NODES)}
+LABELS = {tuple(int(j) for j in create_binary_id(i))
+                : create_binary_id(i) for i in range(0, NODES)}
 
 
 class Hypercube:
     def __init__(self):
-        self.graph = nx.relabel_nodes(nx.generators.lattice.hypercube_graph(HYPERCUBE_SIZE), LABELS)
+        self.graph = nx.relabel_nodes(
+            nx.generators.lattice.hypercube_graph(HYPERCUBE_SIZE), LABELS)
 
     def get_shortest_path(self, source, target):
         return nx.shortest_path(self.graph, source, target)
@@ -49,7 +51,8 @@ class Hypercube:
                         yield parent, child, "forward"
                         visited.add(child)
                         if depth_now > 1:
-                            stack.append((child, depth_now - 1, iter(self.graph[child])))
+                            stack.append(
+                                (child, depth_now - 1, iter(self.graph[child])))
                 except StopIteration:
                     stack.pop()
                     if stack:

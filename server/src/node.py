@@ -1,5 +1,5 @@
-from src.hypercube import Hypercube
-from src.utils import *
+from hypercube import Hypercube
+from utils import *
 import threading
 
 
@@ -20,7 +20,8 @@ class Node:
             else:
                 return 'failure'
         else:
-            neighbor = self.hypercube.get_shortest_path(self.id, bit_keyword)[1]
+            neighbor = self.hypercube.get_shortest_path(
+                self.id, bit_keyword)[1]
             return request(neighbor, INSERT, {'keyword': str(keyword), 'obj': obj})
 
     def remove(self, keyword, obj):
@@ -33,7 +34,8 @@ class Node:
             else:
                 return 'failure'
         else:
-            neighbor = self.hypercube.get_shortest_path(self.id, bit_keyword)[1]
+            neighbor = self.hypercube.get_shortest_path(
+                self.id, bit_keyword)[1]
             return request(neighbor, REMOVE, {'keyword': str(keyword), 'obj': obj})
 
     def pin_search(self, keyword, threshold=-1):
@@ -41,13 +43,15 @@ class Node:
         if bit_keyword == self.id:
             return self.get_objects(threshold)
         else:
-            neighbor = self.hypercube.get_shortest_path(self.id, bit_keyword)[1]
+            neighbor = self.hypercube.get_shortest_path(
+                self.id, bit_keyword)[1]
             return request(neighbor, PIN_SEARCH, {'keyword': str(keyword), 'threshold': threshold})
 
     def superset_search(self, keyword, threshold, sender):
         bit_keyword = create_binary_id(keyword)
         if one(bit_keyword) != one(self.id) and sender == 'user':
-            neighbor = self.hypercube.get_shortest_path(self.id, bit_keyword)[1]
+            neighbor = self.hypercube.get_shortest_path(
+                self.id, bit_keyword)[1]
             return request(neighbor, SUPERSET_SEARCH, {'keyword': keyword, 'threshold': threshold, 'sender': 'user'})
         else:
             results = []
@@ -58,7 +62,8 @@ class Node:
                 if threshold <= 0:
                     break
                 else:
-                    result = get_response(request(neighbor, SUPERSET_SEARCH, {'keyword': keyword, 'threshold': threshold, 'sender': 'node'}).text)
+                    result = get_response(request(neighbor, SUPERSET_SEARCH, {
+                                          'keyword': keyword, 'threshold': threshold, 'sender': 'node'}).text)
                     results.extend(result)
                     threshold -= len(result)
             return results

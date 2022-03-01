@@ -2,9 +2,9 @@ import argparse
 import sys
 from flask import Flask, request
 
-from src.config import *
-from src.node import Node, requests
-from src.utils import INSERT, REMOVE, PIN_SEARCH, SUPERSET_SEARCH
+from config import *
+from node import Node, requests
+from utils import INSERT, REMOVE, PIN_SEARCH, SUPERSET_SEARCH
 
 app = Flask(APP_NAME)
 
@@ -59,7 +59,8 @@ def request_superset_search():
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument('port', type=int, help='Port number to which connect the node')
+    parser.add_argument(
+        'port', type=int, help='Port number to which connect the node')
     return parser.parse_args(argv)
 
 

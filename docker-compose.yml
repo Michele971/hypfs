@@ -1,0 +1,77 @@
+version: '3.9'
+services:
+  hypercube_1:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8881
+  hypercube_2:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8882
+  hypercube_3:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8883
+  hypercube_4:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8884
+  hypercube_5:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8885
+  hypercube_6:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8886
+  hypercube_7:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8887
+  hypercube_8:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8888
+  hypercube-client:
+    network_mode: 'host'
+    image: hypercube-client:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+  ipfs:
+    network_mode: 'host'
+    image: ipfs/go-ipfs:latest
+    environment:
+      - IPFS_PROFILE=server
+      - IPFS_PATH=/ipfsdata
+    volumes:
+      - ./data/ipfs:/ipfsdata
+    ports:
+      - '4001:4001'
+      - '127.0.0.1:8080:8080'
+      - '127.0.0.1:8081:8081'
+      - '127.0.0.1:5001:5001'

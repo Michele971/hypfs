@@ -1,7 +1,7 @@
 from datetime import datetime
 import requests
 
-from src.config import LOCAL_HOST, HYPERCUBE_SIZE, INIT_PORT, HOP_SERVER_PORT
+from config import LOCAL_HOST, HYPERCUBE_SIZE, INIT_PORT, HOP_SERVER_PORT
 
 NODES = 2 ** HYPERCUBE_SIZE
 INSERT = '/insert'
@@ -14,17 +14,20 @@ GET_HOPS = '/get_hops'
 
 
 def request(neighbor, operation, params={}):
-    increase_hops()
-    url = "http://{}:{}{}".format(LOCAL_HOST, str(get_decimal(neighbor) + INIT_PORT), operation)
+    # increase_hops()
+    url = "http://{}:{}{}".format(LOCAL_HOST,
+                                  str(get_decimal(neighbor) + INIT_PORT), operation)
     return requests.get(url=url, params=params)
 
 
 def increase_hops():
-    requests.get(url="http://{}:{}{}".format(LOCAL_HOST, HOP_SERVER_PORT, INCREASE_HOPS))
+    requests.get(url="http://{}:{}{}".format(LOCAL_HOST,
+                 HOP_SERVER_PORT, INCREASE_HOPS))
 
 
 def reset_hops():
-    requests.get(url="http://{}:{}{}".format(LOCAL_HOST, HOP_SERVER_PORT, RESET_HOPS))
+    requests.get(url="http://{}:{}{}".format(LOCAL_HOST,
+                 HOP_SERVER_PORT, RESET_HOPS))
 
 
 def get_hops():
@@ -57,7 +60,8 @@ def hamming_distance(n1, n2):
 
 
 def log(tid, operation, msg):
-    log_line = "> {} - [{}] -> [{}]: {:20}".format(datetime.now().strftime("%Y/%m/%d %H:%M:%S"), tid, operation.upper(), msg)
+    log_line = "> {} - [{}] -> [{}]: {:20}".format(
+        datetime.now().strftime("%Y/%m/%d %H:%M:%S"), tid, operation.upper(), msg)
     print(log_line)
     return
 
