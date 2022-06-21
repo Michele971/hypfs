@@ -10,6 +10,8 @@ from demo.scrolling_window import Scrolling_window
 from src.config import SUPERSET_THRESHOLD
 from src.utils import NODES
 
+
+from algorand_scripts.write_on_blockchain import make_transaction
 TEST_FILES = './test_files/'
 
 menu_list = ["- INSERT", "- GET", "- REMOVE", "- PIN SEARCH", "- SUPERSET SEARCH"]
@@ -68,6 +70,9 @@ def to_menu():
 
 def insert(client):
     path = input_string(screen, R[0], C[0], 'Object path: ')
+    screen.addstr(R[0]+1, C[0], 'aaaaassdasdsadssdasdsas', curses.color_pair(3))
+
+    make_transaction()
     if not path:
         return
     if path == 'random':

@@ -12,6 +12,8 @@ INCREASE_HOPS = '/increase_hops'
 RESET_HOPS = '/reset_hops'
 GET_HOPS = '/get_hops'
 
+#Algorand configurations
+PURE_STAKE_API_KEY = "nYYIqswHmq3C0xpWSNUYb8073dFpTUAu6tg1GXlw"
 
 def request(neighbor, operation, params={}):
     # increase_hops()

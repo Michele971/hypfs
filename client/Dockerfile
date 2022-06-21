@@ -11,9 +11,17 @@ ENV HOP_SERVER_PORT=6000
 #ENV HYPERCUBE_SIZE=3
 #ENV SUPERSET_THRESHOLD=10
 
-#COPY requirements.txt requirements.txt
+
+#FROM opencv:latest
 COPY . .
 RUN pip3 install -r requirements.txt
+
+############# ADDED FROM MICHELE
+RUN pip3 install py-algorand-sdk
+#CMD [ "mkdocs", "serve",  "--dev-addr=0.0.0.0:8000" ]
+
+
+
 
 #EXPOSE 5000
 
