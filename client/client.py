@@ -16,6 +16,8 @@ class Client:
     def add_obj(self, path, keyword):
         ##########################################
         # insert in ipfs and Algorand blockchain #
+
+        #test, eliminazione bonnybay
         ##########################################
         obj_hash = self.ipfs.add(path)['Hash']
         if request(create_binary_id(self.server), INSERT, {'keyword': str(keyword), 'obj': obj_hash, 'hop': str(0)}).text == 'success':
