@@ -2,7 +2,7 @@ import ipfshttpclient
 
 from src.config import SUPERSET_THRESHOLD
 from src.utils import *
-from algorand_scripts import make_transaction
+from algorand_scripts.write_on_blockchain import *
 
 
 DOWNLOAD_FOLDER = './objects'
@@ -20,6 +20,7 @@ class Client:
         ##########################################
         # insert in ipfs and Algorand blockchain #
         ##########################################
+
         make_transaction(algorand_wallet)
         obj_hash = self.ipfs.add(path)['Hash']
         if request(create_binary_id(self.server), INSERT, {'keyword': str(keyword), 'obj': obj_hash, 'hop': str(0)}).text == 'success':
