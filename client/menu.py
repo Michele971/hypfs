@@ -11,7 +11,7 @@ from src.config import SUPERSET_THRESHOLD
 from src.utils import NODES
 
 
-from algorand_scripts.write_on_blockchain import make_transaction
+
 TEST_FILES = './test_files/'
 
 menu_list = ["- INSERT", "- GET", "- REMOVE", "- PIN SEARCH", "- SUPERSET SEARCH"]
@@ -70,9 +70,6 @@ def to_menu():
 
 def insert(client):
     path = input_string(screen, R[0], C[0], 'Object path: ')
-    screen.addstr(R[0]+1, C[0], 'aaaaassdasdsadssdasdsas', curses.color_pair(3))
-
-    make_transaction()
     if not path:
         return
     if path == 'random':
@@ -116,7 +113,7 @@ def insert(client):
 
     if is_test:
         for p in paths:
-            client.add_obj(p, randint(1, NODES-1))
+            client.add_obj(p, randint(1, NODES-1))#, algorand_wallet_passphase)
         screen.addstr(R[-1], C[-1], '{} RANDOM FILES ADDED'.format(len(paths)))
         return to_menu()
 
@@ -133,7 +130,9 @@ def insert(client):
     screen.border(0)
     screen.addstr(R[1]+1, C[1], 'Valid Keyword', curses.color_pair(3))
 
-    res = client.add_obj(path, keyword)
+    algorand_wallet_passphase = input_string(screen, R[2], C[2], 'You Algorand wallet passphase: ')
+    
+    res = client.add_obj(path, keyword, algorand_wallet_passphase)
     screen.addstr(R[-1], C[-1], res)
 
     return to_menu()

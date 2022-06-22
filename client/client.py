@@ -2,7 +2,8 @@ import ipfshttpclient
 
 from src.config import SUPERSET_THRESHOLD
 from src.utils import *
-from algorand_scripts import *
+from algorand_scripts import make_transaction
+
 
 DOWNLOAD_FOLDER = './objects'
 
@@ -12,13 +13,14 @@ class Client:
         self.ipfs = ipfshttpclient.connect(addr)
         self.id = self.ipfs.id()['ID']
         self.server = server
+        #self.algorand_wallet = algorand_wallet
         log(self.id, 'CONNECTION', '{}'.format(addr))
 
-    def add_obj(self, path, keyword):
+    def add_obj(self, path, keyword, algorand_wallet):
         ##########################################
         # insert in ipfs and Algorand blockchain #
         ##########################################
-
+        make_transaction(algorand_wallet)
         obj_hash = self.ipfs.add(path)['Hash']
         if request(create_binary_id(self.server), INSERT, {'keyword': str(keyword), 'obj': obj_hash, 'hop': str(0)}).text == 'success':
             res = 'REFERENCE ({},{}) ADDED'.format(keyword, obj_hash)
