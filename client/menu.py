@@ -175,11 +175,12 @@ def get(client):
     obj_hash = input_string(screen, R[0], C[0], 'Object hash: ')
     if not obj_hash:
         return
-    while len(obj_hash) != 46:
-        screen.addstr(R[0]+1, C[0], 'Error: hash not valid', curses.color_pair(2))
-        obj_hash = input_string(screen, R[0], C[0], 'Object hash: ')
-        if not obj_hash:
-            return
+    # OLD VERSION
+    # while len(obj_hash) != 46:
+    #     screen.addstr(R[0]+1, C[0], 'Error: hash not valid', curses.color_pair(2))
+    #     obj_hash = input_string(screen, R[0], C[0], 'Object hash: ')
+    #     if not obj_hash:
+    #         return
 
     screen.clrtoeol()
     screen.border(0)

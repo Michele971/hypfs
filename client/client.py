@@ -3,6 +3,9 @@ import ipfshttpclient
 from src.config import SUPERSET_THRESHOLD
 from src.utils import *
 from algorand_scripts.write_on_blockchain import *
+from algorand_scripts.read_from_blockchain import *
+import base64
+import json
 
 
 DOWNLOAD_FOLDER = './objects'
@@ -46,13 +49,15 @@ class Client:
     '''
         User insert a specific transaction ID, then this function will download the IPFS hash written inside the note field
     '''
-    def get_obj(self, obj):
+    def get_obj(self, tx_id):
+        ipfs_hash_retrieved = read_transaction(tx_id)
+        print("\t trovatoooo ", ipfs_hash_retrieved)
         try:
-            self.ipfs.get(obj, target=DOWNLOAD_FOLDER)
-            res = "OBJECT '{}' DOWNLOADED".format(obj)
+            self.ipfs.get(ipfs_hash_retrieved, target=DOWNLOAD_FOLDER)
+            res = "OBJECT '{}' DOWNLOADED".format(ipfs_hash_retrieved)
             log(self.id, 'GET', res)
         except Exception:
-            res = "OBJECT '{}' NOT FOUND".format(obj)
+            res = "OBJECT '{}' NOT FOUND".format(ipfs_hash_retrieved)
             log(self.id, 'GET', res)
         return res
 
