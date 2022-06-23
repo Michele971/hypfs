@@ -35,7 +35,6 @@ def make_transaction(algorand_wallet_passphase,obj_hash):
     last_valid_round = params.last
     tx_fee = params.min_fee
     tx_amount = 0
-    print(type(obj_hash))
 
     note0 = '{"ipfs_obj_hash":"'+obj_hash+'"}'
     note = note0.encode() 
@@ -51,7 +50,7 @@ def make_transaction(algorand_wallet_passphase,obj_hash):
         #print('Transaction sent with ID', signed_tx.transaction.get_txid())
         wait_for_confirmation(acl, txid=signed_tx.transaction.get_txid())
 
-        #print("Done.")
+        print("Done.")
         #print("Sent " + str(tx_amount) + " microalgo in transaction: " + str(tx_confirm))
         #print("")
 

@@ -20,9 +20,9 @@ class Client:
         ##########################################
         # insert in ipfs and Algorand blockchain #
         ##########################################
-
-        make_transaction(algorand_wallet)
         obj_hash = self.ipfs.add(path)['Hash']
+        make_transaction(algorand_wallet, obj_hash)
+
         if request(create_binary_id(self.server), INSERT, {'keyword': str(keyword), 'obj': obj_hash, 'hop': str(0)}).text == 'success':
             res = 'REFERENCE ({},{}) ADDED'.format(keyword, obj_hash)
             log(self.id, INSERT[1:], res)
