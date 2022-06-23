@@ -130,23 +130,24 @@ def insert(client):
     screen.border(0)
     screen.addstr(R[1]+1, C[1], 'Valid Keyword', curses.color_pair(3))
 
-    algorand_wallet_passphase = input_string(screen, R[2], C[2], 'You Algorand wallet passphase: ')
+    #algorand_wallet_passphase = input_string(screen, R[2], C[2], 'You Algorand wallet passphase: ')
     
-    res = client.add_obj(path, keyword, algorand_wallet_passphase)
+    res = client.add_obj(path, keyword, "desert laundry solution prosper miss inform above control loan ketchup forget farm tourist author gain shove sure film solar brain physical vocal quote ability volume")
     screen.addstr(R[-1], C[-1], res)
 
     return to_menu()
 
 
 def remove(client):
-    obj_hash = input_string(screen, R[0], C[0], 'Object hash: ')
+    obj_hash = input_string(screen, R[0], C[0], 'Transaction id: ') #the old version was: "object hash"
     if not obj_hash:
         return
-    while len(obj_hash) != 46:
-        screen.addstr(R[0]+1, C[0], 'Error: hash not valid', curses.color_pair(2))
-        obj_hash = input_string(screen, R[0], C[0], 'Object hash: ')
-        if not obj_hash:
-            return
+    #OLD VERSION
+    # while len(obj_hash) != 46:
+    #     screen.addstr(R[0]+1, C[0], 'Error: hash not valid', curses.color_pair(2))
+    #     obj_hash = input_string(screen, R[0], C[0], 'Object hash: ')
+    #     if not obj_hash:
+    #         return
     screen.clrtoeol()
     screen.border(0)
     screen.addstr(R[0]+1, C[0], 'Valid hash', curses.color_pair(3))

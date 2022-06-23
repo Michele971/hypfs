@@ -24,9 +24,18 @@ def wait_for_confirmation(client, txid):
         client.status_after_block(last_round)
         txinfo = client.pending_transaction_info(txid)
     #print('Transaction confirmed in round', txinfo.get('confirmed-round'))
-    return txinfo
+    return txid, txinfo
 
 def make_transaction(algorand_wallet_passphase,obj_hash):
+    '''
+        With this function we store the hash of the IPFS object and store it inside a 
+        transaction of Algorand Blockchain.
+        In particular, we insert the hash inside the note field.
+
+        Sequently, the id of transaction will be stored inside the DHT.
+
+        The original project, without Algorand, stored hash of IPFS in the DHT not the transaction ID. 
+    '''
     account_a_private_key = mnemonic.to_private_key(algorand_wallet_passphase)
     algorand_wallet_address = mnemonic.to_public_key(algorand_wallet_passphase)
     params = acl.suggested_params()
@@ -39,25 +48,24 @@ def make_transaction(algorand_wallet_passphase,obj_hash):
     note0 = '{"ipfs_obj_hash":"'+obj_hash+'"}'
     note = note0.encode() 
 
-    # Create and sign transaction. The transaction is sent to itself (the same address)
+    # -----------> TODO: Send the transaction to a specific address: the address of the COMPANY 
+    # Create and sign transaction. The transaction is sent to itself (the same address). 
     tx = transaction.PaymentTxn(algorand_wallet_address, tx_fee, first_valid_round, last_valid_round, gen_hash, algorand_wallet_address, tx_amount, None, note)
     signed_tx = tx.sign(account_a_private_key)
+
 
     try:
         # Send the transaction
         # note that the PureStake api requires the content type for the following call to be set to application/x-binary
         tx_confirm = acl.send_transaction(signed_tx)
-        #print('Transaction sent with ID', signed_tx.transaction.get_txid())
-        wait_for_confirmation(acl, txid=signed_tx.transaction.get_txid())
-
+        txid_confirmed = wait_for_confirmation(acl, txid=signed_tx.transaction.get_txid())
         print("Done.")
-        #print("Sent " + str(tx_amount) + " microalgo in transaction: " + str(tx_confirm))
-        #print("")
-
         # Query resulting balances
         result = acl.account_info(algorand_wallet_address)
-        #print(result["address"] + ": " + str(result["amount"]) + " microalgo")
 
+        #return the transaction ID
+        return txid_confirmed[0]
+        
 
     except Exception as e:
         print(e)

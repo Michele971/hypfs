@@ -21,25 +21,31 @@ class Client:
         # insert in ipfs and Algorand blockchain #
         ##########################################
         obj_hash = self.ipfs.add(path)['Hash']
-        make_transaction(algorand_wallet, obj_hash)
+        transactionID = make_transaction(algorand_wallet, obj_hash)
 
-        if request(create_binary_id(self.server), INSERT, {'keyword': str(keyword), 'obj': obj_hash, 'hop': str(0)}).text == 'success':
-            res = 'REFERENCE ({},{}) ADDED'.format(keyword, obj_hash)
+
+        if request(create_binary_id(self.server), INSERT, {'keyword': str(keyword), 'obj': transactionID, 'hop': str(0)}).text == 'success':
+            res = 'REFERENCE ({},{}) ADDED'.format(keyword, transactionID) #inserting the transaction ID in DHT
             log(self.id, INSERT[1:], res)
         else:
-            res = 'REFERENCE ({},{}) ALREADY EXIST'.format(keyword, obj_hash)
+            res = 'REFERENCE ({},{}) ALREADY EXIST'.format(keyword, transactionID)
             log(self.id, INSERT[1:], res)
         return res
 
-    def remove_obj(self, obj_hash, keyword):
-        if request(create_binary_id(self.server), REMOVE, {'keyword': str(keyword), 'obj': obj_hash}).text == 'success':
-            res = 'REFERENCE ({},{}) REMOVED'.format(keyword, obj_hash)
+    #TODO: understand if client CAN remove from DHT. Can client remove the Transaction ID ?
+    def remove_obj(self, tx_id, keyword):
+        if request(create_binary_id(self.server), REMOVE, {'keyword': str(keyword), 'obj': client}).text == 'success':
+            res = 'REFERENCE ({},{}) REMOVED'.format(keyword, client)
             log(self.id, REMOVE[1:], res)
         else:
-            res = 'REFERENCE ({},{}) NOT EXIST'.format(keyword, obj_hash)
+            res = 'REFERENCE ({},{}) NOT EXIST'.format(keyword, client)
             log(self.id, REMOVE[1:], res)
         return res
 
+    #getting IPFS hash from blockchain, inserting the tx_id and check if exists in DHT
+    '''
+        User insert a specific transaction ID, then this function will download the IPFS hash written inside the note field
+    '''
     def get_obj(self, obj):
         try:
             self.ipfs.get(obj, target=DOWNLOAD_FOLDER)
