@@ -23,12 +23,17 @@ cd ..
 docker-compose up -d
 ```
 
+## Note
+To run in "local mode" skip **usage** section and use:
+   - `docker run -d --name ipfs_host -e IPFS_SWARM_KEY=<your swarm key> -v $ipfs_staging:/export -v $ipfs_data:/data/ipfs -p 4001:4001 -p 4001:4001/udp -p 127.0.0.1:8080:8080 -p 127.0.0.1:5001:5001 ipfs/go-ipfs:latest`: this allow to start an **IPFS docker container** [Source](https://docs.ipfs.io/how-to/run-ipfs-inside-docker/#customizing-your-node)
+
+
 ## Usage
 
 1. **Check status**
    `docker-compose logs -f` for all services
    `docker-compose logs -f hypercube_0` for an hypercube node
-   `docker-compose logs -f ipfs`
+   `docker-compose logs -f ipfs
 2. **Start client hash**
    `docker-compose run hypercube-client bash`
 3. **Work with the client bash**
