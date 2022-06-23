@@ -23,10 +23,12 @@ cd ..
 docker-compose up -d
 ```
 
-## Note
+## Note: running in local mode
 To run in "local mode" skip **usage** section and use:
    - `docker run -d --name ipfs_host -e IPFS_PROFILE=server -v $ipfs_staging:/export -v $ipfs_data:/data/ipfs -p 4001:4001 -p 4001:4001/udp -p 127.0.0.1:8080:8080 -p 127.0.0.1:5001:5001 ipfs/go-ipfs:latest`: this allow to start an **IPFS docker container** [Source](https://docs.ipfs.io/how-to/run-ipfs-inside-docker/#customizing-your-node)
-
+   - Install both the **requirements.txt** inside client and server directories `pip3 install -r requirements.txt`
+   - Start the server: `python server.py 8881`, where 8881 is the port
+   - Start the client: `python menu.py /ip4/127.0.0.1/tcp/5001 1`
 
 ## Usage
 
