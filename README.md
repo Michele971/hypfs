@@ -1,4 +1,4 @@
-# Hypercube on IPFS
+# Hypercube on IPFS with Blockchain
 
 The implementation of a Decentralized keywords Search Engine based on a hypercube structure and integrated with IPFS and Algorand blockchain using Python.
 
