@@ -172,7 +172,7 @@ def remove(client):
 
 
 def get(client):
-    obj_hash = input_string(screen, R[0], C[0], 'Object hash: ')
+    obj_hash = input_string(screen, R[0], C[0], 'ID transaction: ')
     if not obj_hash:
         return
     # OLD VERSION

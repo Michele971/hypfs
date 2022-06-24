@@ -4,6 +4,7 @@ from algosdk import transaction
 from src.utils import *
 
 
+#TODO: remove the hardcoded passphase. User will have to insert it from command line
 mnemonic_secret = "desert laundry solution prosper miss inform above control loan ketchup forget farm tourist author gain shove sure film solar brain physical vocal quote ability volume"
 
 
