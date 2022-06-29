@@ -82,3 +82,4 @@ To run in "local mode" skip **usage** section and use:
 
 ## TODO
 - Remove the passphase from writeobblockchain
+- - Send the transaction to a specific address: the address of the COMPANY 
