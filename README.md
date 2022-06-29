@@ -79,3 +79,6 @@ To run in "local mode" skip **usage** section and use:
 ## License
 
 [Apache License 2.0](./LICENSE)
+
+## TODO
+- Remove the passphase from writeobblockchain
