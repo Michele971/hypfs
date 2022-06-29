@@ -81,5 +81,5 @@ To run in "local mode" skip **usage** section and use:
 [Apache License 2.0](./LICENSE)
 
 ## TODO
-- Remove the passphase from writeobblockchain
-- Send the transaction to a specific address: the address of the COMPANY 
+- writeobblockchain file: Remove the passphase 
+- writeobblockchain file: Send the transaction to a specific address: the address of the COMPANY 
