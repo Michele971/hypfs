@@ -1,8 +1,7 @@
-# Hypercube on IPFS
+# Hypercube on IPFS with Blockchain
 
-The implementation of a Decentralized keywords Search Engine based on a hypercube structure and integrated with IPFS using Python.
+The implementation of a Decentralized keywords Search Engine based on a hypercube structure and integrated with IPFS and Algorand blockchain using Python.
 
-<center><img src="sys_arch.png" width="75%" align="center"></center>
 
 ## Install with Docker
 
@@ -80,3 +79,7 @@ To run in "local mode" skip **usage** section and use:
 ## License
 
 [Apache License 2.0](./LICENSE)
+
+## TODO
+- writeobblockchain file: Remove the passphase 
+- writeobblockchain file: Send the transaction to a specific address: the address of the COMPANY 
