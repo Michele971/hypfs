@@ -1,6 +1,7 @@
 import { loadStdlib } from '@reach-sh/stdlib';
 import * as backend from './build/index.main.mjs';
 import { ask } from '@reach-sh/stdlib';
+import { done } from '@reach-sh/stdlib/ask.mjs';
 
 let ctc = null;
 const stdlib = loadStdlib(process.env);
@@ -33,7 +34,7 @@ const acc = await stdlib.newTestAccount(iBalance);
 
 console.log(`The consensus network is ${stdlib.connector}.`);
 const commonInteract = {
-  reportPosition: (position) => console.log(`The first position inserted is: "${position}"`),
+  reportPosition: (did,  proof_and_position) => console.log(`New position inserted \n DID: "${did}" \n proof_and_position: "${proof_and_position}"`),
 };
 
 //implement the functions to log inside the backend
@@ -61,8 +62,9 @@ if (role === 'creator') {
   //const ctc = acc.contract(backend); //OLD VERSION
   ctc = acc.contract(backend); //creating the contract
   ctc.getInfo().then((info) => {
-    console.log(`The contract is deployed as = ${JSON.parse(info)}`); //display the id of the contract
+    console.log(`The contract is deployed as = ${JSON.stringify(info)}`); //display the id of the contract. It was "parse" not "stringify"
   });
+  //console.log(`Contract info: ${JSON.stringify(await ctc.getInfo())}`);
 
 
   //await ctc.participants.Creator(creatorInteract); //OLD VERSION
@@ -92,19 +94,32 @@ if (role === 'creator') {
 
   ctc = acc.contract(backend, info);
   
-  // OLD VERSION
-  // ctc = acc.contract(backend, info);
-  // await ctc.p.Attacher(attacherInteract);
-
-  //ctc = acc.contract(backend, info);
+  var did = await ask.ask(
+    `What is your DID?`,
+    (did => did)
+  );
   var location_attacher = await ask.ask(
-    `What is your location?`,
+    `What is your Location?`,
     (x => x)
   );
-  const attacher_api = ctc.a.attacherAPI;
+  var proof_attacher = await ask.ask(
+    `What is your Proof?`,
+    (proof_attacher => proof_attacher)
+  );
 
-  await call(() => attacher_api.insert_position(String(location_attacher)));
+  //Proof + Location, e.g "jshsj2a9sjdja3ksl-G294A02"
+  var proof_and_location = String(proof_attacher)+"-"+String(location_attacher)
+  const attacher_api = ctc.a.attacherAPI;
+  
+  await call(() => attacher_api.insert_position(
+        String(proof_and_location),
+        String(did)
+      )
+    );
 
 
 
 };
+
+
+done();

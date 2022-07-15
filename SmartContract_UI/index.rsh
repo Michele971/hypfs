@@ -11,7 +11,7 @@ const commonInteract = {
   position: Bytes(128),
   decentralized_identifier: Bytes(128),
   proof_reveived: Bytes(128),
-  reportPosition: Fun([Maybe(Bytes(128))], Null)
+  reportPosition: Fun([Bytes(128), Maybe(Bytes(128))], Null)
 };
 const creatorInteract = {
   ...commonInteract,
@@ -27,7 +27,7 @@ export const main = Reach.App(() => {
   const A = Participant('Attacher', attacherInteract); 
 
   const attacherAPI = API('attacherAPI',{
-    insert_position: Fun([Bytes(128)], Bytes(128)),
+    insert_position: Fun([Bytes(128),Bytes(128)], Bytes(128)),
     //insert_did: Fun([Bytes(128)], Null),
     //insert_proof: Fun([Bytes(128)], Null),
   });
@@ -37,16 +37,18 @@ export const main = Reach.App(() => {
   init();
 
   Creator.publish() //we need that to use the MAP below
-  const easy_map = new Map(Address,Bytes(128));
+  const easy_map = new Map(Bytes(128),Bytes(128));
   commit();
   Creator.only(() => { 
-    const position = declassify(interact.position);
-    const decentralized_identifier = declassify(interact.decentralized_identifier);
-    //TODO: const proof_reveived = declassify(interact.proof_reveived);
+    const proof_and_position = declassify(interact.position);
+    const decentralized_identifier_creator = declassify(interact.decentralized_identifier);
   });
 
-  Creator.publish(position, decentralized_identifier); //TODO: add the proof_reveived
-  //easy_map[C] = position;
+  Creator.publish(proof_and_position, decentralized_identifier_creator); //TODO: add the proof_reveived
+  easy_map[decentralized_identifier_creator] = fromSome(easy_map[decentralized_identifier_creator], proof_and_position);
+  //only for DEBUG
+  each([Creator, A], () => interact.reportPosition(decentralized_identifier_creator, easy_map[decentralized_identifier_creator]));
+
   commit();
   
   Creator.publish();
@@ -57,17 +59,17 @@ export const main = Reach.App(() => {
     .invariant(balance() == balance()) // invariant: the condition inside must be true for the all time that the while goes on
     //.define(() => {views.getCtcBalanceV.set(balance());}) // define: the code inside is executed when a function in the while is called (ex. the api call)
     .while(keepGoing)
-    // an API call is formed by 4 steps:
     .api(attacherAPI.insert_position, // the name of the api that is called 
       // (position_of_attacher) => { // the assume that have to be true to continue the execution of the API
       //   assume(balance()==balance(), 'Not allow to invest more positions ')
       // },      
       //(invst) => invst, // the payment that the users have to do when call the api
-      (x, y) => { // the code to execute and the returning variable of the api (y)
-        y(x);
-        //y(position_of_attacher);
-        easy_map[this] = fromSome(easy_map[this], x); // saving the POSITION into the Map 
+      (pos, did, y) => { // the code to execute and the returning variable of the api (y)
+        y(pos);
+      
+        easy_map[did] = fromSome(easy_map[did], pos); // saving the POSITION into the Map 
         Creator.interact.log("somebody added a new position to the map")
+        each([Creator, A], () => interact.reportPosition(did, easy_map[did]));
         return true; // the returning of the API for the parallel reduce necessary to update the initial variable 
       }
     )
@@ -85,8 +87,6 @@ export const main = Reach.App(() => {
   transfer(balance()).to(Creator);
   
   commit();
-
-  each([Creator, A], () => interact.reportPosition(easy_map[Creator]));
   
 
   exit();
