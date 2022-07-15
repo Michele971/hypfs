@@ -45,18 +45,38 @@ commonInteract.log = async (...args) => {
 if (role === 'creator') {
   const creatorInteract = {
     ...commonInteract,
-    decentralized_identifier: await ask.ask('Enter your DID:', (did_inserted) => {
-      return did_inserted;
-    }),
-    proof_reveived: await ask.ask('Enter the proof:', (proof_inserted) => {
-      return proof_inserted; 
-    }),
-    position: await ask.ask('Enter your position:', (positionInserted) => {
-      let pos_result = !positionInserted ? '44.2834757,11.398155' : positionInserted;
-      if (!positionInserted) { console.log(pos_result); }
-      return pos_result;
-    }),
+    // decentralized_identifier: await ask.ask('Enter your DID:', (did_inserted) => {
+    //   return did_inserted;
+    // }),
+    // proof_reveived: await ask.ask('Enter the proof:', (proof_inserted) => {
+    //   return proof_inserted; 
+    // }),
+    // position: await ask.ask('Enter your position:', (positionInserted) => {
+    //   let pos_result = !positionInserted ? '44.2834757,11.398155' : positionInserted;
+    //   if (!positionInserted) { console.log(pos_result); }
+    //   return pos_result;
+    // }),
   };
+  var did = await ask.ask(
+    `What is your DID?`,
+    (did => did)
+  );
+  var location_creator = await ask.ask(
+    `What is your Location?`,
+    (x => x)
+  );
+  var proof_creator = await ask.ask(
+    `What is your Proof?`,
+    (proof => proof)
+  );
+
+  var proof_and_location_creator = String(proof_creator)+"-"+String(location_creator);
+
+  creatorInteract.decentralized_identifier = did;
+  creatorInteract.position = proof_and_location_creator;
+  
+
+
   const acc = await stdlib.newTestAccount(iBalance);
   // await showBalance(acc);
   //const ctc = acc.contract(backend); //OLD VERSION
@@ -64,13 +84,8 @@ if (role === 'creator') {
   ctc.getInfo().then((info) => {
     console.log(`The contract is deployed as = ${JSON.stringify(info)}`); //display the id of the contract. It was "parse" not "stringify"
   });
-  //console.log(`Contract info: ${JSON.stringify(await ctc.getInfo())}`);
 
 
-  //await ctc.participants.Creator(creatorInteract); //OLD VERSION
-
-
-  console.log("The POSITION is ",creatorInteract.position); //for testing
 
   const part = backend.Creator;
   await part(ctc, creatorInteract); 
