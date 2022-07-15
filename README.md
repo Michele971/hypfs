@@ -2,6 +2,7 @@
 
 The implementation of a Decentralized keywords Search Engine based on a hypercube structure and integrated with IPFS and Algorand blockchain using Python.
 
+Smart Contracts are developed with [Reach language](https://www.reach.sh).
 
 ## Install with Docker
 
