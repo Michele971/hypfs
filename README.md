@@ -1,8 +1,12 @@
 # Hypercube on IPFS with Blockchain
 
-The implementation of a Decentralized keywords Search Engine based on a hypercube structure and integrated with IPFS and Algorand blockchain using Python.
+Implementation of a DApp (Decentralized Application) using **decentralized keywords Search Engine** based on a **hypercube structure**; integrated with IPFS and Algorand blockchain using Python.
 
 Smart Contracts are developed with [Reach language](https://www.reach.sh).
+
+## Status
+
+Working on proof of location, simulated in a **permissionless** system.
 
 ## Install with Docker
 
