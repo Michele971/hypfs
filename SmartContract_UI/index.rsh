@@ -1,17 +1,24 @@
 'reach 0.1';
 'use strict';
-//NOTE:
-// TODO: This smart contract is empower to validate if the positions of user are correct
+//NOTES:
+// TODO: This smart contract is empower to validate if the positions if user are correct
 // There is a smart contract for every different position
 // TODO: The Smart Contract will expire after a specific amount of time
-
-
+// TODO: Add the geofence attribute to the smart contract (radius, etc etc ....). In this way 
+//       we can design more checks such as: the position received must be inside the geofence area.
+// TODO: The smart contract will know the verifier (?) ----> still to be decided. 
+//       Maybe using an unique password (for more verifiers) for memory reason
+// TODO: check that the proofs inserted unique and not already present
+//
+//
 const commonInteract = {
   ...hasConsoleLogger,
   position: Bytes(128),
   decentralized_identifier: Bytes(128),
   proof_reveived: Bytes(128),
-  reportPosition: Fun([Bytes(128), Maybe(Bytes(128))], Null)
+  reportPosition: Fun([Bytes(128), Maybe(Bytes(128))], Null),
+  //for testing
+  report_results: Fun([Bytes(128)], Null)
 };
 const creatorInteract = {
   ...commonInteract,
@@ -28,8 +35,15 @@ export const main = Reach.App(() => {
 
   const attacherAPI = API('attacherAPI',{
     insert_position: Fun([Bytes(128),Bytes(128)], Bytes(128)),
-    //insert_did: Fun([Bytes(128)], Null),
-    //insert_proof: Fun([Bytes(128)], Null),
+  });
+
+  const verifierAPI = API('verifierAPI',{
+    get_proof: Fun([Bytes(128)], Bytes(128)),
+  });
+
+  const views = View('views', { 
+    retrieve_results: Fun([Bytes(128)], Bytes(128)), // View that let Verifier checks the retrieve data
+    variable: Bytes(128),
   });
 
 
@@ -38,21 +52,29 @@ export const main = Reach.App(() => {
 
   Creator.publish() //we need that to use the MAP below
   const easy_map = new Map(Bytes(128),Bytes(128));
+
   commit();
   Creator.only(() => { 
     const proof_and_position = declassify(interact.position);
     const decentralized_identifier_creator = declassify(interact.decentralized_identifier);
   });
-
+  
   Creator.publish(proof_and_position, decentralized_identifier_creator); //TODO: add the proof_reveived
-  easy_map[decentralized_identifier_creator] = fromSome(easy_map[decentralized_identifier_creator], proof_and_position);
+
+  easy_map[decentralized_identifier_creator] = proof_and_position;
+
   //only for DEBUG
   each([Creator, A], () => interact.reportPosition(decentralized_identifier_creator, easy_map[decentralized_identifier_creator]));
 
   commit();
-  
+
   Creator.publish();
+  //setting the view
+  // views.retrieve_results.set((did_inserted) => fromSome(easy_map[did_inserted], did_inserted));
+
   Creator.interact.log("Before parallel reduce")
+  
+  // ************ INSERT POSITION API **************
   //the attacher can insert their positions
   const keepGoing = 
   parallelReduce(true) 
@@ -68,8 +90,27 @@ export const main = Reach.App(() => {
         y(pos);
       
         easy_map[did] = fromSome(easy_map[did], pos); // saving the POSITION into the Map 
-        Creator.interact.log("somebody added a new position to the map")
+        Creator.interact.log("Somebody added a new position to the map")
         each([Creator, A], () => interact.reportPosition(did, easy_map[did]));
+        return true; // the returning of the API for the parallel reduce necessary to update the initial variable 
+      }
+    )
+    .api(verifierAPI.get_proof, // the name of the api that is called 
+      (did, y) => { 
+        y(did);
+
+        views.retrieve_results.set((did_1) => fromSome(easy_map[did], did_1));
+
+        const retrieve_data = fromSome(easy_map[did], did); // saving the POSITION into the Map 
+        views.variable.set(retrieve_data);
+
+        commit();
+        Creator.publish();
+
+        
+        //views.retrieve_results.set(retrieve_data);
+        each([Creator, A], () => interact.report_results(retrieve_data));
+        
         return true; // the returning of the API for the parallel reduce necessary to update the initial variable 
       }
     )
@@ -80,6 +121,8 @@ export const main = Reach.App(() => {
     //   return [total_balance,false]; // set keepGoing to false to finish the campaign
     // }); 
   
+
+
 
   // TODO: the first received position has to be stored in a data structure, will be compared to the subsquent received positions
 
