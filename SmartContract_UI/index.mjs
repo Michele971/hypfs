@@ -6,7 +6,11 @@ import { done } from '@reach-sh/stdlib/ask.mjs';
 let ctc = null;
 const stdlib = loadStdlib(process.env);
 
-
+//function that return a string which will be passed to the backend
+const getProof_Loc_Addr = ((params)=>{
+  const {proof, location, walletAddress} = params;
+  return `${proof}-${location}-${walletAddress}`;
+});
 
 
 
@@ -42,7 +46,7 @@ console.log(`Your role is ${role}`);
 
 const iBalance = stdlib.parseCurrency(1000);
 const acc = await stdlib.newTestAccount(iBalance);
-const addrCreator = stdlib.formatAddress(acc.getAddress());
+
 
 console.log(`The consensus network is ${stdlib.connector}.`);
 const commonInteract = {
@@ -85,8 +89,15 @@ if (role === 'creator') { // ***** CREEATOR ******
     (proof => proof)
   );
 
-  var proof_and_location_creator = String(proof_creator)+"-"+String(location_creator);
+  const addrCreator = stdlib.formatAddress(acc.getAddress());
 
+  var proof_and_location_creator = getProof_Loc_Addr({
+    proof: String(proof_creator),
+    location: String(location_creator),
+    walletAddress: addrCreator
+  });
+
+  console.log(proof_and_location_creator)
   creatorInteract.decentralized_identifier = did;
   creatorInteract.position = proof_and_location_creator;
   
@@ -136,12 +147,17 @@ if (role === 'creator') { // ***** CREEATOR ******
     (proof_attacher => proof_attacher)
   );
 
-  //Proof + Location, e.g "jshsj2a9sjdja3ksl-G294A02"
-  var proof_and_location = String(proof_attacher)+"-"+String(location_attacher)
+  const addrAttacher = stdlib.formatAddress(acc.getAddress());
+  //Proof + Location + waletAddres e.g "jshsj2a9sjdja3ksl-G294A02-0x32idssdji2034"
+  var proof_and_location_attacher = getProof_Loc_Addr({
+    proof: String(proof_attacher),
+    location: String(location_attacher),
+    walletAddress: addrAttacher
+  });
   const attacher_api = ctc.a.attacherAPI;
   
   await call(() => attacher_api.insert_position(
-        String(proof_and_location),
+        String(proof_and_location_attacher),
         String(did)
       )
     );
@@ -162,15 +178,24 @@ if (role === 'creator') { // ***** CREEATOR ******
     `What is your DID which you are looking for?`,
     (did => did)
   );
-  //const verifierAPI = ctc.a.verifierAPI;
-  // await call(() => verifierAPI.get_proof(
-  //   String(did)
-  //   )
-  // );
+
 
   const retrieve_Data = await ctc.v.views.retrieve_results(parseInt(did));
-
   console.log("retrieve data: ",retrieve_Data[1])
+
+  const user_know_id = await ask.ask(`Do you want to verify someone?`, ask.yesno);
+  if (verify_resopnse){
+    //call the API to execute the verification process
+    const verifierAPI = ctc.a.verifierAPI;
+    await call(() => verifierAPI.verify(
+      [String(did), 99]
+      )
+    );
+    
+  }
+
+
+
 
 }
 

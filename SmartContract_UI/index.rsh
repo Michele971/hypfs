@@ -41,9 +41,9 @@ export const main = Reach.App(() => {
     insert_position: Fun([Bytes(128),UInt], Bytes(128)), //PositionAndProof - DID - ReturnField
   });
 
-  // const verifierAPI = API('verifierAPI',{
-  //   //get_proof: Fun([Bytes(128)], Bytes(128)),
-  // });
+  const verifierAPI = API('verifierAPI',{
+    verify: Fun([array], Bool),
+  });
  
   const views = View('views', { 
     retrieve_results: Fun([UInt], Bytes(128)), // View that let Verifier checks the retrieve data
@@ -87,39 +87,30 @@ export const main = Reach.App(() => {
         
         //TODO: notify the attacher (not the creator) when the key is already used 
         if(easy_map[did] != Null){
-          Creator.interact.log("The key is already used")
+          Creator.interact.log("The key is already used");
           return true;
         }
         /** 
          * The line below manages the case when the key is already 
          * assigned to a specific value 
          * */
-        easy_map[did] = fromSome(easy_map[did],pos)
+        easy_map[did] = fromSome(easy_map[did],pos);
 
-        Creator.interact.log("Somebody added a new position to the map")
+        Creator.interact.log("Somebody added a new position to the map");
         each([Creator, A], () => interact.reportPosition(did, easy_map[did]));
 
         return true; // the returning of the API for the parallel reduce necessary to update the initial variable 
       }
     )
-    // .api(verifierAPI.get_proof, // the name of the api that is called 
-    //   (did, y) => { 
-    //     y(did);
+    .api(verifierAPI.verify, 
+      (vector, y) => { 
+        y(vector[0]);
 
-    //     //views.retrieve_results.set((did_1) => fromSome(easy_map[did], did_1));
+        delete easy_map[vector[0]]; //vector[0] is the did
 
-    //     const retrieve_data = fromSome(easy_map[did], did); // saving the POSITION into the Map 
-
-    //     commit();
-    //     Creator.publish();
-
-        
-    //     //views.retrieve_results.set(retrieve_data);
-    //     each([Creator, A], () => interact.report_results(retrieve_data));
-        
-    //     return true; // the returning of the API for the parallel reduce necessary to update the initial variable 
-    //   }
-    //)
+        return true; 
+      }
+    )
     // TIMEOUT WORKS ONLY ON TESTNET
     // .timeout(relativeTime(deadline), () => { // timeout: function that executes code every amount of time decided by the first parameter
     //   Creator.interact.log("The campaign has finished") // log on the Creator cli to inform the end of the campaign
