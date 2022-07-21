@@ -42,7 +42,8 @@ export const main = Reach.App(() => {
   });
 
   const verifierAPI = API('verifierAPI',{
-    verify: Fun([array], Bool),
+    verify: Fun([UInt,Address], Bool),
+    insert_money: Fun([UInt], Bool), 
   });
  
   const views = View('views', { 
@@ -86,7 +87,7 @@ export const main = Reach.App(() => {
         y(pos);
         
         //TODO: notify the attacher (not the creator) when the key is already used 
-        if(easy_map[did] != Null){
+        if(easy_map[did] != Null){ //TODO: FIX THIS CHECK. CHECK if map contain THE ID INSERTED --------------> IMPORTANT
           Creator.interact.log("The key is already used");
           return true;
         }
@@ -99,16 +100,10 @@ export const main = Reach.App(() => {
         Creator.interact.log("Somebody added a new position to the map");
         each([Creator, A], () => interact.reportPosition(did, easy_map[did]));
 
+        //TODO: ONLY for TESTING: terminate the parallel reduce
+  
+
         return true; // the returning of the API for the parallel reduce necessary to update the initial variable 
-      }
-    )
-    .api(verifierAPI.verify, 
-      (vector, y) => { 
-        y(vector[0]);
-
-        delete easy_map[vector[0]]; //vector[0] is the did
-
-        return true; 
       }
     )
     // TIMEOUT WORKS ONLY ON TESTNET
@@ -118,7 +113,39 @@ export const main = Reach.App(() => {
     //   return [total_balance,false]; // set keepGoing to false to finish the campaign
     // }); 
   
+    Creator.interact.log("TIME TO VERIFY! SECOND PARALLEL REDUCE")
 
+    const keepGoing2 = 
+    parallelReduce(true) 
+      .invariant(balance() == balance())
+      .while(keepGoing2)
+      .api(verifierAPI.insert_money,
+        (money) => { // the assume that have to be true to continue the execution of the API
+          assume(money > 0);
+        },      
+        (money) => money, // the payment that the users have to do when call the api
+        (money,y) => { 
+          y(true);
+          
+          Creator.interact.log("Verifier inserted the following amount into smart contract: ", money);
+          return true;
+        }
+      )
+      .api(verifierAPI.verify, 
+        (did, walletAddress, ret) => { 
+  
+          // transfer some money to the Prover (attacher)
+          if (balance()>=6){
+            transfer(5).to(walletAddress);
+            ret(true);
+
+          }
+          ret(false);
+          delete easy_map[did]; //vector[0] is the did
+  
+          return true; 
+        }
+      )
 
 
   // TODO: the first received position has to be stored in a data structure, will be compared to the subsquent received positions

@@ -179,16 +179,26 @@ if (role === 'creator') { // ***** CREEATOR ******
     (did => did)
   );
 
+  //only for testing
+  const addrVerifier = stdlib.formatAddress(acc.getAddress());
+
 
   const retrieve_Data = await ctc.v.views.retrieve_results(parseInt(did));
   console.log("retrieve data: ",retrieve_Data[1])
 
-  const user_know_id = await ask.ask(`Do you want to verify someone?`, ask.yesno);
+  const verify_resopnse = await ask.ask(`Do you want to verify someone?`, ask.yesno);
   if (verify_resopnse){
-    //call the API to execute the verification process
     const verifierAPI = ctc.a.verifierAPI;
+
+    console.log("You are payng the following amount: 5");
+    //PAYING the smart contract
+    await call(() => verifierAPI.insert_money(5));
+    
+    //INSERT DATA into smart contract
+    //call the API to execute the verification process
     await call(() => verifierAPI.verify(
-      [String(did), 99]
+      parseInt(did),
+      addrVerifier //TODO: replace addrVerifier with the address of attacher
       )
     );
     
