@@ -6,6 +6,10 @@ import { done } from '@reach-sh/stdlib/ask.mjs';
 let ctc = null;
 const stdlib = loadStdlib(process.env);
 
+
+
+
+
 //setting the user role
 let role = "creator" //default
 const user_know_id = await ask.ask(`Do you already have a contract id?`, ask.yesno);
@@ -38,11 +42,13 @@ console.log(`Your role is ${role}`);
 
 const iBalance = stdlib.parseCurrency(1000);
 const acc = await stdlib.newTestAccount(iBalance);
+const addrCreator = stdlib.formatAddress(acc.getAddress());
 
 console.log(`The consensus network is ${stdlib.connector}.`);
 const commonInteract = {
   reportPosition: (did,  proof_and_position) => console.log(`New position inserted \n DID: "${did}" \n proof_and_position: "${proof_and_position}"`),
   report_results: (results) => console.log(`Results "${results}"`),
+
 };
 
 //implement the functions to log inside the backend
@@ -86,7 +92,7 @@ if (role === 'creator') { // ***** CREEATOR ******
   
 
 
-  const acc = await stdlib.newTestAccount(iBalance);
+
   // await showBalance(acc);
   //const ctc = acc.contract(backend); //OLD VERSION
   ctc = acc.contract(backend); //creating the contract
@@ -140,31 +146,31 @@ if (role === 'creator') { // ***** CREEATOR ******
       )
     );
 
+
 }else{ // ***** VERIFIER ******
   console.log('%c Hi Verifier! ', 'background: #222; color: #bada55');
 
-  const acc = await stdlib.newTestAccount(iBalance);
+  const acc_verifier = await stdlib.newTestAccount(iBalance);
   const info = await ask.ask(
     `Please paste the contract information:`,
     JSON.parse
   );
 
-  ctc = acc.contract(backend, info);
+  ctc = acc_verifier.contract(backend, info);
   
   var did = await ask.ask(
     `What is your DID which you are looking for?`,
     (did => did)
   );
-  const verifierAPI = ctc.a.verifierAPI;
-  await call(() => verifierAPI.get_proof(
-    String(did)
-  )
-);
+  //const verifierAPI = ctc.a.verifierAPI;
+  // await call(() => verifierAPI.get_proof(
+  //   String(did)
+  //   )
+  // );
 
-  const retrieve_Data = await ctc.v.views.retrieve_results("1");
-  const varTest = await ctc.v.views.variabile();
-  console.log("retrieve data: ",retrieve_Data)
-  console.log("varTest recuperata: ",varTest)
+  const retrieve_Data = await ctc.v.views.retrieve_results(parseInt(did));
+
+  console.log("retrieve data: ",retrieve_Data[1])
 
 }
 

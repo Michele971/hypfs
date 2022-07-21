@@ -1,5 +1,8 @@
 'reach 0.1';
 'use strict';
+
+const myFromMaybe = (m) => fromMaybe(m, (() => 0), ((x) => x));
+
 //NOTES:
 // TODO: This smart contract is empower to validate if the positions if user are correct
 // There is a smart contract for every different position
@@ -14,9 +17,10 @@
 const commonInteract = {
   ...hasConsoleLogger,
   position: Bytes(128),
-  decentralized_identifier: Bytes(128),
+  decentralized_identifier: UInt,
   proof_reveived: Bytes(128),
-  reportPosition: Fun([Bytes(128), Maybe(Bytes(128))], Null),
+  reportPosition: Fun([UInt, Maybe(Bytes(128))], Null),
+
   //for testing
   report_results: Fun([Bytes(128)], Null)
 };
@@ -34,24 +38,22 @@ export const main = Reach.App(() => {
   const A = Participant('Attacher', attacherInteract); 
 
   const attacherAPI = API('attacherAPI',{
-    insert_position: Fun([Bytes(128),Bytes(128)], Bytes(128)),
+    insert_position: Fun([Bytes(128),UInt], Bytes(128)), //PositionAndProof - DID - ReturnField
   });
 
-  const verifierAPI = API('verifierAPI',{
-    get_proof: Fun([Bytes(128)], Bytes(128)),
-  });
-
+  // const verifierAPI = API('verifierAPI',{
+  //   //get_proof: Fun([Bytes(128)], Bytes(128)),
+  // });
+ 
   const views = View('views', { 
-    retrieve_results: Fun([Bytes(128)], Bytes(128)), // View that let Verifier checks the retrieve data
-    variable: Bytes(128),
+    retrieve_results: Fun([UInt], Bytes(128)), // View that let Verifier checks the retrieve data
   });
-
 
   setOptions({untrustworthyMaps: true});
   init();
 
   Creator.publish() //we need that to use the MAP below
-  const easy_map = new Map(Bytes(128),Bytes(128));
+  const easy_map = new Map(UInt,Bytes(128));
 
   commit();
   Creator.only(() => { 
@@ -61,59 +63,54 @@ export const main = Reach.App(() => {
   
   Creator.publish(proof_and_position, decentralized_identifier_creator); //TODO: add the proof_reveived
 
-  easy_map[decentralized_identifier_creator] = proof_and_position;
-
-  //only for DEBUG
-  each([Creator, A], () => interact.reportPosition(decentralized_identifier_creator, easy_map[decentralized_identifier_creator]));
+  easy_map[decentralized_identifier_creator] = proof_and_position; //setting the first value of the map with Creator values
 
   commit();
-
   Creator.publish();
   //setting the view
-  // views.retrieve_results.set((did_inserted) => fromSome(easy_map[did_inserted], did_inserted));
+  views.retrieve_results.set((m) => fromSome(easy_map[m], proof_and_position));//the default is proof_and_position
 
-  Creator.interact.log("Before parallel reduce")
+
   
+  
+  Creator.interact.log("Before parallel reduce");
   // ************ INSERT POSITION API **************
   //the attacher can insert their positions
   const keepGoing = 
   parallelReduce(true) 
     .invariant(balance() == balance()) // invariant: the condition inside must be true for the all time that the while goes on
-    //.define(() => {views.getCtcBalanceV.set(balance());}) // define: the code inside is executed when a function in the while is called (ex. the api call)
+    //.define(() => {views.retrieve_results.set(did_user);}) // define: the code inside is executed when a function in the while is called (ex. the api call)
     .while(keepGoing)
     .api(attacherAPI.insert_position, // the name of the api that is called 
-      // (position_of_attacher) => { // the assume that have to be true to continue the execution of the API
-      //   assume(balance()==balance(), 'Not allow to invest more positions ')
-      // },      
-      //(invst) => invst, // the payment that the users have to do when call the api
       (pos, did, y) => { // the code to execute and the returning variable of the api (y)
+        
+        easy_map[did] = pos; // saving the POSITION into the Map 
+
         y(pos);
-      
-        easy_map[did] = fromSome(easy_map[did], pos); // saving the POSITION into the Map 
         Creator.interact.log("Somebody added a new position to the map")
         each([Creator, A], () => interact.reportPosition(did, easy_map[did]));
+
         return true; // the returning of the API for the parallel reduce necessary to update the initial variable 
       }
     )
-    .api(verifierAPI.get_proof, // the name of the api that is called 
-      (did, y) => { 
-        y(did);
+    // .api(verifierAPI.get_proof, // the name of the api that is called 
+    //   (did, y) => { 
+    //     y(did);
 
-        views.retrieve_results.set((did_1) => fromSome(easy_map[did], did_1));
+    //     //views.retrieve_results.set((did_1) => fromSome(easy_map[did], did_1));
 
-        const retrieve_data = fromSome(easy_map[did], did); // saving the POSITION into the Map 
-        views.variable.set(retrieve_data);
+    //     const retrieve_data = fromSome(easy_map[did], did); // saving the POSITION into the Map 
 
-        commit();
-        Creator.publish();
+    //     commit();
+    //     Creator.publish();
 
         
-        //views.retrieve_results.set(retrieve_data);
-        each([Creator, A], () => interact.report_results(retrieve_data));
+    //     //views.retrieve_results.set(retrieve_data);
+    //     each([Creator, A], () => interact.report_results(retrieve_data));
         
-        return true; // the returning of the API for the parallel reduce necessary to update the initial variable 
-      }
-    )
+    //     return true; // the returning of the API for the parallel reduce necessary to update the initial variable 
+    //   }
+    //)
     // TIMEOUT WORKS ONLY ON TESTNET
     // .timeout(relativeTime(deadline), () => { // timeout: function that executes code every amount of time decided by the first parameter
     //   Creator.interact.log("The campaign has finished") // log on the Creator cli to inform the end of the campaign
