@@ -61,7 +61,7 @@ export const main = Reach.App(() => {
     const decentralized_identifier_creator = declassify(interact.decentralized_identifier);
   });
   
-  Creator.publish(proof_and_position, decentralized_identifier_creator); //TODO: add the proof_reveived
+  Creator.publish(proof_and_position, decentralized_identifier_creator); //TODO: add the proof_received
 
   easy_map[decentralized_identifier_creator] = proof_and_position; //setting the first value of the map with Creator values
 
