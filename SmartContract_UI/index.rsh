@@ -83,10 +83,19 @@ export const main = Reach.App(() => {
     .while(keepGoing)
     .api(attacherAPI.insert_position, // the name of the api that is called 
       (pos, did, y) => { // the code to execute and the returning variable of the api (y)
-        
-        easy_map[did] = pos; // saving the POSITION into the Map 
-
         y(pos);
+        
+        //TODO: notify the attacher (not the creator) when the key is already used 
+        if(easy_map[did] != Null){
+          Creator.interact.log("The key is already used")
+          return true;
+        }
+        /** 
+         * The line below manages the case when the key is already 
+         * assigned to a specific value 
+         * */
+        easy_map[did] = fromSome(easy_map[did],pos)
+
         Creator.interact.log("Somebody added a new position to the map")
         each([Creator, A], () => interact.reportPosition(did, easy_map[did]));
 
