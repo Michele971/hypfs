@@ -145,7 +145,7 @@ export const main = Reach.App(() => {
           ret(false);
           delete easy_map[did]; //vector[0] is the did
   
-          return false; 
+          return false; //TODO: THIS HAS TO BE TRUEE, false only for testing
         }
       )
 

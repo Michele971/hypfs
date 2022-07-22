@@ -88,4 +88,8 @@ To run in "local mode" skip **usage** section and use:
 ## TODO
 - writeobblockchain file: Remove the passphase 
 - writeobblockchain file: Send the transaction to a specific address: the address of the COMPANY 
-- SmartContract_UI/index.rsh: Notify the attacher when he is inserting a new position. If his DID already exists, the position will not be added to the map.
+- SmartContract_UI/index.rsh: Notify the attacher when he is inserting a new position. If his DID already exists, the position will not be added to the map
+- SmartContract_UI/index.mjs: Refactoring the amount sent by Verifier to smart contract
+- SmartContract_UI: recover the address of users in the map passing a specific row of the map to frontend. Then split and passed the address to backend
+- SmartContract_UI/index.rsh: add the timeout to the first API (insert_position)
+- Display the whole map to the Verifier, when he required for that
