@@ -3,6 +3,7 @@ import * as backend from './build/index.main.mjs';
 import { ask } from '@reach-sh/stdlib';
 import { done } from '@reach-sh/stdlib/ask.mjs';
 
+
 let ctc = null;
 const stdlib = loadStdlib(process.env);
 
@@ -44,13 +45,18 @@ const call = async (f) => {
 
 console.log(`Your role is ${role}`);
 
-const fmt = (x) => stdlib.formatCurrency(x, 4);
+const fmt = (x) => stdlib.formatCurrency(x, 18);
+
+//console.log(fmt(stdlib.bigNumberify(50000000000000000000)));
+
 //getting balance of the address
 const getBalance = async (acc) => fmt(await stdlib.balanceOf(acc));
 
 
-const iBalance = stdlib.parseCurrency(1000);
+const iBalance = stdlib.bigNumberify(50000000000000000000);
 const acc = await stdlib.newTestAccount(iBalance);
+const myGasLimit = 5000000;
+acc.setGasLimit(myGasLimit);
 
 //calling getBalance() function
 const before = await getBalance(acc);
@@ -127,7 +133,10 @@ if (role === 'creator') { // ***** CREEATOR ******
 
 
   const part = backend.Creator;
-  await part(ctc, creatorInteract); 
+  await part(ctc, creatorInteract);
+  
+  const afterCreator = await getBalance(acc);
+  console.log(`Your balance is: ${afterCreator}`);
   // ATTACHER
 } else if (role == 'attacher'){ // ***** ATTACHER ******
   const attacherInteract = {
@@ -184,13 +193,13 @@ if (role === 'creator') { // ***** CREEATOR ******
 }else{ // ***** VERIFIER ******
   console.log('%c Hi Verifier! ', 'background: #222; color: #bada55');
 
-  const acc_verifier = await stdlib.newTestAccount(iBalance);
+  // const acc_verifier = await stdlib.newTestAccount(iBalance);
   const info = await ask.ask(
     `Please paste the contract information:`,
     JSON.parse
   );
 
-  ctc = acc_verifier.contract(backend, info);
+  ctc = acc.contract(backend, info);
   
   var did = await ask.ask(
     `What is your DID which you are looking for?`,
@@ -210,8 +219,8 @@ if (role === 'creator') { // ***** CREEATOR ******
 
     console.log("You are paying the following amount: 5");
     //PAYING the smart contract
-    await call(() => verifierAPI.insert_money(500));
-    
+    const money_sent = await call(() => verifierAPI.insert_money(stdlib.bigNumberify(5000000000000000000)));
+    console.log("You have sent ", money_sent);
     //INSERT DATA into smart contract
     //call the API to execute the verification process
     await call(() => verifierAPI.verify(
@@ -220,11 +229,13 @@ if (role === 'creator') { // ***** CREEATOR ******
       )
     );
 
-    const afterVerifier = await getBalance(acc_verifier);
+    const afterVerifier = await getBalance(acc);
     console.log(`Your balance is: ${afterVerifier}`);
 
     
   }
+
+
 
 
 

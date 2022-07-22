@@ -1,7 +1,7 @@
 'reach 0.1';
 'use strict';
 
-const REWARD_FOR_PROVER = 50//send by VERIFIER
+const REWARD_FOR_PROVER = 1000000000000000000//send by VERIFIER
 
 //NOTES:
 // TODO: This smart contract is empower to validate if the positions if user are correct
@@ -43,7 +43,7 @@ export const main = Reach.App(() => {
 
   const verifierAPI = API('verifierAPI',{
     verify: Fun([UInt,Address], Bool),
-    insert_money: Fun([UInt], Bool), 
+    insert_money: Fun([UInt], UInt), 
   });
  
   const views = View('views', { 
@@ -125,7 +125,7 @@ export const main = Reach.App(() => {
         },      
         (money) => money, // the payment that the users have to do when call the api
         (money,y) => { 
-          y(true);
+          y(money);
           
           Creator.interact.log("Verifier inserted the following amount into smart contract: ", money);
           Creator.interact.log("Balance is", balance());
@@ -138,14 +138,14 @@ export const main = Reach.App(() => {
           Creator.interact.log("wallet address passed: ", walletAddress);
           // transfer some money to the Prover (attacher)
           if (balance()>=REWARD_FOR_PROVER){
-            transfer(REWARD_FOR_PROVER).to(Creator);
+            transfer(REWARD_FOR_PROVER).to(walletAddress);
             ret(true);
 
           }
           ret(false);
           delete easy_map[did]; //vector[0] is the did
   
-          return true; 
+          return false; 
         }
       )
 
@@ -153,6 +153,7 @@ export const main = Reach.App(() => {
   // TODO: the first received position has to be stored in a data structure, will be compared to the subsquent received positions
 
   //for TESTING
+  Creator.interact.log("Smart contract is terminating")
   transfer(balance()).to(Creator);
   
   commit();
