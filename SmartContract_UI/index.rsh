@@ -1,7 +1,7 @@
 'reach 0.1';
 'use strict';
 
-const myFromMaybe = (m) => fromMaybe(m, (() => 0), ((x) => x));
+const REWARD_FOR_PROVER = 50//send by VERIFIER
 
 //NOTES:
 // TODO: This smart contract is empower to validate if the positions if user are correct
@@ -89,7 +89,7 @@ export const main = Reach.App(() => {
         //TODO: notify the attacher (not the creator) when the key is already used 
         if(easy_map[did] != Null){ //TODO: FIX THIS CHECK. CHECK if map contain THE ID INSERTED --------------> IMPORTANT
           Creator.interact.log("The key is already used");
-          return true;
+          return false; //TODO: THIS HAS TO RETURN TRUE
         }
         /** 
          * The line below manages the case when the key is already 
@@ -128,15 +128,17 @@ export const main = Reach.App(() => {
           y(true);
           
           Creator.interact.log("Verifier inserted the following amount into smart contract: ", money);
+          Creator.interact.log("Balance is", balance());
+
           return true;
         }
       )
       .api(verifierAPI.verify, 
         (did, walletAddress, ret) => { 
-  
+          Creator.interact.log("wallet address passed: ", walletAddress);
           // transfer some money to the Prover (attacher)
-          if (balance()>=6){
-            transfer(5).to(walletAddress);
+          if (balance()>=REWARD_FOR_PROVER){
+            transfer(REWARD_FOR_PROVER).to(Creator);
             ret(true);
 
           }

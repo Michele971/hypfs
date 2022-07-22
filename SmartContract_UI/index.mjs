@@ -44,11 +44,24 @@ const call = async (f) => {
 
 console.log(`Your role is ${role}`);
 
+const fmt = (x) => stdlib.formatCurrency(x, 4);
+//getting balance of the address
+const getBalance = async (acc) => fmt(await stdlib.balanceOf(acc));
+
+
 const iBalance = stdlib.parseCurrency(1000);
 const acc = await stdlib.newTestAccount(iBalance);
 
+//calling getBalance() function
+const before = await getBalance(acc);
+console.log(`Your balance is: ${before}`);
 
+// some informations
 console.log(`The consensus network is ${stdlib.connector}.`);
+console.log(`The standard unit is ${stdlib.standardUnit}`);
+console.log(`The atomic unit is ${stdlib.atomicUnit}`);
+
+
 const commonInteract = {
   reportPosition: (did,  proof_and_position) => console.log(`New position inserted \n DID: "${did}" \n proof_and_position: "${proof_and_position}"`),
   report_results: (results) => console.log(`Results "${results}"`),
@@ -127,6 +140,11 @@ if (role === 'creator') { // ***** CREEATOR ******
 
 
   const acc = await stdlib.newTestAccount(iBalance);
+
+  //calling getBalance() function
+  const before = await getBalance(acc);
+  console.log(`Your balance is: ${before}`);
+
   const info = await ask.ask(
     `Please paste the contract information:`,
     JSON.parse
@@ -190,9 +208,9 @@ if (role === 'creator') { // ***** CREEATOR ******
   if (verify_resopnse){
     const verifierAPI = ctc.a.verifierAPI;
 
-    console.log("You are payng the following amount: 5");
+    console.log("You are paying the following amount: 5");
     //PAYING the smart contract
-    await call(() => verifierAPI.insert_money(5));
+    await call(() => verifierAPI.insert_money(500));
     
     //INSERT DATA into smart contract
     //call the API to execute the verification process
@@ -201,6 +219,10 @@ if (role === 'creator') { // ***** CREEATOR ******
       addrVerifier //TODO: replace addrVerifier with the address of attacher
       )
     );
+
+    const afterVerifier = await getBalance(acc_verifier);
+    console.log(`Your balance is: ${afterVerifier}`);
+
     
   }
 
