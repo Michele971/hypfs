@@ -121,8 +121,6 @@ if (role === 'creator') { // ***** CREEATOR ******
   creatorInteract.position = proof_and_location_creator;
   
 
-
-
   // await showBalance(acc);
   //const ctc = acc.contract(backend); //OLD VERSION
   ctc = acc.contract(backend); //creating the contract
@@ -213,8 +211,8 @@ if (role === 'creator') { // ***** CREEATOR ******
   const retrieve_Data = await ctc.v.views.retrieve_results(parseInt(did));
   console.log("retrieve data: ",retrieve_Data[1])
 
-  const verify_resopnse = await ask.ask(`Do you want to verify someone?`, ask.yesno);
-  if (verify_resopnse){
+  const verify_response = await ask.ask(`Do you want to verify the user?`, ask.yesno);
+  if (verify_response){
     const verifierAPI = ctc.a.verifierAPI;
 
     console.log("You are paying the following amount: 5");
