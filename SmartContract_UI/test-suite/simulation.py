@@ -1,7 +1,7 @@
 from openlocationcode import openlocationcode as olc
 import random
 import math
-
+import json
 '''
     NOTEs:
     - Since we don't simulate the bluetooth feature during the process that finds neighbors,
@@ -21,16 +21,16 @@ LOCATION_LIST_WIT = ["7H369FXP+FH", "7H369F4W+Q8"]
 LOCATION_LIST_PROV = ["7H369FXP+FH", "7H369F4W+Q8"]
 
 dictOfLocation = {
-    "7H369FXP+FH":[
-        0,
-        3,
-        4,
-        5
-    ],
-    "7H369F4W+Q8":[
-        2,
-        6
-    ]
+    # "7H369FXP+FH":[
+    #     0,
+    #     3,
+    #     4,
+    #     5
+    # ],
+    # "7H369F4W+Q8":[
+    #     2,
+    #     6
+    # ]
 }
 
 
@@ -141,7 +141,7 @@ def generateOLC(latitude, longitude):
 def startSimulation():
     #generateOLC
     # generateOLC(11.356988, 44.495858) # just for testing
-
+    
     for i in range(0,WITNESS_NUMBER):
         wit = createWitness(  
             did= DID_LIST_WIT[i],
@@ -151,8 +151,11 @@ def startSimulation():
             location= LOCATION_LIST_WIT[round(random.uniform(0, 1))]) #random number between 0 and 1
         
         #insert the witness in the dict of neighbours
-        dictOfLocation['wit.did']=wit.location
+        dictOfLocation[wit.location] = wit.did #TODO: FIX HERE --> THE VALUE MUST BE A LIST!!
+        
+        
 
+    print(json.dumps(dictOfLocation, indent=4))
 
     for i in range(0, PROVER_NUMBER):
         prov = createProver(
