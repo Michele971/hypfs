@@ -137,32 +137,36 @@ def generateOLC(latitude, longitude):
     print('Encoded location: ', location_encoded)
     return location_encoded
 
+# START the simulation
 def startSimulation():
     #generateOLC
-    generateOLC(11.356988, 44.495858)
-    print(random.uniform(0, 1))
+    # generateOLC(11.356988, 44.495858) # just for testing
+
     for i in range(0,WITNESS_NUMBER):
         wit = createWitness(  
             did= DID_LIST_WIT[i],
             public_key= "SHJDAJAKRHAKD",
             private_key= "xxxxx",
             proofs_array_computed= [],
-            location= LOCATION_LIST_WIT[math.floor(random.uniform(0, 1))]) #random number between 0 and 1
-        #insert the wit in the dict of neighbour
+            location= LOCATION_LIST_WIT[round(random.uniform(0, 1))]) #random number between 0 and 1
+        
+        #insert the witness in the dict of neighbours
         dictOfLocation['wit.did']=wit.location
 
 
-    # for i in PROVER_NUMBER
-    prov = createProver(
-        did= "1",
-        public_key= "FFFFFFFFF",
-        private_key= "xxxxxxx",
-        proofs_array_computed= [],
-        location= "7H369FXP+FH",
-        proofs_received_array=[])
-    
-    print('wit ', wit.did)
-    print('prov ', prov.did)
+    for i in range(0, PROVER_NUMBER):
+        prov = createProver(
+            did= DID_LIST_PROV[i],
+            public_key= "FFFFFFFFF",
+            private_key= "xxxxxxx",
+            proofs_array_computed= [],
+            location= LOCATION_LIST_PROV[round(random.uniform(0, 1))],
+            proofs_received_array=[])
+        
+        # Find neighbours
+        locationProver = prov.location
+        neighbours = prov.find_neighbours(prov.location, dictOfLocation)
+        print('Hi Prover, your DID is: ', prov.did,'\n Your location is: ', prov.location, '\n Your neighbours are: ', neighbours)
 
     # Move the Prover
 
@@ -170,10 +174,7 @@ def startSimulation():
     # print(wit.computed_distance_from_prover(wit.location, prov.location))
 
 
-    # Find neighbours
-    locationProver = prov.location
-    neighbours = prov.find_neighbours(locationProver, dictOfLocation)
-    print('Your neighbours are: ', neighbours)
+
 
 
 
