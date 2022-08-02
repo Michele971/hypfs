@@ -192,6 +192,10 @@ def startSimulation():
 
 if __name__ == '__main__':
     rpc, rpc_callbacks = mk_rpc()
+    
+    starting_balance = rpc('/stdlib/parseCurrency', 100)
+    acc_alice        = rpc('/stdlib/newTestAccount', starting_balance)
+    acc_bob          = rpc('/stdlib/newTestAccount', starting_balance)
 
     def fmt(x):
         return rpc('/stdlib/formatCurrency', x, 18)
