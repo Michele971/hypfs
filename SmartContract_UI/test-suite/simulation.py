@@ -15,22 +15,32 @@ import json
 WITNESS_NUMBER = 4
 PROVER_NUMBER = 2
 DID_LIST_WIT = [0, 3, 4, 5]
-DID_LIST_PROV = [2, 6]
+LOCATION_LIST_WIT = ["7H369FXP+FH", "7H369F4W+Q8", "7H369F4W+Q9"]
 
-LOCATION_LIST_WIT = ["7H369FXP+FH", "7H369F4W+Q8"]
+'''
+    WARNING: 
+    ---> len(DID_LIST_PROV) and len(LOCATION_LIST_PROV) MUST TO BE EQUALS !!!
+'''
+DID_LIST_PROV = [2, 6]
 LOCATION_LIST_PROV = ["7H369FXP+FH", "7H369F4W+Q8"]
 
 dictOfLocation = {
-    # "7H369FXP+FH":[
-    #     0,
-    #     3,
-    #     4,
-    #     5
-    # ],
-    # "7H369F4W+Q8":[
-    #     2,
-    #     6
-    # ]
+    "7H369FXP+FH":[
+        0,
+        3,
+        4,
+        5
+    ],
+    "7H369F4W+Q8":[
+        2,
+        6
+    ],
+    "7H369F4W+Q9":[
+        8,
+        9,
+        10,
+        11
+    ]
 }
 
 
@@ -137,40 +147,34 @@ def generateOLC(latitude, longitude):
     print('Encoded location: ', location_encoded)
     return location_encoded
 
+def deploySmartContract(proverObject):
+
+
 # START the simulation
 def startSimulation():
     #generateOLC
-    # generateOLC(11.356988, 44.495858) # just for testing
-    
-    for i in range(0,WITNESS_NUMBER):
-        wit = createWitness(  
-            did= DID_LIST_WIT[i],
-            public_key= "SHJDAJAKRHAKD",
-            private_key= "xxxxx",
-            proofs_array_computed= [],
-            location= LOCATION_LIST_WIT[round(random.uniform(0, 1))]) #random number between 0 and 1
-        
-        #insert the witness in the dict of neighbours
-        dictOfLocation[wit.location] = wit.did #TODO: FIX HERE --> THE VALUE MUST BE A LIST!!
-        
-        
-
-    print(json.dumps(dictOfLocation, indent=4))
-
+    #generateOLC(11.356988, 44.495888) # just for testing
+    #buildDict()
     for i in range(0, PROVER_NUMBER):
         prov = createProver(
             did= DID_LIST_PROV[i],
             public_key= "FFFFFFFFF",
             private_key= "xxxxxxx",
             proofs_array_computed= [],
-            location= LOCATION_LIST_PROV[round(random.uniform(0, 1))],
+            location= LOCATION_LIST_PROV[i],
             proofs_received_array=[])
         
         # Find neighbours
-        locationProver = prov.location
         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
-        print('Hi Prover, your DID is: ', prov.did,'\n Your location is: ', prov.location, '\n Your neighbours are: ', neighbours)
+        if neighbours:
+            print('Hi Prover, your DID is: ', prov.did,'\n Your location is: ', prov.location, '\n Your neighbours are: ', neighbours)
 
+            '''
+                TODO: The first user that call the contract has to deploy it;
+                      the others will attach.
+            '''
+            deploySmartContract(prov)
+    
     # Move the Prover
 
     # print(olc.isValid(prov.location))
@@ -186,3 +190,54 @@ def startSimulation():
 
 if __name__ == '__main__':
     startSimulation()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def buildDict():
+#     list_temp_id_wit = []
+#     list_temp_loc_wit = []
+#     for i in range(0,WITNESS_NUMBER):
+#         if wit[DID_LIST_WIT[i]]: #if exists
+#             list_temp_id_wit.append(wit.get(DID_LIST_WIT[i]))
+#         else:
+#             list_temp_id_wit.append(DID_LIST_WIT[i])
+#         wit = createWitness(  
+#             did= list_temp_id_wit,
+#             public_key= "SHJDAJAKRHAKD",
+#             private_key= "xxxxx",
+#             proofs_array_computed= [],
+#             location= LOCATION_LIST_WIT[round(random.uniform(0, 1))])
+      
+#         list_temp_id_wit = []
+
+       
+#         #insert the witness in the dict of neighbours
+#         dictOfLocation[list_temp_loc_wit[i]] = list_temp_id_wit[i] #TODO: FIX HERE --> THE VALUE MUST BE A LIST!!G
+        
+
+#     print(json.dumps(dictOfLocation, indent=4))
+
+#     for i in range(0, PROVER_NUMBER):
+#         prov = createProver(
+#             did= DID_LIST_PROV[i],
+#             public_key= "FFFFFFFFF",
+#             private_key= "xxxxxxx",
+#             proofs_array_computed= [],
+#             location= LOCATION_LIST_PROV[round(random.uniform(0, 1))],
+#             proofs_received_array=[])
+        
+#         # Find neighbours
+#         locationProver = prov.location
+#         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
+#         print('Hi Prover, your DID is: ', prov.did,'\n Your location is: ', prov.location, '\n Your neighbours are: ', neighbours)
