@@ -2,6 +2,8 @@ from openlocationcode import openlocationcode as olc
 import random
 import math
 import json
+from reach_rpc import mk_rpc
+from threading import Thread
 '''
     NOTEs:
     - Since we don't simulate the bluetooth feature during the process that finds neighbors,
@@ -147,7 +149,7 @@ def generateOLC(latitude, longitude):
     print('Encoded location: ', location_encoded)
     return location_encoded
 
-def deploySmartContract(proverObject):
+#def deploySmartContract(proverObject):
 
 
 # START the simulation
@@ -189,7 +191,21 @@ def startSimulation():
 
 
 if __name__ == '__main__':
-    startSimulation()
+    rpc, rpc_callbacks = mk_rpc()
+
+    def fmt(x):
+        return rpc('/stdlib/formatCurrency', x, 18)
+
+    def get_balance(w):
+        return fmt(rpc('/stdlib/balanceOf', w))
+
+    ctc_alice = rpc('/acc/contract', acc_alice)
+
+
+
+
+    
+    #startSimulation()
 
 
 
