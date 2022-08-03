@@ -7,6 +7,7 @@ Smart Contracts are developed with [Reach language](https://www.reach.sh).
 ## Status
 
 Working on proof of location, simulated in a **permissionless** system.
+
 Working on interactions between Python and Smart Contract.
 
 ## Install with Docker
