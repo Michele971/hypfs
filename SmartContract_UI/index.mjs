@@ -68,33 +68,23 @@ console.log(`The standard unit is ${stdlib.standardUnit}`);
 console.log(`The atomic unit is ${stdlib.atomicUnit}`);
 
 
-const commonInteract = {
+// const commonInteract = {
+//   reportPosition: (did,  proof_and_position) => console.log(`New position inserted \n DID: "${did}" \n proof_and_position: "${proof_and_position}"`),
+//   report_results: (results) => console.log(`Results "${results}"`),
+
+// };
+const creatorInteract = {
   reportPosition: (did,  proof_and_position) => console.log(`New position inserted \n DID: "${did}" \n proof_and_position: "${proof_and_position}"`),
   report_results: (results) => console.log(`Results "${results}"`),
-
 };
-
 //implement the functions to log inside the backend
-commonInteract.log = async (...args) => {
+creatorInteract.log = async (...args) => { //era commonInteract.log
   console.log(...args)
 };
 // CREATOR
 if (role === 'creator') { // ***** CREEATOR ******
-  const creatorInteract = {
-    ...commonInteract,
-    //old version
-    // decentralized_identifier: await ask.ask('Enter your DID:', (did_inserted) => {
-    //   return did_inserted;
-    // }),
-    // proof_reveived: await ask.ask('Enter the proof:', (proof_inserted) => {
-    //   return proof_inserted; 
-    // }),
-    // position: await ask.ask('Enter your position:', (positionInserted) => {
-    //   let pos_result = !positionInserted ? '44.2834757,11.398155' : positionInserted;
-    //   if (!positionInserted) { console.log(pos_result); }
-    //   return pos_result;
-    // }),
-  };
+
+
   var did = await ask.ask(
     `What is your DID?`,
     (did => did)
@@ -137,9 +127,7 @@ if (role === 'creator') { // ***** CREEATOR ******
   console.log(`Your balance is: ${afterCreator}`);
   // ATTACHER
 } else if (role == 'attacher'){ // ***** ATTACHER ******
-  const attacherInteract = {
-    ...commonInteract,
-  };
+
 
   //TODO: receive the proofs
   console.log("\t\tA smart contract associated to this position already existed.");

@@ -14,28 +14,39 @@ const REWARD_FOR_PROVER = 1000000000000000000//send by VERIFIER
 // TODO: check that the proofs inserted unique and not already present
 //
 //
-const commonInteract = {
-  ...hasConsoleLogger,
-  position: Bytes(128),
-  decentralized_identifier: UInt,
-  proof_reveived: Bytes(128),
-  reportPosition: Fun([UInt, Maybe(Bytes(128))], Null),
+// const commonInteract = {
+//   ...hasConsoleLogger,
+//   position: Bytes(128),
+//   decentralized_identifier: UInt,
+//   proof_reveived: Bytes(128),
+//   reportPosition: Fun([UInt, Maybe(Bytes(128))], Null),
 
-  //for testing
-  report_results: Fun([Bytes(128)], Null)
-};
-const creatorInteract = {
-  ...commonInteract,
-};
-const attacherInteract = {
-  ...commonInteract,
-};
+//   //for testing
+//   report_results: Fun([Bytes(128)], Null)
+// };
+// const creatorInteract = {
+//   ...commonInteract,
+// };
+// const attacherInteract = {
+//   ...commonInteract,
+// };
 
 
 export const main = Reach.App(() => {
-  const Creator = Participant('Creator', creatorInteract);
+    const Creator = Participant('Creator',{ 
+    ...hasConsoleLogger,
+    position: Bytes(128),
+    decentralized_identifier: UInt,
+    proof_reveived: Bytes(128),
+    reportPosition: Fun([UInt, Maybe(Bytes(128))], Null),
+
+    //for testing
+    report_results: Fun([Bytes(128)], Null)
+  });
+
+
   //TODO: remove the Attacher participant and add the Verifier
-  const A = Participant('Attacher', attacherInteract); 
+  //const A = Participant('Attacher', attacherInteract); 
 
   const attacherAPI = API('attacherAPI',{
     insert_position: Fun([Bytes(128),UInt], Bytes(128)), //PositionAndProof - DID - ReturnField
@@ -98,7 +109,7 @@ export const main = Reach.App(() => {
         easy_map[did] = fromSome(easy_map[did],pos);
 
         Creator.interact.log("Somebody added a new position to the map");
-        each([Creator, A], () => interact.reportPosition(did, easy_map[did]));
+        Creator.only(() => interact.reportPosition(did, easy_map[did]));
 
         //TODO: ONLY for TESTING: terminate the parallel reduce
   
