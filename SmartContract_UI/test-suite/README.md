@@ -7,7 +7,8 @@
 You have to [install Reach](https://docs.reach.sh/quickstart/) and start the docker. 
 To run the **simulation.py** script, use:
 - `pip install -r requirements.txt`
-- `../reach rpc-run python3 -u ./simulaiton.py`
+- `pip install --upgrade reach-rpc-client`
+- `../reach rpc-run python3 -u ./simulation.py`
 
 # Author
 Michele Bonini
