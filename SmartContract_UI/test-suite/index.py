@@ -1,3 +1,4 @@
+from socket import timeout
 from reach_rpc import mk_rpc
 from threading import Thread
 from openlocationcode import openlocationcode as olc
@@ -213,22 +214,22 @@ def main():
 
         return {'stdlib.hasConsoleLogger': True,
                 'reportPosition': reportPosition,
-                'report_results': report_results,
                 }
     def play_alice():
         rpc_callbacks(
-            '/backend/Alice',
+            '/backend/Creator',
             ctc_alice,
             dict(
                 position="Bologna",
                 decentralized_identifier=1,
                 proof_reveived="PROOF",
-                **player('Alice')
+                **player('Creator')
             ),
         )
 
     alice = Thread(target=play_alice)
     alice.start()
+    print("\t Creator started!")
 
     def play_bob(accc):
         ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_alice))

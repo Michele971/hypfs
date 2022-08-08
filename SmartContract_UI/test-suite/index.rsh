@@ -22,9 +22,9 @@ export const main = Reach.App(() => {
     proof_reveived: Bytes(128),
     reportPosition: Fun([UInt, Maybe(Bytes(128))], Null),
 
-    //for testing
-    report_results: Fun([Bytes(128)], Null)
   });
+
+
 
   const attacherAPI = API('attacherAPI',{
     insert_position: Fun([Bytes(128),UInt], Bytes(128)), //PositionAndProof - DID - ReturnField
@@ -35,9 +35,7 @@ export const main = Reach.App(() => {
     insert_money: Fun([UInt], UInt), 
   });
  
-  const views = View('views', { 
-    retrieve_results: Fun([UInt], Bytes(128)), // View that let Verifier checks the retrieve data
-  });
+
 
   setOptions({untrustworthyMaps: true});
   init();
@@ -58,8 +56,6 @@ export const main = Reach.App(() => {
   commit();
   Creator.publish();
   //setting the view
-  views.retrieve_results.set((m) => fromSome(easy_map[m], proof_and_position));//the default is proof_and_position
-
 
   
   
