@@ -26,8 +26,6 @@ export const main = Reach.App(() => {
     report_results: Fun([Bytes(128)], Null)
   });
 
-
-
   const attacherAPI = API('attacherAPI',{
     insert_position: Fun([Bytes(128),UInt], Bytes(128)), //PositionAndProof - DID - ReturnField
   });

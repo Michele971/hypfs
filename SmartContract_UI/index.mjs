@@ -177,7 +177,7 @@ if (role === 'creator') { // ***** CREEATOR ******
 
 
 }else{ // ***** VERIFIER ******
-  console.log('%c Hi Verifier! ', 'background: #222; color: #bada55');
+  console.log('Hi Verifier! ');
 
   // const acc_verifier = await stdlib.newTestAccount(iBalance);
   const info = await ask.ask(

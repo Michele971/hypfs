@@ -4,7 +4,7 @@ from openlocationcode import openlocationcode as olc
 import random
 import math
 import json
-
+import time
 # '''
 #     NOTEs:
 #     - Since we don't simulate the bluetooth feature during the process that finds neighbors,
@@ -187,20 +187,22 @@ import json
 def main():
     rpc, rpc_callbacks = mk_rpc()
 
-    starting_balance = rpc('/stdlib/parseCurrency', 100)
-    acc_alice        = rpc('/stdlib/newTestAccount', starting_balance)
-    acc_bob          = rpc('/stdlib/newTestAccount', starting_balance)
-
+    starting_balance = rpc("/stdlib/parseCurrency", 100)
+    name = 'Alice'
+    acc_alice = rpc("/stdlib/newTestAccount", starting_balance)
+    acc_bob1 = rpc("/stdlib/newTestAccount", starting_balance)
+    
     def fmt(x):
-        return rpc('/stdlib/formatCurrency', x, 4)
+        return rpc("/stdlib/formatCurrency", x, 4)
 
     def get_balance(w):
-        return fmt(rpc('/stdlib/balanceOf', w))
+        return fmt(rpc("/stdlib/balanceOf", w))
 
     before_alice = get_balance(acc_alice)
+    before_bob1 = get_balance(acc_bob1)
 
-    ctc_alice    = rpc('/acc/contract', acc_alice)
-
+    #time.sleep(10)
+    ctc_alice = rpc("/acc/contract", acc_alice)
 
     def player(who):
         def reportPosition(did,  proof_and_position):
@@ -213,16 +215,40 @@ def main():
                 'reportPosition': reportPosition,
                 'report_results': report_results,
                 }
-
-
     def play_alice():
         rpc_callbacks(
             '/backend/Alice',
             ctc_alice,
-            dict(position="Bologna",decentralized_identifier=1, proof_reveived="PROOF", **player('Alice')))
+            dict(
+                position="Bologna",
+                decentralized_identifier=1,
+                proof_reveived="PROOF",
+                **player('Alice')
+            ),
+        )
 
     alice = Thread(target=play_alice)
     alice.start()
+
+    def play_bob(accc):
+        ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_alice))
+        rpc('/ctc/apis/attacherAPI/insert_position', ctc_bob, "POSITION")
+        rpc("/forget/ctc", ctc_bob)
+
+
+
+    bob1 = Thread(target=play_bob(acc_bob1))
+    bob1.start()
+
+    alice.join()
+    bob1.join()
+
+
+    after_alice = get_balance(acc_alice)
+    print('Alice went from %s to %s' % (before_alice, after_alice))
+    
+    rpc('/forget/acc', acc_alice, acc_bob1)
+    rpc("/forget/ctc", ctc_alice)
 
 if __name__ == '__main__':
     #startSimulation()
