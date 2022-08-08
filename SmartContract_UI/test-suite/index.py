@@ -188,6 +188,9 @@ import time
 def main():
     rpc, rpc_callbacks = mk_rpc()
 
+
+    print("The consensus network is: ", rpc("/stdlib/connector"));
+
     starting_balance = rpc("/stdlib/parseCurrency", 100)
     name = 'Alice'
     acc_alice = rpc("/stdlib/newTestAccount", starting_balance)
@@ -233,7 +236,7 @@ def main():
 
     def play_bob(accc):
         ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_alice))
-        rpc('/ctc/apis/attacherAPI/insert_position', ctc_bob, "POSITION")
+        rpc('/ctc/a/attacherAPI/insert_position', ctc_bob, "POSITION")
         rpc("/forget/ctc", ctc_bob)
 
 
