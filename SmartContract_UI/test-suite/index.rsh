@@ -16,7 +16,7 @@ const REWARD_FOR_PROVER = 1000000000000000000//send by VERIFIER
 
 export const main = Reach.App(() => {
     const Creator = Participant('Creator',{ 
-    ...hasConsoleLogger,
+    //...hasConsoleLogger,
     position: Bytes(128),
     decentralized_identifier: UInt,
     proof_reveived: Bytes(128),
@@ -56,7 +56,7 @@ export const main = Reach.App(() => {
   commit();
   Creator.publish();
   //setting the view
-
+  Creator.only(() => interact.reportPosition(decentralized_identifier_creator, easy_map[decentralized_identifier_creator]));
   
   // ************ INSERT POSITION API **************
   //the attacher can insert their positions
@@ -71,7 +71,6 @@ export const main = Reach.App(() => {
         
         //TODO: notify the attacher (not the creator) when the key is already used 
         if(easy_map[did] != Null){ //TODO: FIX THIS CHECK. CHECK if map contain THE ID INSERTED --------------> IMPORTANT
-          Creator.interact.log("The key is already used");
           return false; //TODO: THIS HAS TO RETURN TRUE
         }
         /** 
@@ -80,7 +79,6 @@ export const main = Reach.App(() => {
          * */
         easy_map[did] = fromSome(easy_map[did],pos);
 
-        Creator.interact.log("Somebody added a new position to the map");
         Creator.only(() => interact.reportPosition(did, easy_map[did]));
 
         //TODO: ONLY for TESTING: terminate the parallel reduce
@@ -96,7 +94,6 @@ export const main = Reach.App(() => {
     //   return [total_balance,false]; // set keepGoing to false to finish the campaign
     // }); 
   
-    Creator.interact.log("TIME TO VERIFY! SECOND PARALLEL REDUCE")
 
     const keepGoing2 = 
     parallelReduce(true) 
@@ -110,15 +107,12 @@ export const main = Reach.App(() => {
         (money,y) => { 
           y(money);
           
-          Creator.interact.log("Verifier inserted the following amount into smart contract: ", money);
-          Creator.interact.log("Balance is", balance());
 
           return true;
         }
       )
       .api(verifierAPI.verify, 
         (did, walletAddress, ret) => { 
-          Creator.interact.log("wallet address passed: ", walletAddress);
           // transfer some money to the Prover (attacher)
           if (balance()>=REWARD_FOR_PROVER){
             transfer(REWARD_FOR_PROVER).to(walletAddress);
@@ -136,7 +130,6 @@ export const main = Reach.App(() => {
   // TODO: the first received position has to be stored in a data structure, will be compared to the subsquent received positions
 
   //for TESTING
-  Creator.interact.log("Smart contract is terminating")
   transfer(balance()).to(Creator);
   
   commit();

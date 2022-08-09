@@ -208,17 +208,21 @@ def main():
 
     ctc_alice = rpc("/acc/contract", acc_alice)
 
-    def player(who):
-        def reportPosition(did,  proof_and_position):
-            print('New position inserted \n DID: %s did \n proof_and_position: %sproof_and_position' % did, proof_and_position)
+    # def player(who):
+    #     def reportPosition(did,  proof_and_position):
+    #         print('New position inserted \n DID: %s did \n proof_and_position: %sproof_and_position' % did, proof_and_position)
         
-        def report_results(results):
-            print('Results %s' % results) 
+    #     def report_results(results):
+    #         print('Results %s' % results) 
 
-        return {'stdlib.hasConsoleLogger': True,
-                'reportPosition': reportPosition,
-                }
+    #     return {#'stdlib.hasConsoleLogger': True,
+    #             'reportPosition': reportPosition,
+    #             }
     def play_alice():
+        def reportPosition(did,  proof_and_position):
+            print("report results, position inserted: ", proof_and_position[1])
+            #print('New position inserted \n DID: %s did \n proof_and_position: %s proof_and_position' % str(did), proof_and_position[1])
+        
         rpc_callbacks(
             '/backend/Creator',
             ctc_alice,
@@ -226,7 +230,7 @@ def main():
                 position="Bologna",
                 decentralized_identifier=1,
                 proof_reveived="PROOF",
-                **player('Creator')
+                reportPosition= reportPosition,#**player('Creator')
             ),
         )
 
@@ -236,14 +240,17 @@ def main():
 
     def play_bob(accc):
         ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_alice))
-        rpc('/ctc/apis/attacherAPI/insert_position', ctc_bob)
+        time.sleep(10)
+        result_api = rpc('/ctc/apis/attacherAPI/insert_position', ctc_bob)
+        print("result api ", result_api)
         rpc("/forget/ctc", ctc_bob)
 
     
-
+    print("\t aaaaaa 0")
+    time.sleep(4)
     bob1 = Thread(target=play_bob(acc_bob1))
+    print("\t aaaaaa 1")
     bob1.start()
-    
     alice.join()
     bob1.join()
 
