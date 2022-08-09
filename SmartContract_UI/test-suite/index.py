@@ -205,7 +205,7 @@ def main():
     before_alice = get_balance(acc_alice)
     before_bob1 = get_balance(acc_bob1)
 
-    #time.sleep(10)
+
     ctc_alice = rpc("/acc/contract", acc_alice)
 
     def player(who):
@@ -236,14 +236,14 @@ def main():
 
     def play_bob(accc):
         ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_alice))
-        rpc('/ctc/a/attacherAPI/insert_position', ctc_bob, "POSITION")
+        rpc('/ctc/apis/attacherAPI/insert_position', ctc_bob)
         rpc("/forget/ctc", ctc_bob)
 
-
+    
 
     bob1 = Thread(target=play_bob(acc_bob1))
     bob1.start()
-
+    
     alice.join()
     bob1.join()
 

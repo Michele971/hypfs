@@ -58,8 +58,6 @@ export const main = Reach.App(() => {
   //setting the view
 
   
-  
-  Creator.interact.log("Before parallel reduce");
   // ************ INSERT POSITION API **************
   //the attacher can insert their positions
   const keepGoing = 
