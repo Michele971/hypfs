@@ -25,6 +25,7 @@ LOCATION_LIST_WIT = ["7H369FXP+FH", "7H369F4W+Q8", "7H369F4W+Q9"]
 DID_LIST_PROV = [2, 6]
 LOCATION_LIST_PROV = ["7H369FXP+FH", "7H369F4W+Q8"]
 
+#### We no the position of every witness because it is stored in dictOfLocation
 dictOfLocation = {
     "7H369FXP+FH":[
         0,
@@ -178,6 +179,7 @@ def startSimulation():
             '''
             deploySmartContract(prov)
     
+
     # Move the Prover
 
     # print(olc.isValid(prov.location))
