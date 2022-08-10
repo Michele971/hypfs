@@ -121,10 +121,10 @@ class Prover(Witness):
 
 def createWitness(did, public_key, private_key, proofs_array_computed, location):
     wit = Witness(
-        did= did,
-        public_key= public_key,
-        private_key= private_key,
-        proofs_array_computed= proofs_array_computed,
+        did= did, # Decentralized IDentifier 
+        public_key= public_key, # Public key of the wallet
+        private_key= private_key, # Private key of the wallet
+        proofs_array_computed= proofs_array_computed, # Witness will store every proof that has computed for someone (in the local mobile db e.g Room Database with Android) 
         location= location)
 
     return wit
@@ -135,7 +135,7 @@ def createProver(did, public_key, private_key, proofs_array_computed, location, 
         private_key= private_key,
         proofs_array_computed= proofs_array_computed,
         location= location,
-        proofs_received_array= proofs_received_array)
+        proofs_received_array= proofs_received_array) #store the received proofs
     
     return prov
 
@@ -153,22 +153,24 @@ def deploySmartContract(proverObject):
 
 # START the simulation
 def startSimulation():
-    #generateOLC
-    #generateOLC(11.356988, 44.495888) # just for testing
-    #buildDict()
     for i in range(0, PROVER_NUMBER):
+        ##### TODO: Generate random LATITUDE & LONGITUDE (for every user), Then convert them to Open Location code and add to LOCATION_LIST_PROV
+        #generateOLC
+        #generateOLC(11.356988, 44.495888) # just for testing
+        #buildDict()
+
         prov = createProver(
-            did= DID_LIST_PROV[i],
+            did= DID_LIST_PROV[i], # The Prover ID come from an default array that contains all the IDs
             public_key= "FFFFFFFFF",
             private_key= "xxxxxxx",
             proofs_array_computed= [],
-            location= LOCATION_LIST_PROV[i],
+            location= LOCATION_LIST_PROV[i], # The Prover Location come from an default array that contains all the Locations
             proofs_received_array=[])
         
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
         if neighbours:
-            print('Hi Prover, your DID is: ', prov.did,'\n Your location is: ', prov.location, '\n Your neighbours are: ', neighbours)
+            print('Prover DID: ', prov.did,'\n Location: ', prov.location, '\n Neighbours: ', neighbours,'\n',)
 
             '''
                 TODO: The first user that call the contract has to deploy it;

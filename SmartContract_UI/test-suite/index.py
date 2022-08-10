@@ -1,7 +1,6 @@
 from socket import timeout
 from reach_rpc import mk_rpc
 from threading import Thread
-
 import random
 import math
 import json
