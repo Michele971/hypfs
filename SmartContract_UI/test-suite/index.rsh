@@ -32,7 +32,7 @@ export const main = Reach.App(() => {
 
   const verifierAPI = API('verifierAPI',{
     insert_money: Fun([UInt], UInt), 
-    verify: Fun([UInt,Address], Bool),
+    verify: Fun([UInt,Address], Address),
   });
  
   setOptions({untrustworthyMaps: true});
@@ -96,7 +96,7 @@ export const main = Reach.App(() => {
     commit();
     Creator.publish();
 
-    Creator.only(() => interact.reportPosition(decentralized_identifier_creator, easy_map[decentralized_identifier_creator]));
+
     const keepGoing2 = 
     parallelReduce(true) 
       .invariant(balance() == balance())
@@ -108,8 +108,7 @@ export const main = Reach.App(() => {
         (money) => money, // the payment that the users have to do when call the api
         (money, y) => { 
           y(money);
-          
-
+        
           return true;
         }
       )
@@ -117,11 +116,11 @@ export const main = Reach.App(() => {
         (did, walletAddress, ret) => { 
           // transfer some money to the Prover (attacher)
           if (balance()>=REWARD_FOR_PROVER){
-            transfer(REWARD_FOR_PROVER).to(walletAddress);
-            ret(true);
+            transfer(REWARD_FOR_PROVER).to(this); //TODO: change this with walletAddress
+            ret(walletAddress);
 
           }
-          ret(false);
+          ret(walletAddress);
           delete easy_map[did]; //vector[0] is the did
   
           return false; //TODO: THIS HAS TO BE TRUEE, false only for testing

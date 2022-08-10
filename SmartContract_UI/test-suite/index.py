@@ -12,7 +12,7 @@ def main():
 
     print("The consensus network is: ", rpc("/stdlib/connector"));
 
-    starting_balance = rpc("/stdlib/parseCurrency", 10000)
+    starting_balance = rpc("/stdlib/parseCurrency", 1000)
 
     acc_alice = rpc("/stdlib/newTestAccount", starting_balance)
     acc_bob1 = rpc("/stdlib/newTestAccount", starting_balance)
@@ -31,6 +31,13 @@ def main():
 
     def get_balance(w):
         return fmt(rpc("/stdlib/balanceOf", w))
+    
+    #this function take an account as input and prepare it for the backend
+    def format_address(account):
+        addr = rpc("/acc/contract", account)
+        print("address ", addr)
+        #return rpc("/stdlib/formatAddress", addr) # TODO: FIX THISSSSS!!! this fuction must NOT return addr, but the result of this RPC!!!!!
+        return addr
 
     before_alice = get_balance(acc_alice)
     before_bob1 = get_balance(acc_bob1)
@@ -68,16 +75,24 @@ def main():
     print("\t Creator started!")
 
     def play_bob(accc, pos, did):
+        # Get and attach to the Alice Contract
         ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_alice))
-
+        # Call the API
         result_api = rpc('/ctc/apis/attacherAPI/insert_position', ctc_bob, pos, did)
         print("result api ", result_api)
         rpc("/forget/ctc", ctc_bob)
 
-    def play_verifier(accc):
+    def verifier_pay(accc):
         ctc_verifier = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_alice))
-
-        result_api = rpc('/ctc/apis/verifierAPI/insert_money', ctc_verifier, ftm_eth(5000000000000000000))
+        # Call the API
+        result_api = rpc('/ctc/apis/verifierAPI/insert_money', ctc_verifier, ftm_eth(500000000000000000000))
+        print("result api ", result_api)
+        rpc("/forget/ctc", ctc_verifier)
+        
+    def verifier_api(accc, did_choose, wallet_toVerify):
+        ctc_verifier = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_alice))
+        # Call the API
+        result_api = rpc('/ctc/apis/verifierAPI/verify', ctc_verifier, did_choose, wallet_toVerify)
         print("result api ", result_api)
         rpc("/forget/ctc", ctc_verifier)
     
@@ -105,9 +120,20 @@ def main():
 
     time.sleep(4)
     print("Verifier1 balance is: ", before_verifier1)
-    print("Verifier1 is going to pay: ",  ftm_eth(5000000000000000000))
-    verifier1 = Thread(target=play_verifier(acc_verifier1))
+    print("Verifier1 is going to pay: ",  ftm_eth(500000000000000000000))
+    verifier1 = Thread(target=verifier_pay(acc_verifier1))
     verifier1.start()
+    before_verifier1_last = get_balance(acc_verifier1)
+    print("Verifier1 is now: ", before_verifier1_last)
+
+    print("Verifier1 is goint to verify someone")
+    walletVerifier = format_address(acc_verifier1)
+    print("walletVerifier TODO: (IS IT CORRECT? for now NO.)", walletVerifier)
+    did_choose = 1 #DID to verify
+    #TODO: the wallet must be the PROVER wallet, now is the VERIFIER wallet
+    verifier1_verify = Thread(target=verifier_api(acc_verifier1, did_choose, walletVerifier))
+    verifier1_verify.start()
+
 
     alice.join()
     bob1.join()
@@ -115,6 +141,7 @@ def main():
     bob3.join()
     #bob4.join()
     verifier1.join()
+    verifier1_verify.join()
 
     after_alice = get_balance(acc_alice)
     print('Alice went from %s to %s' % (before_alice, after_alice))
