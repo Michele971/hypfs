@@ -68,12 +68,11 @@ export const main = Reach.App(() => {
     .api(attacherAPI.insert_position, // the name of the api that is called 
       (pos, did, y) => { // the code to execute and the returning variable of the api (y)
         y(did);
-        Creator.only(() => interact.reportPosition(counter, easy_map[did]));
+ 
         //TODO: notify the attacher (not the creator) when the key is already used 
-        if(easy_map[did] != Null){ //TODO: FIX THIS CHECK. CHECK if map contain THE ID INSERTED --------------> IMPORTANT
-          const stopLoop = 0
-          return stopLoop; //TODO: THIS HAS TO RETURN TRUE when the API return bool. Now return an UInt just for testing
-        }
+        // if(easy_map[did] != Null){ //TODO: FIX THIS CHECK. CHECK if map contain THE ID INSERTED --------------> IMPORTANT
+        //   return true; //TODO: THIS HAS TO RETURN TRUE
+        // }
         /** 
          * The line below manages the case when the key is already 
          * assigned to a specific value 
@@ -85,7 +84,7 @@ export const main = Reach.App(() => {
         //TODO: ONLY for TESTING: terminate the parallel reduce
   
 
-        return counter - 1; 
+        return counter - 1; // the returning of the API for the parallel reduce necessary to update the initial variable 
       }
     )
     // TIMEOUT WORKS ONLY ON TESTNET
@@ -105,7 +104,7 @@ export const main = Reach.App(() => {
           assume(money > 0);
         },      
         (money) => money, // the payment that the users have to do when call the api
-        (money, y) => { 
+        (money,y) => { 
           y(money);
           
 
