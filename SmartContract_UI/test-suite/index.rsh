@@ -31,8 +31,8 @@ export const main = Reach.App(() => {
   });
 
   const verifierAPI = API('verifierAPI',{
-    verify: Fun([UInt,Address], Bool),
     insert_money: Fun([UInt], UInt), 
+    verify: Fun([UInt,Address], Bool),
   });
  
   setOptions({untrustworthyMaps: true});
@@ -64,7 +64,7 @@ export const main = Reach.App(() => {
   parallelReduce(3) 
     .invariant(balance() == balance()) // invariant: the condition inside must be true for the all time that the while goes on
     //.define(() => {views.retrieve_results.set(did_user);}) // define: the code inside is executed when a function in the while is called (ex. the api call)
-    .while(counter >= 0)
+    .while(counter > 0)
     .api(attacherAPI.insert_position, // the name of the api that is called 
       (pos, did, y) => { // the code to execute and the returning variable of the api (y)
         y(did);
@@ -93,8 +93,10 @@ export const main = Reach.App(() => {
     //   Anybody.publish(); // publish needed to finish the parallel reduce
     //   return [total_balance,false]; // set keepGoing to false to finish the campaign
     // }); 
-  
+    commit();
+    Creator.publish();
 
+    Creator.only(() => interact.reportPosition(decentralized_identifier_creator, easy_map[decentralized_identifier_creator]));
     const keepGoing2 = 
     parallelReduce(true) 
       .invariant(balance() == balance())
@@ -104,7 +106,7 @@ export const main = Reach.App(() => {
           assume(money > 0);
         },      
         (money) => money, // the payment that the users have to do when call the api
-        (money,y) => { 
+        (money, y) => { 
           y(money);
           
 

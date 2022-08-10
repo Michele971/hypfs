@@ -12,7 +12,7 @@ def main():
 
     print("The consensus network is: ", rpc("/stdlib/connector"));
 
-    starting_balance = rpc("/stdlib/parseCurrency", 100)
+    starting_balance = rpc("/stdlib/parseCurrency", 10000)
 
     acc_alice = rpc("/stdlib/newTestAccount", starting_balance)
     acc_bob1 = rpc("/stdlib/newTestAccount", starting_balance)
@@ -26,19 +26,22 @@ def main():
     def fmt(x):
         return rpc("/stdlib/formatCurrency", x, 4)
 
+    def ftm_eth(x):
+        return rpc("/stdlib/bigNumberify",x)
+
     def get_balance(w):
         return fmt(rpc("/stdlib/balanceOf", w))
 
     before_alice = get_balance(acc_alice)
     before_bob1 = get_balance(acc_bob1)
+    before_verifier1 = get_balance(acc_verifier1)
 
 
     ctc_alice = rpc("/acc/contract", acc_alice)
 
     def player(who):
         def reportPosition(did,  proof_and_position):
-            print("DID inserted: ",did)
-            print("position inserted: ",proof_and_position[1])
+            print("DID inserted: ",did,"\tposition inserted: ",proof_and_position[1])
 
         return {'stdlib.hasConsoleLogger': True,
                 'reportPosition': reportPosition,
@@ -74,7 +77,7 @@ def main():
     def play_verifier(accc):
         ctc_verifier = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_alice))
 
-        result_api = rpc('/ctc/apis/verifierAPI/insert_money', ctc_verifier, fmt(5))
+        result_api = rpc('/ctc/apis/verifierAPI/insert_money', ctc_verifier, ftm_eth(5000000000000000000))
         print("result api ", result_api)
         rpc("/forget/ctc", ctc_verifier)
     
@@ -100,7 +103,9 @@ def main():
     # bob4 = Thread(target=play_bob(acc_bob4, pos_bob, did_bob))
     # bob4.start()
 
-    
+    time.sleep(4)
+    print("Verifier1 balance is: ", before_verifier1)
+    print("Verifier1 is going to pay: ",  ftm_eth(5000000000000000000))
     verifier1 = Thread(target=play_verifier(acc_verifier1))
     verifier1.start()
 
