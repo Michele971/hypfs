@@ -170,7 +170,8 @@ def startSimulation():
         
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
-        if neighbours:
+        if neighbours: 
+            ### TODO: do not print the id of the prover!!
             print('Prover DID: ', prov.did,'\n Location: ', prov.location, '\n Neighbours: ', neighbours,'\n',)
 
             '''

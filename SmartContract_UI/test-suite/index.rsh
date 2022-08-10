@@ -16,7 +16,7 @@ const REWARD_FOR_PROVER = 1000000000000000000//send by VERIFIER
 
 export const main = Reach.App(() => {
     const Creator = Participant('Creator',{ 
-    //...hasConsoleLogger,
+    ...hasConsoleLogger,
     position: Bytes(128),
     decentralized_identifier: UInt,
     proof_reveived: Bytes(128),
@@ -27,7 +27,7 @@ export const main = Reach.App(() => {
 
 
   const attacherAPI = API('attacherAPI',{
-    insert_position: Fun([Bytes(128),UInt], Bytes(128)), //PositionAndProof - DID - ReturnField
+    insert_position: Fun([Bytes(128),UInt], UInt), //PositionAndProof - DID - ReturnField
   });
 
   const verifierAPI = API('verifierAPI',{
@@ -35,20 +35,19 @@ export const main = Reach.App(() => {
     insert_money: Fun([UInt], UInt), 
   });
  
-
-
   setOptions({untrustworthyMaps: true});
   init();
 
   Creator.publish() //we need that to use the MAP below
   const easy_map = new Map(UInt,Bytes(128));
-
+  
   commit();
   Creator.only(() => { 
     const proof_and_position = declassify(interact.position);
     const decentralized_identifier_creator = declassify(interact.decentralized_identifier);
   });
-  
+
+
   Creator.publish(proof_and_position, decentralized_identifier_creator); //TODO: add the proof_received
 
   easy_map[decentralized_identifier_creator] = proof_and_position; //setting the first value of the map with Creator values
@@ -59,32 +58,33 @@ export const main = Reach.App(() => {
   Creator.only(() => interact.reportPosition(decentralized_identifier_creator, easy_map[decentralized_identifier_creator]));
   
   // ************ INSERT POSITION API **************
+  // the API terminated whe it reaches 3 users
   //the attacher can insert their positions
-  const keepGoing = 
-  parallelReduce(true) 
+  const counter = 
+  parallelReduce(3) 
     .invariant(balance() == balance()) // invariant: the condition inside must be true for the all time that the while goes on
     //.define(() => {views.retrieve_results.set(did_user);}) // define: the code inside is executed when a function in the while is called (ex. the api call)
-    .while(keepGoing)
+    .while(counter >= 0)
     .api(attacherAPI.insert_position, // the name of the api that is called 
       (pos, did, y) => { // the code to execute and the returning variable of the api (y)
-        y(pos);
-        
+        y(did);
+ 
         //TODO: notify the attacher (not the creator) when the key is already used 
-        if(easy_map[did] != Null){ //TODO: FIX THIS CHECK. CHECK if map contain THE ID INSERTED --------------> IMPORTANT
-          return false; //TODO: THIS HAS TO RETURN TRUE
-        }
+        // if(easy_map[did] != Null){ //TODO: FIX THIS CHECK. CHECK if map contain THE ID INSERTED --------------> IMPORTANT
+        //   return true; //TODO: THIS HAS TO RETURN TRUE
+        // }
         /** 
          * The line below manages the case when the key is already 
          * assigned to a specific value 
          * */
         easy_map[did] = fromSome(easy_map[did],pos);
 
-        Creator.only(() => interact.reportPosition(did, easy_map[did]));
+        Creator.only(() => interact.reportPosition(counter, easy_map[did]));
 
         //TODO: ONLY for TESTING: terminate the parallel reduce
   
 
-        return true; // the returning of the API for the parallel reduce necessary to update the initial variable 
+        return counter - 1; // the returning of the API for the parallel reduce necessary to update the initial variable 
       }
     )
     // TIMEOUT WORKS ONLY ON TESTNET
