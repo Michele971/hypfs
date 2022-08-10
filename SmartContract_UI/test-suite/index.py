@@ -74,7 +74,7 @@ def main():
     def play_verifier(accc):
         ctc_verifier = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_alice))
 
-        result_api = rpc('/ctc/apis/verifierAPI/insert_money', ctc_verifier, 5)
+        result_api = rpc('/ctc/apis/verifierAPI/insert_money', ctc_verifier, fmt(5))
         print("result api ", result_api)
         rpc("/forget/ctc", ctc_verifier)
     
@@ -108,7 +108,7 @@ def main():
     bob1.join()
     bob2.join()
     bob3.join()
-    bob4.join()
+    #bob4.join()
     verifier1.join()
 
     after_alice = get_balance(acc_alice)
