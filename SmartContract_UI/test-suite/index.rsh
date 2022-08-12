@@ -1,8 +1,8 @@
 'reach 0.1';
 'use strict';
 
-const REWARD_FOR_PROVER = 1000000000000000000//send by VERIFIER
-
+const REWARD_FOR_PROVER = 10000000000000//send by VERIFIER
+const SMART_CONTRACT_MAX_USER = 3
 //NOTES:
 // TODO: This smart contract is empower to validate if the positions if user are correct
 // There is a smart contract for every different position
@@ -21,6 +21,7 @@ export const main = Reach.App(() => {
     decentralized_identifier: UInt,
     proof_reveived: Bytes(128),
     reportPosition: Fun([UInt, Maybe(Bytes(128))], Null),
+    reportVerification: Fun([UInt, Address], Null),
 
   });
 
@@ -61,13 +62,13 @@ export const main = Reach.App(() => {
   // the API terminated whe it reaches 3 users
   //the attacher can insert their positions
   const counter = 
-  parallelReduce(3) 
+  parallelReduce(SMART_CONTRACT_MAX_USER) 
     .invariant(balance() == balance()) // invariant: the condition inside must be true for the all time that the while goes on
     //.define(() => {views.retrieve_results.set(did_user);}) // define: the code inside is executed when a function in the while is called (ex. the api call)
     .while(counter > 0)
     .api(attacherAPI.insert_position, // the name of the api that is called 
       (pos, did, y) => { // the code to execute and the returning variable of the api (y)
-        y(did);
+        y(counter); //allow the frontend to retrieve the space available 
  
         //TODO: notify the attacher (not the creator) when the key is already used 
         // if(easy_map[did] != Null){ //TODO: FIX THIS CHECK. CHECK if map contain THE ID INSERTED --------------> IMPORTANT
@@ -80,9 +81,6 @@ export const main = Reach.App(() => {
         easy_map[did] = fromSome(easy_map[did],pos);
 
         Creator.only(() => interact.reportPosition(did, easy_map[did]));
-
-        //TODO: ONLY for TESTING: terminate the parallel reduce
-  
 
         return counter - 1; // the returning of the API for the parallel reduce necessary to update the initial variable 
       }
@@ -116,13 +114,13 @@ export const main = Reach.App(() => {
         (did, walletAddress, ret) => { 
           // transfer some money to the Prover (attacher)
           if (balance()>=REWARD_FOR_PROVER){
-            transfer(REWARD_FOR_PROVER).to(this); //TODO: change this with walletAddress
+            transfer(balance()).to(walletAddress); //TODO: change amount transfered. THE TRANSFER DOES NOT WORKS.
             ret(walletAddress);
-
           }
+          //transfer(balance()).to(walletAddress); //TODO: change amount transfered
           ret(walletAddress);
           delete easy_map[did]; //vector[0] is the did
-  
+          Creator.only(() => interact.reportVerification(did, this));
           return false; //TODO: THIS HAS TO BE TRUEE, false only for testing
         }
       )
