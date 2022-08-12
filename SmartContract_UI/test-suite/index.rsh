@@ -79,7 +79,7 @@ export const main = Reach.App(() => {
          * */
         easy_map[did] = fromSome(easy_map[did],pos);
 
-        Creator.only(() => interact.reportPosition(counter, easy_map[did]));
+        Creator.only(() => interact.reportPosition(did, easy_map[did]));
 
         //TODO: ONLY for TESTING: terminate the parallel reduce
   
