@@ -14,7 +14,7 @@ You have to [install Reach](https://docs.reach.sh/quickstart/) and start the doc
 To run the **simulation.py** script, use:
 - `pip install -r requirements.txt`
 - `pip install --upgrade reach-rpc-client`
-- `../reach rpc-run python3 -u ./index.py`
+- `./reach rpc-run python3 -u ./index.py`
 
 # Author
 Michele Bonini
