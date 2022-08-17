@@ -19,7 +19,8 @@ def main():
     acc_bob1 = rpc("/stdlib/newTestAccount", starting_balance)
     acc_bob2 = rpc("/stdlib/newTestAccount", starting_balance)
     acc_bob3 = rpc("/stdlib/newTestAccount", starting_balance)
-    acc_bob4 = rpc("/stdlib/newTestAccount", starting_balance)
+    #acc_bob4 = rpc("/stdlib/newTestAccount", starting_balance)
+
 
     acc_verifier1 = rpc("/stdlib/newTestAccount", starting_balance)
     
@@ -27,6 +28,10 @@ def main():
     def fmt(x):
         return rpc("/stdlib/formatCurrency", x, 4)
 
+    '''
+        Because there are 1,000,000,000,000,000,000 WEI in 1 ETH, "BigNumber" is used to represet values in WEI ( 1000000000000000000).
+        Quantities of a network token should always be passed into Reach in the token's atomic unit.    
+    '''
     def ftm_eth(x):
         return rpc("/stdlib/bigNumberify",x)
 
@@ -157,7 +162,7 @@ def main():
     before_verifier1_last = get_balance(acc_verifier1)
     print("Verifier1 balance is now: ", before_verifier1_last) #TODO: print the balance of rewarded prover, not verifier!
 
-    rpc('/forget/acc', acc_creator, acc_bob1, acc_bob2, acc_bob3, acc_bob4, acc_verifier1)
+    rpc('/forget/acc', acc_creator, acc_bob1, acc_bob2, acc_bob3, acc_verifier1) #acc_bob4
     rpc("/forget/ctc", ctc_creator)
 
 

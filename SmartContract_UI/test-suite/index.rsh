@@ -1,7 +1,7 @@
 'reach 0.1';
 'use strict';
 
-const REWARD_FOR_PROVER = 10000000000000//send by VERIFIER
+const REWARD_FOR_PROVER = 1000000000000000000//send by VERIFIER
 const SMART_CONTRACT_MAX_USER = 3
 //NOTES:
 // TODO: This smart contract is empower to validate if the positions if user are correct
@@ -114,13 +114,15 @@ export const main = Reach.App(() => {
         (did, walletAddress, ret) => { 
           // transfer some money to the Prover (attacher)
           if (balance()>=REWARD_FOR_PROVER){
-            transfer(balance()).to(walletAddress); //TODO: change amount transfered. THE TRANSFER DOES NOT WORKS.
+
+            Creator.only(() => interact.reportVerification(did, this));
+            //transfer(balance()).to(walletAddress); //TODO: change amount transfered. THE TRANSFER DOES NOT WORKS.
             ret(walletAddress);
           }
           //transfer(balance()).to(walletAddress); //TODO: change amount transfered
           ret(walletAddress);
           delete easy_map[did]; //vector[0] is the did
-          Creator.only(() => interact.reportVerification(did, this));
+          // Creator.only(() => interact.reportVerification(did, this));
           return false; //TODO: THIS HAS TO BE TRUEE, false only for testing
         }
       )
