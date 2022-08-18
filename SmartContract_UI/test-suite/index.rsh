@@ -12,7 +12,8 @@ const SMART_CONTRACT_MAX_USER = 3
 // TODO: The smart contract will know the verifier (?) ----> still to be decided. 
 //       Maybe using an unique password (for more verifiers) for memory reason
 // TODO: check that the proofs inserted unique and not already present
-
+// TODO: print balance of the contract() using the view
+// TODO: print the reward that will be assign to everyone that has a valid proof, after verify it
 
 export const main = Reach.App(() => {
     const Creator = Participant('Creator',{ 
@@ -114,9 +115,8 @@ export const main = Reach.App(() => {
         (did, walletAddress, ret) => { 
           // transfer some money to the Prover (attacher)
           if (balance()>=REWARD_FOR_PROVER){
-
             Creator.only(() => interact.reportVerification(did, this));
-            //transfer(balance()).to(walletAddress); //TODO: change amount transfered. THE TRANSFER DOES NOT WORKS.
+            transfer(balance()).to(walletAddress); //TODO: change amount transfered. THE TRANSFER DOES NOT WORKS.
             ret(walletAddress);
           }
           //transfer(balance()).to(walletAddress); //TODO: change amount transfered

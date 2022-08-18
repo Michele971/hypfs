@@ -6,6 +6,9 @@ import math
 import json
 import time
 import sys
+
+provers_addresses = [] # this address need to be verified
+
 def main():
  
     rpc, rpc_callbacks = mk_rpc()
@@ -82,6 +85,7 @@ def main():
 
     creator = Thread(target=play_Creator)
     creator.start()
+    provers_addresses.append(format_address(acc_creator))
     print("\t Creator started! Smart contract deployed. ")
 
     def play_bob(accc, pos, did):
@@ -106,6 +110,11 @@ def main():
         # Call the API
         result_api = rpc('/ctc/apis/verifierAPI/verify', ctc_verifier, did_choose, wallet_toVerify)
         print("User with wallet address ", result_api, " has been verified!")
+
+        '''
+            TODO: remove the address from "provers_addresses" list, if it is successfully verified!!!
+        '''
+
         rpc("/forget/ctc", ctc_verifier)
     
     print("\n\tProvers are inserting their position and, proof computed by witness, inside the smart contract")
@@ -114,21 +123,29 @@ def main():
     did_bob = 2
     bob1 = Thread(target=play_bob(acc_bob1, pos_bob, did_bob))
     bob1.start()
+    provers_addresses.append(format_address(acc_bob1))
+
     time.sleep(4)
     pos_bob = "Milano"
     did_bob = 3
     bob2 = Thread(target=play_bob(acc_bob2, pos_bob, did_bob))
     bob2.start()
+    provers_addresses.append(format_address(acc_bob2))
+
     time.sleep(4)
     pos_bob = "Venezia"
     did_bob = 4
     bob3 = Thread(target=play_bob(acc_bob3, pos_bob, did_bob))
     bob3.start()
+    provers_addresses.append(format_address(acc_bob3))
+
     time.sleep(4)
     # pos_bob = "San Lazzaro"
     # did_bob = 5
     # bob4 = Thread(target=play_bob(acc_bob4, pos_bob, did_bob))
     # bob4.start()
+    # provers_addresses.append(format_address(acc_bob4))
+
 
     time.sleep(4)
     #print("Verifier1 balance is: ", before_verifier1)
@@ -141,10 +158,10 @@ def main():
     ##### TODO: change the line below passing the address of the prover!!!!!!
     walletVerifier = format_address(acc_verifier1) # TODO: the wallet must be the PROVER wallet, now is the VERIFIER wallet
 
-    did_choose = 1 #DID to verify
+    did_choose = 2 #DID to verify
 
     print("\n\tVerifier1 is going to Verify someone")
-    verifier1_verify = Thread(target=verifier_api(acc_verifier1, did_choose, walletVerifier))
+    verifier1_verify = Thread(target=verifier_api(acc_verifier1, did_choose, provers_addresses[1])) # in this case, the verifier is going to verify the bob1
     verifier1_verify.start()
 
 
@@ -159,15 +176,22 @@ def main():
     after_creator = get_balance(acc_creator)
     print('Creator went from %s to %s' % (before_creator, after_creator))
     
-    before_verifier1_last = get_balance(acc_verifier1)
-    print("Verifier1 balance is now: ", before_verifier1_last) #TODO: print the balance of rewarded prover, not verifier!
+    #################### start some testing steps ####################
+    creator_last = get_balance(acc_creator)
+    print("CREATOR balance is now: ", creator_last) #TODO: print the balance of rewarded prover, not verifier!
+    print("WALLET BOB: ", provers_addresses[0])
+
+    after_bob1 = get_balance(acc_bob1)
+    print("accBob1 balance is now: ", after_bob1)
+    print("WALLET BOB: ", provers_addresses[1])
+    #################### end some testing steps ####################
+
 
     rpc('/forget/acc', acc_creator, acc_bob1, acc_bob2, acc_bob3, acc_verifier1) #acc_bob4
     rpc("/forget/ctc", ctc_creator)
 
 
 if __name__ == '__main__':
-    #startSimulation()
     main()
     
     sys.exit()
