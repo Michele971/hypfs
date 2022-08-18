@@ -164,6 +164,17 @@ def main():
     verifier1_verify = Thread(target=verifier_api(acc_verifier1, did_choose, provers_addresses[1])) # in this case, the verifier is going to verify the bob1
     verifier1_verify.start()
 
+    #################### start some testing steps ####################
+    creator_last = get_balance(acc_creator)
+    print("CREATOR balance is now: ", creator_last) #TODO: print the balance of rewarded prover, not verifier!
+    print("WALLET CREATOR: ", provers_addresses[0])
+
+    after_bob1 = get_balance(acc_bob1)
+    print("accBob1 balance is now: ", after_bob1)
+    print("WALLET BOB: ", provers_addresses[1])
+
+    print("WALLET VERIFIER: ", walletVerifier)
+    #################### end some testing steps ####################
 
     creator.join()
     bob1.join()
@@ -176,15 +187,7 @@ def main():
     after_creator = get_balance(acc_creator)
     print('Creator went from %s to %s' % (before_creator, after_creator))
     
-    #################### start some testing steps ####################
-    creator_last = get_balance(acc_creator)
-    print("CREATOR balance is now: ", creator_last) #TODO: print the balance of rewarded prover, not verifier!
-    print("WALLET BOB: ", provers_addresses[0])
 
-    after_bob1 = get_balance(acc_bob1)
-    print("accBob1 balance is now: ", after_bob1)
-    print("WALLET BOB: ", provers_addresses[1])
-    #################### end some testing steps ####################
 
 
     rpc('/forget/acc', acc_creator, acc_bob1, acc_bob2, acc_bob3, acc_verifier1) #acc_bob4
