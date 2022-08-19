@@ -10,6 +10,8 @@ Working on proof of location, simulated in a **permissionless** system.
 
 Working on interactions between Python and Smart Contract.
 
+Performance evaluation with startSimulation.py .
+
 ## Install with Docker
 
 ##### Requirements
