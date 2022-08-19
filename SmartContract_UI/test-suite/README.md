@@ -26,6 +26,7 @@ If you want to try the simulation use:
 - **startSimulation**: Simulation script that will call functions inside index.py to interact with Smart Contract.
 
 <center><img src="img/interactionsScripts.png" width="75%" align="center"></center>
+<center><img src="img/terminalStartSimulation.png" width="75%" align="center"></center>
 
 ## If issues comes ...
 Try with
