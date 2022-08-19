@@ -16,7 +16,7 @@ def main():
 
     print("The consensus network is: ", rpc("/stdlib/connector"));
 
-    starting_balance = rpc("/stdlib/parseCurrency", 1000)
+    starting_balance = rpc("/stdlib/parseCurrency", 1000) # use "parseCurrency" method when you send value TO backend
 
     acc_creator = rpc("/stdlib/newTestAccount", starting_balance)
     acc_bob1 = rpc("/stdlib/newTestAccount", starting_balance)
@@ -34,6 +34,7 @@ def main():
     '''
         Because there are 1,000,000,000,000,000,000 WEI in 1 ETH, "BigNumber" is used to represet values in WEI ( 1000000000000000000).
         Quantities of a network token should always be passed into Reach in the token's atomic unit.    
+        In particular, if the value comes FROM backend you will have to format it with "ftm_eth()" function. 
     '''
     def ftm_eth(x):
         return rpc("/stdlib/bigNumberify",x)
@@ -50,7 +51,7 @@ def main():
     before_bob1 = get_balance(acc_bob1)
     before_verifier1 = get_balance(acc_verifier1)
 
-    SMART_CONTRAT_PAYMENT = ftm_eth(500000000000000000000)
+    SMART_CONTRAT_PAYMENT = rpc("/stdlib/parseCurrency", 500)
 
     ctc_creator = rpc("/acc/contract", acc_creator)
 
@@ -102,21 +103,36 @@ def main():
         # Call the API
         money_payed = rpc('/ctc/apis/verifierAPI/insert_money', ctc_verifier, SMART_CONTRAT_PAYMENT)
         money_payed_int = int(money_payed.get('hex'), 16)
-        print("money_payed by verifier to the contract ", money_payed_int/1000000000000000000)
+        #print("money_payed by verifier to the contract ", ftm_eth(money_payed_int))
         rpc("/forget/ctc", ctc_verifier)
         
-    def verifier_api(accc, did_choose, wallet_toVerify):
+    def verifier_api_verify(accc, did_choose, wallet_toVerify):
         ctc_verifier = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_creator))
         # Call the API
         result_api = rpc('/ctc/apis/verifierAPI/verify', ctc_verifier, did_choose, wallet_toVerify)
-        print("User with wallet address ", result_api, " has been verified!")
+        #print("User with wallet address ", result_api, " has been verified!")
 
         '''
             TODO: remove the address from "provers_addresses" list, if it is successfully verified!!!
         '''
-
         rpc("/forget/ctc", ctc_verifier)
     
+    def view_getCtcBalance(accc):
+        ctc_bobs = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_creator))
+        # call the view
+        result_view = rpc("/ctc/views/views/getCtcBalance",ctc_bobs)
+        print("Balance of the contract: ", ftm_eth(int(result_view[1].get('hex'), 16))) 
+        rpc("/forget/ctc", ctc_bobs)
+        
+    def view_getReward(accc):
+        ctc_users = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_creator))
+        reward_amount = rpc("/ctc/views/views/getReward",ctc_users)
+        print("Reward to pay ", int(reward_amount[1].get('hex'), 16))
+        rpc("/forget/ctc", ctc_users)
+        #return reward_amount
+
+
+
     print("\n\tProvers are inserting their position and, proof computed by witness, inside the smart contract")
     time.sleep(4)
     pos_bob = "Torino"
@@ -149,19 +165,29 @@ def main():
 
     time.sleep(4)
     #print("Verifier1 balance is: ", before_verifier1)
-    print("\n\tVerifier1 is going to pay: ",  int(SMART_CONTRAT_PAYMENT.get('hex'),16)/1000000000000000000)
+    print("\n\tVerifier1 is going to pay: ", SMART_CONTRAT_PAYMENT)
     verifier1 = Thread(target=verifier_pay(acc_verifier1))
     verifier1.start()
     verifier1_last = get_balance(acc_verifier1)
     
     print('Verifier1 went from %s to %s' % (before_verifier1, verifier1_last))
+
+    ######## some tests
+    # someone verify the contract balance
+    bobViewGetBalance = Thread(target=view_getCtcBalance(acc_bob1))
+    bobViewGetBalance.start()
+
+    userView_getReward = Thread(target=view_getReward(acc_bob1))
+    userView_getReward.start()
+    ######## end tests
+
     ##### TODO: change the line below passing the address of the prover!!!!!!
     walletVerifier = format_address(acc_verifier1) # TODO: the wallet must be the PROVER wallet, now is the VERIFIER wallet
 
     did_choose = 2 #DID to verify
 
     print("\n\tVerifier1 is going to Verify someone")
-    verifier1_verify = Thread(target=verifier_api(acc_verifier1, did_choose, provers_addresses[1])) # in this case, the verifier is going to verify the bob1
+    verifier1_verify = Thread(target=verifier_api_verify(acc_verifier1, did_choose, provers_addresses[1])) # in this case, the verifier is going to verify the bob1
     verifier1_verify.start()
 
     #################### start some testing steps ####################
@@ -182,6 +208,8 @@ def main():
     bob3.join()
     #bob4.join()
     verifier1.join()
+    bobViewGetBalance.join()
+    userView_getReward.join()
     verifier1_verify.join()
 
     after_creator = get_balance(acc_creator)

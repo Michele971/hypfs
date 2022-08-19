@@ -1,7 +1,7 @@
 'reach 0.1';
 'use strict';
 
-const REWARD_FOR_PROVER = 10000000000000000000//send by VERIFIER
+const REWARD_FOR_PROVER = 10000//send by VERIFIER
 const SMART_CONTRACT_MAX_USER = 3
 //NOTES:
 // TODO: This smart contract is empower to validate if the positions if user are correct
@@ -36,6 +36,13 @@ export const main = Reach.App(() => {
     insert_money: Fun([UInt], UInt), 
     verify: Fun([UInt,Address], Address),
   });
+
+  const views = View('views', { 
+    getCtcBalance: UInt, // Allow users to check the balance of the contract
+    getReward: UInt, // Allow the users and verifier to get the reward
+
+  });
+
  
   setOptions({untrustworthyMaps: true});
   init();
@@ -92,6 +99,8 @@ export const main = Reach.App(() => {
     //   Anybody.publish(); // publish needed to finish the parallel reduce
     //   return [total_balance,false]; // set keepGoing to false to finish the campaign
     // }); 
+    views.getCtcBalance.set(balance());
+    views.getReward.set(REWARD_FOR_PROVER);
     commit();
     Creator.publish();
 
@@ -99,6 +108,7 @@ export const main = Reach.App(() => {
     const keepGoing2 = 
     parallelReduce(true) 
       .invariant(balance() == balance())
+      .define(() => {views.getCtcBalance.set(balance());})
       .while(keepGoing2)
       .api(verifierAPI.insert_money,
         (money) => { // the assume that have to be true to continue the execution of the API
