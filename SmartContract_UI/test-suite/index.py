@@ -27,6 +27,7 @@ def get_balance(w):
 def format_address(account):
     addr = rpc("/acc/getAddress", account) # get the address associated to a specific account. Transactions can be send to this address (inside backend)
     return addr
+
 def player(who):
     def reportPosition(did,  proof_and_position):
         did_int = int(did.get('hex'), 16)
@@ -39,22 +40,19 @@ def player(who):
             'reportPosition': reportPosition,
             'reportVerification':reportVerification,
             }
-def play_Creator(ctc_user_creator, position, did, proof):
-    # def reportPosition(did,  proof_and_position):
-    #     print("report results, position inserted: ", proof_and_position[1])
-    #     #print('New position inserted \n DID: %s did \n proof_and_position: %s proof_and_position' % str(did), proof_and_position[1])
-    
+
+def play_Creator(contract_creator, position, did, proof):
     rpc_callbacks(
         '/backend/Creator',
-        ctc_user_creator,
+        contract_creator,
         dict(
             position=position,
             decentralized_identifier=did,
             proof_reveived=proof,  
-            #reportPosition= reportPosition,
             **player('Creator')
         ),
     )
+
 
 def play_bob(ctc_user_creator, accc, pos, did):
     # Get and attach to the creator Contract
@@ -64,6 +62,8 @@ def play_bob(ctc_user_creator, accc, pos, did):
     counter_int = int(result_counter.get('hex'), 16)
     print("Number of users that can still insert their position: ", counter_int)
     rpc("/forget/ctc", ctc_bob)
+
+
 
 def main():
 
@@ -88,13 +88,15 @@ def main():
 
     ctc_creator = rpc("/acc/contract", acc_creator)
 
+
     position = "Bologna"
     did = '1'
     proof = 'proof_creator'
 
     #deploying the contract using the creator account
-    creator = Thread(target=play_Creator(ctc_creator,  position, did, proof))
+    creator = Thread(target=play_Creator, args=(ctc_creator, position, did, proof))
     creator.start()
+    print("SONO QUI")
     provers_addresses.append(format_address(acc_creator))
     print("\t Creator started! Smart contract deployed. ")
 
@@ -104,7 +106,7 @@ def main():
         ctc_verifier = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_creator))
         # Call the API
         money_payed = rpc('/ctc/apis/verifierAPI/insert_money', ctc_verifier, SMART_CONTRAT_PAYMENT)
-        money_payed_int = int(money_payed.get('hex'), 16)
+        #money_payed_int = int(money_payed.get('hex'), 16)
         #print("money_payed by verifier to the contract ", ftm_eth(money_payed_int))
         rpc("/forget/ctc", ctc_verifier)
         

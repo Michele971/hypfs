@@ -31,10 +31,10 @@ LOCATION_LIST_WIT = ["7H369FXP+FH", "7H369F4W+Q8", "7H369F4W+Q9"]
     WARNING: 
     ---> len(DID_LIST_PROV) and len(LOCATION_LIST_PROV) MUST TO BE EQUALS !!!
 '''
-DID_LIST_PROV = [2, 6]
+DID_LIST_PROV = [2, 6, 8, 14]
 LOCATION_LIST_PROV = ["7H369FXP+FH", "7H369F4W+Q8"]
 
-#### We no the position of every witness because it is stored in dictOfLocation
+#### We know the position of every witness because it is stored in dictOfLocation. The position is the KEY, the values are the DID of user in that position
 dictOfLocation = {
     "7H369FXP+FH":[
         0,
@@ -94,7 +94,7 @@ class Prover(Witness):
         This method will return the list of neihbours. 
         listWitnessLocation is the input dict that own the location of every users:
             - the Key is the position OLC
-            - the Value is an List of DID
+            - the Value is a List of users DIDs, in a location can be many users that means many DIDs
     '''
     def find_neighbours(self, locationProver, dicWitnessLocation):
         if (dicWitnessLocation.get(locationProver)):
@@ -165,14 +165,15 @@ def generateOLC(latitude, longitude):
 
 def deploySmartContract(proverObject):
     ctc_creator = rpc("/acc/contract", proverObject.account)
-    creatorThread = Thread(target=play_Creator(ctc_creator, proverObject.location, proverObject.did, 'proof'))
+    print(" Deploying the smart contract ...")
+    creatorThread = Thread(target=play_Creator, args=(ctc_creator, proverObject.location, proverObject.did, 'proof',))
     creatorThread.start()
-
+    print(" Smart contract deployed")
     return creatorThread
 
 def attachToSmartContract(proverAttacherObject):
     ctc_creator = rpc("/acc/contract", proverAttacherObject.account)
-    attacherThread = Thread(target=play_bob(ctc_creator, proverAttacherObject.location, proverAttacherObject.did, 'proof'))
+    attacherThread = Thread(target=play_bob, args=(ctc_creator, proverAttacherObject.location, proverAttacherObject.did, 'proof',))
     attacherThread.start()
 
     return attacherThread
@@ -224,8 +225,7 @@ def startSimulation():
                 prover_addresses.append(proverThread)
     
     
-    for provUser in len(prover_addresses):
-        print(provUser)
+    for provUser in prover_addresses:
         provUser.join()
 
     # Move the Prover
@@ -234,7 +234,7 @@ def startSimulation():
     # print(wit.computed_distance_from_prover(wit.location, prov.location))
 
 
-    for provUser in len(prover_list_account):
+    for provUser in prover_list_account:
         rpc("/forget/ctc", provUser)
 def main():
     startSimulation()
@@ -249,7 +249,7 @@ if __name__ == '__main__':
 
 
 
-
+#### this method should build the input DICT in an automatic way 
 # def buildDict():
 #     list_temp_id_wit = []
 #     list_temp_loc_wit = []
