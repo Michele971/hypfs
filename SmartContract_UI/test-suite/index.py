@@ -8,10 +8,57 @@ import time
 import sys
 
 provers_addresses = [] # this address need to be verified
+rpc, rpc_callbacks = mk_rpc()
+def fmt(x):
+    return rpc("/stdlib/formatCurrency", x, 4)
+
+'''
+    Because there are 1,000,000,000,000,000,000 WEI in 1 ETH, "BigNumber" is used to represet values in WEI ( 1000000000000000000).
+    Quantities of a network token should always be passed into Reach in the token's atomic unit.    
+    In particular, if the value comes FROM backend you will have to format it with "ftm_eth()" function. 
+'''
+def ftm_eth(x):
+    return rpc("/stdlib/bigNumberify",x)
+
+def get_balance(w):
+    return fmt(rpc("/stdlib/balanceOf", w))
+
+#this function take an account as input and prepare it for the backend
+def format_address(account):
+    addr = rpc("/acc/getAddress", account) # get the address associated to a specific account. Transactions can be send to this address (inside backend)
+    return addr
+def player(who):
+    def reportPosition(did,  proof_and_position):
+        did_int = int(did.get('hex'), 16)
+        print("DID inserted: ",did_int,"\tposition inserted: ",proof_and_position[1])
+
+    def reportVerification(did, verifier):
+        did_int = int(did.get('hex'), 16)
+        print("DID ", did_int, " has been verified by Verifier ", verifier)
+    return {'stdlib.hasConsoleLogger': True,
+            'reportPosition': reportPosition,
+            'reportVerification':reportVerification,
+            }
+def play_Creator(ctc_user_creator, position, did, proof):
+    # def reportPosition(did,  proof_and_position):
+    #     print("report results, position inserted: ", proof_and_position[1])
+    #     #print('New position inserted \n DID: %s did \n proof_and_position: %s proof_and_position' % str(did), proof_and_position[1])
+    
+    rpc_callbacks(
+        '/backend/Creator',
+        ctc_user_creator,
+        dict(
+            position=position,
+            decentralized_identifier=did,
+            proof_reveived=proof,  
+            #reportPosition= reportPosition,
+            **player('Creator')
+        ),
+    )
 
 def main():
  
-    rpc, rpc_callbacks = mk_rpc()
+    
 
 
     print("The consensus network is: ", rpc("/stdlib/connector"));
@@ -27,26 +74,6 @@ def main():
 
     acc_verifier1 = rpc("/stdlib/newTestAccount", starting_balance)
     
-    
-    def fmt(x):
-        return rpc("/stdlib/formatCurrency", x, 4)
-
-    '''
-        Because there are 1,000,000,000,000,000,000 WEI in 1 ETH, "BigNumber" is used to represet values in WEI ( 1000000000000000000).
-        Quantities of a network token should always be passed into Reach in the token's atomic unit.    
-        In particular, if the value comes FROM backend you will have to format it with "ftm_eth()" function. 
-    '''
-    def ftm_eth(x):
-        return rpc("/stdlib/bigNumberify",x)
-
-    def get_balance(w):
-        return fmt(rpc("/stdlib/balanceOf", w))
-    
-    #this function take an account as input and prepare it for the backend
-    def format_address(account):
-        addr = rpc("/acc/getAddress", account) # get the address associated to a specific account. Transactions can be send to this address (inside backend)
-        return addr
-
     before_creator = get_balance(acc_creator)
     before_bob1 = get_balance(acc_bob1)
     before_verifier1 = get_balance(acc_verifier1)
@@ -55,36 +82,10 @@ def main():
 
     ctc_creator = rpc("/acc/contract", acc_creator)
 
-    def player(who):
-        def reportPosition(did,  proof_and_position):
-            did_int = int(did.get('hex'), 16)
-            print("DID inserted: ",did_int,"\tposition inserted: ",proof_and_position[1])
-
-        def reportVerification(did, verifier):
-            did_int = int(did.get('hex'), 16)
-            print("DID ", did_int, " has been verified by Verifier ", verifier)
-        return {'stdlib.hasConsoleLogger': True,
-                'reportPosition': reportPosition,
-                'reportVerification':reportVerification,
-                }
-    def play_Creator():
-        # def reportPosition(did,  proof_and_position):
-        #     print("report results, position inserted: ", proof_and_position[1])
-        #     #print('New position inserted \n DID: %s did \n proof_and_position: %s proof_and_position' % str(did), proof_and_position[1])
-        
-        rpc_callbacks(
-            '/backend/Creator',
-            ctc_creator,
-            dict(
-                position="Bologna",
-                decentralized_identifier=1,
-                proof_reveived="PROOF",  
-                #reportPosition= reportPosition,
-                **player('Creator')
-            ),
-        )
-
-    creator = Thread(target=play_Creator)
+    position = "Bologna"
+    did = '1'
+    proof = 'proof_creator'
+    creator = Thread(target=play_Creator(ctc_creator,  position, did, proof))
     creator.start()
     provers_addresses.append(format_address(acc_creator))
     print("\t Creator started! Smart contract deployed. ")
@@ -129,7 +130,6 @@ def main():
         reward_amount = rpc("/ctc/views/views/getReward",ctc_users)
         print("Reward to pay ", int(reward_amount[1].get('hex'), 16))
         rpc("/forget/ctc", ctc_users)
-        #return reward_amount
 
 
 

@@ -1,7 +1,12 @@
 
 from openlocationcode import openlocationcode as olc
-
-
+from reach_rpc import mk_rpc
+from index import format_address
+from index import play_Creator
+from threading import Thread
+rpc, rpc_callbacks = mk_rpc()
+STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1000) # use "parseCurrency" method when you send value TO backend
+location_in_hypercube = False # simulate if the location is already stored in hypercube
 
 '''
     NOTEs:
@@ -119,6 +124,10 @@ class Prover(Witness):
         # Deploy smart contract if location is not in the hypercube
         pass
 
+    def createAccount(self):
+        acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        return acc_prover
+
 
 def createWitness(did, public_key, private_key, proofs_array_computed, location):
     wit = Witness(
@@ -150,7 +159,9 @@ def generateOLC(latitude, longitude):
     return location_encoded
 
 def deploySmartContract(proverObject):
-    pass
+    ctc_creator = rpc("/acc/contract", proverObject.public_key)
+    creator = Thread(target=play_Creator(ctc_creator, proverObject.location, proverObject.did, 'proof'))
+    creator.start()
 
 # START the simulation
 def startSimulation():
@@ -167,7 +178,11 @@ def startSimulation():
             proofs_array_computed= [],
             location= LOCATION_LIST_PROV[i], # The Prover Location come from an default array that contains all the Locations
             proofs_received_array=[])
-        
+
+        account_prov = prov.createAccount()
+        #prov.public_key = format_address(account_prov)
+        prov.public_key = account_prov
+
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
         if neighbours: 
@@ -178,7 +193,8 @@ def startSimulation():
                 TODO: The first user that call the contract has to deploy it;
                     the others will attach.
             '''
-            deploySmartContract(prov)
+            if (location_in_hypercube == False):
+                deploySmartContract(prov)
     
 
     # Move the Prover

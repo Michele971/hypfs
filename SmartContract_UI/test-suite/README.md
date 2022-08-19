@@ -16,5 +16,8 @@ To run the **simulation.py** script, use:
 - `pip install --upgrade reach-rpc-client`
 - `./reach rpc-run python3 -u ./index.py`
 
+If you want to try the simulation use:
+- `./reach rpc-run python3 -u ./startSimulation.py`
+
 # Author
 Michele Bonini
