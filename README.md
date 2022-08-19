@@ -10,6 +10,8 @@ Working on proof of location, simulated in a **permissionless** system.
 
 Working on interactions between Python and Smart Contract.
 
+Performance evaluation with startSimulation.py .
+
 ## Install with Docker
 
 ##### Requirements
@@ -36,7 +38,7 @@ To run in "local mode" skip **usage** section and use:
    - Start the server: `python server.py 8881`, where 8881 is the port
    - Start the client: `python menu.py /ip4/127.0.0.1/tcp/5001 1`
 
-## Usage
+## Usage the Hypercube
 
 1. **Check status**
    `docker-compose logs -f` for all services
