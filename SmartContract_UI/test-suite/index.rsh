@@ -2,7 +2,7 @@
 'use strict';
 
 const REWARD_FOR_PROVER = 10000//send by VERIFIER
-const SMART_CONTRACT_MAX_USER = 3
+const SMART_CONTRACT_MAX_USER = 5
 //NOTES:
 // TODO: This smart contract is empower to validate if the positions if user are correct
 // There is a smart contract for every different position

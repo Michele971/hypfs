@@ -27,5 +27,10 @@ If you want to try the simulation use:
 
 <center><img src="img/interactionsScripts.png" width="75%" align="center"></center>
 
+## If issues comes ...
+Try with
+- `./reach down`
+- `./reach update`
+
 # Author
 Michele Bonini

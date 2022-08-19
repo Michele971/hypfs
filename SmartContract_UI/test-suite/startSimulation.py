@@ -4,9 +4,11 @@ from reach_rpc import mk_rpc
 from index import format_address
 from index import play_Creator, play_bob
 from threading import Thread
-
+import time
 prover_addresses = [] #list of prover thread
 prover_list_account = [] #list of prover account 
+
+contract_creator_deployed = None #contrat deployed, will have to be a list of contracts
 
 rpc, rpc_callbacks = mk_rpc()
 STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1000) # use "parseCurrency" method when you send value TO backend
@@ -23,21 +25,22 @@ location_in_hypercube = False # simulate if the location is already stored in hy
 '''
 
 WITNESS_NUMBER = 4
-PROVER_NUMBER = 2
+PROVER_NUMBER = 5
 DID_LIST_WIT = [0, 3, 4, 5]
 LOCATION_LIST_WIT = ["7H369FXP+FH", "7H369F4W+Q8", "7H369F4W+Q9"]
 
 '''
-    WARNING: 
-    ---> len(DID_LIST_PROV) and len(LOCATION_LIST_PROV) MUST TO BE EQUALS !!!
+    ❗️❗️❗️❗️  WARNING: ❗️❗️❗️❗️
+    ---> len(DID_LIST_PROV) and len(LOCATION_LIST_PROV) MUST TO BE EQUALS !!! You can decrease the PROVER_NUMBER during the testing
+    ---> PROVER_NUMBER must be less or equal to SMART_CONTRACT_MAX_USER variable located inside index.rsh
 '''
-DID_LIST_PROV = [2, 6, 8, 14]
-LOCATION_LIST_PROV = ["7H369FXP+FH", "7H369F4W+Q8"]
+DID_LIST_PROV = [2, 6, 8, 14, 19]
+LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6"]
 
 #### We know the position of every witness because it is stored in dictOfLocation. The position is the KEY, the values are the DID of user in that position
 dictOfLocation = {
     "7H369FXP+FH":[
-        0,
+        0, 
         3,
         4,
         5
@@ -51,7 +54,21 @@ dictOfLocation = {
         9,
         10,
         11
-    ]
+    ],
+    "7H368FRV+FM":[ #Bologna
+        12,
+        13,
+        14
+    ],
+    "7H368FWV+X6": [ #Ice-cream 
+        15,
+        16,
+        17,
+        18,
+        19
+    ],
+  
+
 }
 
 
@@ -163,27 +180,31 @@ def generateOLC(latitude, longitude):
     print('Encoded location: ', location_encoded)
     return location_encoded
 
+
+# this method will interact with index.py
 def deploySmartContract(proverObject):
     ctc_creator = rpc("/acc/contract", proverObject.account)
-    print(" Deploying the smart contract ...")
     creatorThread = Thread(target=play_Creator, args=(ctc_creator, proverObject.location, proverObject.did, 'proof',))
     creatorThread.start()
-    print(" Smart contract deployed")
-    return creatorThread
+    return creatorThread, ctc_creator
 
-def attachToSmartContract(proverAttacherObject):
-    ctc_creator = rpc("/acc/contract", proverAttacherObject.account)
-    attacherThread = Thread(target=play_bob, args=(ctc_creator, proverAttacherObject.location, proverAttacherObject.did, 'proof',))
+# this method will interact with index.py
+def attachToSmartContract(proverAttacherObject, ctc_creator):
+    attacherThread = Thread(target=play_bob, args=(ctc_creator, proverAttacherObject.account, proverAttacherObject.location, proverAttacherObject.did, 'proof',))
     attacherThread.start()
 
     return attacherThread
 
+
+
 # START the simulation
 def startSimulation():
     for i in range(0, PROVER_NUMBER):
+        # bologna: 11.3411625, 44.4942452
+        # la vecchia stalla gelateria: 11.3474453, 44.4930181 
         ##### TODO: Generate random LATITUDE & LONGITUDE (for every user), Then convert them to Open Location code and add to LOCATION_LIST_PROV
         #generateOLC
-        #generateOLC(11.356988, 44.495888) # just for testing
+        #generateOLC(11.3474453,44.4930181 )#11.356988, 44.495888) # just for testing
         #buildDict()
 
         prov = createProver(
@@ -203,7 +224,7 @@ def startSimulation():
         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
         if neighbours: 
             ### TODO: do not print the id of the prover!!
-            print('Prover DID: ', prov.did,'\n Location: ', prov.location, '\n Neighbours: ', neighbours,'\n',)
+            print('→ 🪪 Prover DID: ', prov.did,'\n 📍 Location: ', prov.location, '\n    Neighbours: ', neighbours,'\n',)
 
             '''
                 TODO: The first user that call the contract has to deploy it;
@@ -212,16 +233,22 @@ def startSimulation():
             '''
                 TODO: HERE you'll have to check if the data are already located inside the hypercube
             '''
+            global location_in_hypercube
+    
+            global contract_creator_deployed 
+            time.sleep(3)
             if (location_in_hypercube == False):
-                creatorThread = deploySmartContract(prov)
+                print(" Deploying the smart contract ...")
+                creatorThread, contract_creator_deployed = deploySmartContract(prov)
+                print("Smart contract deployed  🚀 ")
                 prover_addresses.append(creatorThread)
                 '''
                     TODO: insert the required data inside the hypercube 
                 '''
-                location_in_hypercube == True # TODO: remove this in production
+
+                location_in_hypercube = True # TODO: remove this in production
             else:
-                print("sono qui")
-                proverThread = attachToSmartContract(prov)
+                proverThread = attachToSmartContract(prov, contract_creator_deployed)
                 prover_addresses.append(proverThread)
     
     
