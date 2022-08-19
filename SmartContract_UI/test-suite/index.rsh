@@ -2,9 +2,9 @@
 'use strict';
 
 const REWARD_FOR_PROVER = 10000//send by VERIFIER
-const SMART_CONTRACT_MAX_USER = 5
+const SMART_CONTRACT_MAX_USER = 4
 //NOTES:
-// TODO: This smart contract is empower to validate if the positions if user are correct
+// TODO: This smart contract is empower to validate if the positions of users are correct
 // There is a smart contract for every different position
 // TODO: The Smart Contract will expire after a specific amount of time
 // TODO: Add the geofence attribute to the smart contract (radius, etc etc ....). In this way 

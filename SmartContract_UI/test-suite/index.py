@@ -9,6 +9,8 @@ import sys
 
 provers_addresses = [] # this address need to be verified
 rpc, rpc_callbacks = mk_rpc()
+SMART_CONTRAT_PAYMENT = rpc("/stdlib/parseCurrency", 500)
+
 def fmt(x):
     return rpc("/stdlib/formatCurrency", x, 4)
 
@@ -63,7 +65,24 @@ def play_bob(ctc_user_creator, accc, pos, did, proof):
     print("Number of users that can still insert their position: ", counter_int)
     rpc("/forget/ctc", ctc_bob)
 
+def verifier_pay(ctc_user_creator,accc):
+        ctc_verifier = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_user_creator))
+        # Call the API
+        money_payed = rpc('/ctc/apis/verifierAPI/insert_money', ctc_verifier, SMART_CONTRAT_PAYMENT)
+        #money_payed_int = int(money_payed.get('hex'), 16)
+        #print("money_payed by verifier to the contract ", ftm_eth(money_payed_int))
+        rpc("/forget/ctc", ctc_verifier)
 
+def verifier_api_verify(ctc_user_creator, accc, did_choose, wallet_toVerify):
+        ctc_verifier = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_user_creator))
+        # Call the API
+        result_api = rpc('/ctc/apis/verifierAPI/verify', ctc_verifier, did_choose, wallet_toVerify)
+        #print("User with wallet address ", result_api, " has been verified!")
+
+        '''
+            TODO: remove the address from "provers_addresses" list, if it is successfully verified!!!
+        '''
+        rpc("/forget/ctc", ctc_verifier)
 
 def main():
 
@@ -84,7 +103,7 @@ def main():
     before_bob1 = get_balance(acc_bob1)
     before_verifier1 = get_balance(acc_verifier1)
 
-    SMART_CONTRAT_PAYMENT = rpc("/stdlib/parseCurrency", 500)
+    
 
     ctc_creator = rpc("/acc/contract", acc_creator)
 
@@ -96,30 +115,12 @@ def main():
     #deploying the contract using the creator account
     creator = Thread(target=play_Creator, args=(ctc_creator, position, did, proof))
     creator.start()
-    print("SONO QUI")
     provers_addresses.append(format_address(acc_creator))
     print("\t Creator started! Smart contract deployed. ")
 
 
-
-    def verifier_pay(accc):
-        ctc_verifier = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_creator))
-        # Call the API
-        money_payed = rpc('/ctc/apis/verifierAPI/insert_money', ctc_verifier, SMART_CONTRAT_PAYMENT)
-        #money_payed_int = int(money_payed.get('hex'), 16)
-        #print("money_payed by verifier to the contract ", ftm_eth(money_payed_int))
-        rpc("/forget/ctc", ctc_verifier)
         
-    def verifier_api_verify(accc, did_choose, wallet_toVerify):
-        ctc_verifier = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_creator))
-        # Call the API
-        result_api = rpc('/ctc/apis/verifierAPI/verify', ctc_verifier, did_choose, wallet_toVerify)
-        #print("User with wallet address ", result_api, " has been verified!")
-
-        '''
-            TODO: remove the address from "provers_addresses" list, if it is successfully verified!!!
-        '''
-        rpc("/forget/ctc", ctc_verifier)
+    
     
     def view_getCtcBalance(accc):
         ctc_bobs = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_creator))

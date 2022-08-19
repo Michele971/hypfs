@@ -2,13 +2,17 @@
 from openlocationcode import openlocationcode as olc
 from reach_rpc import mk_rpc
 from index import format_address
-from index import play_Creator, play_bob
+from index import play_Creator, play_bob, verifier_pay, verifier_api_verify
 from threading import Thread
 import time
-prover_addresses = [] #list of prover thread
+prover_thread = [] #list of prover thread
 prover_list_account = [] #list of prover account 
+prover_addresses = [] # list of provers addresses
 
-contract_creator_deployed = None #contrat deployed, will have to be a list of contracts
+verifier_addresses = [] #list of verifier thread
+verifier_list_account = [] #list of verifier account 
+
+contract_creator_deployed = None # contrat deployed, will have to be a list of contracts
 
 rpc, rpc_callbacks = mk_rpc()
 STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1000) # use "parseCurrency" method when you send value TO backend
@@ -24,18 +28,21 @@ location_in_hypercube = False # simulate if the location is already stored in hy
     don't simulate that.
 '''
 
-WITNESS_NUMBER = 4
-PROVER_NUMBER = 5
-DID_LIST_WIT = [0, 3, 4, 5]
-LOCATION_LIST_WIT = ["7H369FXP+FH", "7H369F4W+Q8", "7H369F4W+Q9"]
+WITNESS_NUMBER = 4 # number of witnesses
+PROVER_NUMBER = 5 # number of provers
+DID_LIST_WIT = [0, 3, 4, 5] # list of DID witnesses
+LOCATION_LIST_WIT = ["7H369FXP+FH", "7H369F4W+Q8", "7H369F4W+Q9"] # list of witnesses locations
 
 '''
     ❗️❗️❗️❗️  WARNING: ❗️❗️❗️❗️
     ---> len(DID_LIST_PROV) and len(LOCATION_LIST_PROV) MUST TO BE EQUALS !!! You can decrease the PROVER_NUMBER during the testing
     ---> PROVER_NUMBER must be less or equal to SMART_CONTRACT_MAX_USER variable located inside index.rsh
 '''
-DID_LIST_PROV = [2, 6, 8, 14, 19]
-LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6"]
+DID_LIST_PROV = [2, 6, 8, 14, 19] # DID of provers that will ask for a Proof Of Location and a verify process
+LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6"] # list of Provers locatios
+
+VERIFIER_NUMBER = 1 #number of verifiers
+DID_LIST_VER = [99] #list of DID associated to verifiers
 
 #### We know the position of every witness because it is stored in dictOfLocation. The position is the KEY, the values are the DID of user in that position
 dictOfLocation = {
@@ -99,8 +106,29 @@ class Witness:
             return False
         
 
+class Verifier():
+    def __init__(self, did, account):
+        self.did = did
+        self.account = account
+    
+    #this method allow the verifier to attach and pay the smart contract
+    def paySmartContract(self, verifierObject, ctc_creator):
+        verifierThread = Thread(target=verifier_pay, args=(ctc_creator, verifierObject.account))
+        verifierThread.start()
 
+        return verifierThread
+    
+    #this method allow the verifier to verify a prover using "proverToVerify" variable and using the DID of the prover "didProver"
+    def verifySmartContract(self, verifierObject, ctc_creator, proverToVerify, didProver):
+        print(" Verifier is going to verify some provers ")
+        verifierThread = Thread(target=verifier_api_verify, args=(ctc_creator,verifierObject.account, didProver, proverToVerify)) 
+        verifierThread.start()
+        print(" ✅  ",proverToVerify," succesfully verified! ")
+        return verifierThread
 
+    def createAccount(self):
+        acc_verifier = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        return acc_verifier
 
 class Prover(Witness):
     def __init__(self, did, account, private_key, proofs_array_computed, location, proofs_received_array):
@@ -171,6 +199,12 @@ def createProver(did, account, private_key, proofs_array_computed, location, pro
     
     return prov
 
+def createVerifier(did, account):
+    ver = Verifier(
+        did= did,
+        account= account
+    )
+    return ver
 ''' 
     We'll use  Open Location Code format.
     This is ideally suited for people that live in rural areas and don’t have access to an address.
@@ -199,6 +233,8 @@ def attachToSmartContract(proverAttacherObject, ctc_creator):
 
 # START the simulation
 def startSimulation():
+    global contract_creator_deployed 
+    # Starting prover steps
     for i in range(0, PROVER_NUMBER):
         # bologna: 11.3411625, 44.4942452
         # la vecchia stalla gelateria: 11.3474453, 44.4930181 
@@ -216,8 +252,9 @@ def startSimulation():
             proofs_received_array=[])
 
         account_prov = prov.createAccount()
+        # TODO: create a list of object provers and remove the two line below. Refactoring
         prover_list_account.append(account_prov)
-        #prov.public_key = format_address(account_prov)
+        prover_addresses.append(format_address(account_prov)) #getting the wallet addresses for prover and appending to the list
         prov.account = account_prov
 
         # Find neighbours
@@ -235,13 +272,13 @@ def startSimulation():
             '''
             global location_in_hypercube
     
-            global contract_creator_deployed 
+            
             time.sleep(3)
             if (location_in_hypercube == False):
                 print(" Deploying the smart contract ...")
                 creatorThread, contract_creator_deployed = deploySmartContract(prov)
                 print("Smart contract deployed  🚀 ")
-                prover_addresses.append(creatorThread)
+                prover_thread.append(creatorThread)
                 '''
                     TODO: insert the required data inside the hypercube 
                 '''
@@ -249,20 +286,66 @@ def startSimulation():
                 location_in_hypercube = True # TODO: remove this in production
             else:
                 proverThread = attachToSmartContract(prov, contract_creator_deployed)
-                prover_addresses.append(proverThread)
+                prover_thread.append(proverThread)
     
-    
-    for provUser in prover_addresses:
+
+    # Starting Verifier steps
+    '''
+        ❗️  WARNING: ❗️
+        ---> Check that SMART_CONTRACT_MAX_USER variable in index.rsh has been reached here: Everybody has to attach to the contract if you want going on with verifiers
+    '''
+    for i in range(0, VERIFIER_NUMBER):
+        time.sleep(3)
+        verifier = createVerifier(
+            did= DID_LIST_VER[i],
+            account= ""
+        )
+        #generate an account on blockchain for the verifier
+        accountVerifier = verifier.createAccount()
+        #assign the account to the verifier
+        verifier.account = accountVerifier
+
+        # is not mandatory, but the verifier can insert funds inside the smart contract
+        print(" 💰💰  Verifier is going to insert funds inside the contract ...")
+        verifier.paySmartContract(verifier, contract_creator_deployed)
+        
+
+        # verify some provers
+        time.sleep(3)
+        didProverToVerify = DID_LIST_PROV[1]
+        verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[1], didProverToVerify)
+
+        time.sleep(3)
+        didProverToVerify = DID_LIST_PROV[2]
+        verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[2], didProverToVerify)
+
+        time.sleep(3)
+        didProverToVerify = DID_LIST_PROV[3]
+        verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[3], didProverToVerify)
+
+        time.sleep(3)
+        didProverToVerify = DID_LIST_PROV[4]
+        verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[4], didProverToVerify)
+
+        prover_addresses.remove(prover_addresses[1]) #remove the address from the provers that will need to be verify
+        prover_addresses.remove(prover_addresses[1]) 
+        prover_addresses.remove(prover_addresses[1]) 
+        prover_addresses.remove(prover_addresses[1]) 
+
+    # Joining the thread of provers and verifiers
+    for provUser in prover_thread:
         provUser.join()
-
-    # Move the Prover
-
-    # print(olc.isValid(prov.location))
-    # print(wit.computed_distance_from_prover(wit.location, prov.location))
+    
+    for verifierUser in verifier_addresses:
+        verifierUser.join()
 
 
     for provUser in prover_list_account:
         rpc("/forget/ctc", provUser)
+
+    for verifierUser in verifier_list_account:
+        rpc("/forget/ctc", verifierUser)
+        
 def main():
     startSimulation()
 
