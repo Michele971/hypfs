@@ -19,5 +19,9 @@ To run the **simulation.py** script, use:
 If you want to try the simulation use:
 - `./reach rpc-run python3 -u ./startSimulation.py`
 
+## How it works
+
+<center><img src="img/interactionsScripts.png" width="75%" align="center"></center>
+
 # Author
 Michele Bonini

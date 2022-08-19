@@ -56,10 +56,16 @@ def play_Creator(ctc_user_creator, position, did, proof):
         ),
     )
 
-def main():
- 
-    
+def play_bob(ctc_user_creator, accc, pos, did):
+    # Get and attach to the creator Contract
+    ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_user_creator))
+    # Call the API
+    result_counter = rpc('/ctc/apis/attacherAPI/insert_position', ctc_bob, pos, did)
+    counter_int = int(result_counter.get('hex'), 16)
+    print("Number of users that can still insert their position: ", counter_int)
+    rpc("/forget/ctc", ctc_bob)
 
+def main():
 
     print("The consensus network is: ", rpc("/stdlib/connector"));
 
@@ -85,19 +91,14 @@ def main():
     position = "Bologna"
     did = '1'
     proof = 'proof_creator'
+
+    #deploying the contract using the creator account
     creator = Thread(target=play_Creator(ctc_creator,  position, did, proof))
     creator.start()
     provers_addresses.append(format_address(acc_creator))
     print("\t Creator started! Smart contract deployed. ")
 
-    def play_bob(accc, pos, did):
-        # Get and attach to the creator Contract
-        ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_creator))
-        # Call the API
-        result_counter = rpc('/ctc/apis/attacherAPI/insert_position', ctc_bob, pos, did)
-        counter_int = int(result_counter.get('hex'), 16)
-        print("Number of users that can still insert their position: ", counter_int)
-        rpc("/forget/ctc", ctc_bob)
+
 
     def verifier_pay(accc):
         ctc_verifier = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_creator))
@@ -137,28 +138,28 @@ def main():
     time.sleep(4)
     pos_bob = "Torino"
     did_bob = 2
-    bob1 = Thread(target=play_bob(acc_bob1, pos_bob, did_bob))
+    bob1 = Thread(target=play_bob(ctc_creator, acc_bob1, pos_bob, did_bob))
     bob1.start()
     provers_addresses.append(format_address(acc_bob1))
 
     time.sleep(4)
     pos_bob = "Milano"
     did_bob = 3
-    bob2 = Thread(target=play_bob(acc_bob2, pos_bob, did_bob))
+    bob2 = Thread(target=play_bob(ctc_creator, acc_bob2, pos_bob, did_bob))
     bob2.start()
     provers_addresses.append(format_address(acc_bob2))
 
     time.sleep(4)
     pos_bob = "Venezia"
     did_bob = 4
-    bob3 = Thread(target=play_bob(acc_bob3, pos_bob, did_bob))
+    bob3 = Thread(target=play_bob(ctc_creator, acc_bob3, pos_bob, did_bob))
     bob3.start()
     provers_addresses.append(format_address(acc_bob3))
 
     time.sleep(4)
     # pos_bob = "San Lazzaro"
     # did_bob = 5
-    # bob4 = Thread(target=play_bob(acc_bob4, pos_bob, did_bob))
+    # bob4 = Thread(target=play_bob(ctc_creator, acc_bob4, pos_bob, did_bob))
     # bob4.start()
     # provers_addresses.append(format_address(acc_bob4))
 

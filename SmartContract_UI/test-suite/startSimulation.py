@@ -2,8 +2,12 @@
 from openlocationcode import openlocationcode as olc
 from reach_rpc import mk_rpc
 from index import format_address
-from index import play_Creator
+from index import play_Creator, play_bob
 from threading import Thread
+
+prover_addresses = [] #list of prover thread
+prover_list_account = [] #list of prover account 
+
 rpc, rpc_callbacks = mk_rpc()
 STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1000) # use "parseCurrency" method when you send value TO backend
 location_in_hypercube = False # simulate if the location is already stored in hypercube
@@ -82,8 +86,8 @@ class Witness:
 
 
 class Prover(Witness):
-    def __init__(self, did, public_key, private_key, proofs_array_computed, location, proofs_received_array):
-        super().__init__(did, public_key, private_key, proofs_array_computed, location)
+    def __init__(self, did, account, private_key, proofs_array_computed, location, proofs_received_array):
+        super().__init__(did, account, private_key, proofs_array_computed, location)
         self.proofs_received_array = proofs_received_array
 
     '''
@@ -139,9 +143,10 @@ def createWitness(did, public_key, private_key, proofs_array_computed, location)
 
     return wit
 
-def createProver(did, public_key, private_key, proofs_array_computed, location, proofs_received_array):
+def createProver(did, account, private_key, proofs_array_computed, location, proofs_received_array):
     prov = Prover(
-        did= did, public_key= public_key,
+        did= did,
+        account= account,
         private_key= private_key,
         proofs_array_computed= proofs_array_computed,
         location= location,
@@ -159,9 +164,18 @@ def generateOLC(latitude, longitude):
     return location_encoded
 
 def deploySmartContract(proverObject):
-    ctc_creator = rpc("/acc/contract", proverObject.public_key)
-    creator = Thread(target=play_Creator(ctc_creator, proverObject.location, proverObject.did, 'proof'))
-    creator.start()
+    ctc_creator = rpc("/acc/contract", proverObject.account)
+    creatorThread = Thread(target=play_Creator(ctc_creator, proverObject.location, proverObject.did, 'proof'))
+    creatorThread.start()
+
+    return creatorThread
+
+def attachToSmartContract(proverAttacherObject):
+    ctc_creator = rpc("/acc/contract", proverAttacherObject.account)
+    attacherThread = Thread(target=play_bob(ctc_creator, proverAttacherObject.location, proverAttacherObject.did, 'proof'))
+    attacherThread.start()
+
+    return attacherThread
 
 # START the simulation
 def startSimulation():
@@ -173,15 +187,16 @@ def startSimulation():
 
         prov = createProver(
             did= DID_LIST_PROV[i], # The Prover ID come from an default array that contains all the IDs
-            public_key= "FFFFFFFFF",
+            account= "FFFFFFFFF",
             private_key= "xxxxxxx",
             proofs_array_computed= [],
             location= LOCATION_LIST_PROV[i], # The Prover Location come from an default array that contains all the Locations
             proofs_received_array=[])
 
         account_prov = prov.createAccount()
+        prover_list_account.append(account_prov)
         #prov.public_key = format_address(account_prov)
-        prov.public_key = account_prov
+        prov.account = account_prov
 
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
@@ -193,9 +208,25 @@ def startSimulation():
                 TODO: The first user that call the contract has to deploy it;
                     the others will attach.
             '''
+            '''
+                TODO: HERE you'll have to check if the data are already located inside the hypercube
+            '''
             if (location_in_hypercube == False):
-                deploySmartContract(prov)
+                creatorThread = deploySmartContract(prov)
+                prover_addresses.append(creatorThread)
+                '''
+                    TODO: insert the required data inside the hypercube 
+                '''
+                location_in_hypercube == True # TODO: remove this in production
+            else:
+                print("sono qui")
+                proverThread = attachToSmartContract(prov)
+                prover_addresses.append(proverThread)
     
+    
+    for provUser in len(prover_addresses):
+        print(provUser)
+        provUser.join()
 
     # Move the Prover
 
@@ -203,7 +234,8 @@ def startSimulation():
     # print(wit.computed_distance_from_prover(wit.location, prov.location))
 
 
-
+    for provUser in len(prover_list_account):
+        rpc("/forget/ctc", provUser)
 def main():
     startSimulation()
 
