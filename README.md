@@ -4,7 +4,7 @@ Implementation of a DApp (Decentralized Application) using **decentralized keywo
 
 Smart Contracts are developed with [Reach language](https://www.reach.sh) and are located inside **SmartContract_UI**.
 
-The folder **/SmartContract_UI/test-suite** contains some smart contracts and the simulation script.
+The folder **/SmartContract_UI/test-suite** contains some smart contracts and the simulation scripts.
 
 ## Status
 
