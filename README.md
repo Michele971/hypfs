@@ -2,7 +2,9 @@
 
 Implementation of a DApp (Decentralized Application) using **decentralized keywords Search Engine** based on a **hypercube structure**; integrated with IPFS and Algorand blockchain using Python.
 
-Smart Contracts are developed with [Reach language](https://www.reach.sh).
+Smart Contracts are developed with [Reach language](https://www.reach.sh) and are located inside **SmartContract_UI**.
+
+The folder **test-suite** contains some smart contracts and the simulation script.
 
 ## Status
 
