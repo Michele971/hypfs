@@ -94,7 +94,7 @@ def main():
     acc_bob1 = rpc("/stdlib/newTestAccount", starting_balance)
     acc_bob2 = rpc("/stdlib/newTestAccount", starting_balance)
     acc_bob3 = rpc("/stdlib/newTestAccount", starting_balance)
-    #acc_bob4 = rpc("/stdlib/newTestAccount", starting_balance)
+    acc_bob4 = rpc("/stdlib/newTestAccount", starting_balance)
 
 
     acc_verifier1 = rpc("/stdlib/newTestAccount", starting_balance)
@@ -141,36 +141,36 @@ def main():
     time.sleep(4)
     pos_bob = "Torino"
     did_bob = 2
-    bob1 = Thread(target=play_bob(ctc_creator, acc_bob1, pos_bob, did_bob))
+    bob1 = Thread(target=play_bob(ctc_creator, acc_bob1, pos_bob, did_bob, 'proof'))
     bob1.start()
     provers_addresses.append(format_address(acc_bob1))
 
     time.sleep(4)
     pos_bob = "Milano"
     did_bob = 3
-    bob2 = Thread(target=play_bob(ctc_creator, acc_bob2, pos_bob, did_bob))
+    bob2 = Thread(target=play_bob(ctc_creator, acc_bob2, pos_bob, did_bob, 'proof'))
     bob2.start()
     provers_addresses.append(format_address(acc_bob2))
 
     time.sleep(4)
     pos_bob = "Venezia"
     did_bob = 4
-    bob3 = Thread(target=play_bob(ctc_creator, acc_bob3, pos_bob, did_bob))
+    bob3 = Thread(target=play_bob(ctc_creator, acc_bob3, pos_bob, did_bob, 'proof'))
     bob3.start()
     provers_addresses.append(format_address(acc_bob3))
 
     time.sleep(4)
-    # pos_bob = "San Lazzaro"
-    # did_bob = 5
-    # bob4 = Thread(target=play_bob(ctc_creator, acc_bob4, pos_bob, did_bob))
-    # bob4.start()
-    # provers_addresses.append(format_address(acc_bob4))
+    pos_bob = "San Lazzaro"
+    did_bob = 5
+    bob4 = Thread(target=play_bob(ctc_creator, acc_bob4, pos_bob, did_bob, 'proof'))
+    bob4.start()
+    provers_addresses.append(format_address(acc_bob4))
 
 
     time.sleep(4)
     #print("Verifier1 balance is: ", before_verifier1)
     print("\n\tVerifier1 is going to pay: ", SMART_CONTRAT_PAYMENT)
-    verifier1 = Thread(target=verifier_pay(acc_verifier1))
+    verifier1 = Thread(target=verifier_pay(ctc_creator, acc_verifier1))
     verifier1.start()
     verifier1_last = get_balance(acc_verifier1)
     
@@ -191,7 +191,7 @@ def main():
     did_choose = 2 #DID to verify
 
     print("\n\tVerifier1 is going to Verify someone")
-    verifier1_verify = Thread(target=verifier_api_verify(acc_verifier1, did_choose, provers_addresses[1])) # in this case, the verifier is going to verify the bob1
+    verifier1_verify = Thread(target=verifier_api_verify(ctc_creator, acc_verifier1, did_choose, provers_addresses[1])) # in this case, the verifier is going to verify the bob1
     verifier1_verify.start()
 
     #################### start some testing steps ####################
@@ -222,7 +222,7 @@ def main():
 
 
 
-    rpc('/forget/acc', acc_creator, acc_bob1, acc_bob2, acc_bob3, acc_verifier1) #acc_bob4
+    rpc('/forget/acc', acc_creator, acc_bob1, acc_bob2, acc_bob3, acc_bob4, acc_verifier1) 
     rpc("/forget/ctc", ctc_creator)
 
 
