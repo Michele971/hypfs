@@ -25,7 +25,7 @@ If you want to try the simulation use:
 - **index.py**: Frontend code (that interact with Smart Contract backend code);
 - **startSimulation**: Simulation script that will call functions inside index.py to interact with Smart Contract.
 
-Some functionalities of scripts: 
+Some functionalities of scripts; initial interactions between Deployer and Prover: 
 <center><img src="img/interactionsScripts.png" width="75%" align="center"></center>
 
 Outcome:
