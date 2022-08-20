@@ -14,7 +14,7 @@ Working on interactions between Python and Smart Contract.
 
 Performance evaluation with startSimulation.py .
 
-## Install with Docker
+## Install the Hypercube with Docker
 
 ##### Requirements
 
