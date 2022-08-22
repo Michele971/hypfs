@@ -1,0 +1,865 @@
+#pragma version 6
+// resource: R_Txn
+int 0
+store 0 // GV_txnCounter :: UInt
+txn ApplicationID
+bz alloc
+byte base64()
+app_global_get
+dup
+int 0
+extract_uint64
+store 1 // GV_currentStep :: UInt
+int 8
+extract_uint64
+store 2 // GV_currentTime :: UInt
+txn OnCompletion
+int OptIn
+==
+bz normal
+// checked on completion
+txn Sender
+int 129
+bzero
+dig 1
+byte base64(AA==)
+dig 2
+extract 0 127
+app_local_put
+dig 1
+byte base64(AQ==)
+dig 2
+extract 127 2
+app_local_put
+pop
+pop
+b checkSize
+normal:
+txna ApplicationArgs 0
+btoi
+preamble:
+dup
+bz publish
+api:
+int 0
+store 4 // GV_argTime :: UInt
+int 1
+store 6 // GV_wasMeth :: Bool
+dup
+int 3576124915
+<
+bnz l4_method_lt_3576124915
+dup
+int 3976917511
+<
+bnz l5_method_lt_3976917511
+int 3976917511
+==
+assert
+
+  // { l1_verifierAPI_insert_money
+  l1_verifierAPI_insert_money:
+  // API: verifierAPI_insert_money(uint64)uint64
+  //  i(3976917511) h(ed0af207) b64(7QryBw==)
+  txna ApplicationArgs 1
+  store 255 // v860 :: Tuple(UInt)
+  byte base64(AA==)
+  load 255 // v860 :: Tuple(UInt)
+  concat
+  global ZeroAddress
+  concat
+  b publish5
+  // l1_verifierAPI_insert_money }
+
+l5_method_lt_3976917511:
+int 3576124915
+==
+assert
+
+  // { l3_views_retrieve_results
+  l3_views_retrieve_results:
+  // View: views_retrieve_results(uint64)byte[128]
+  //  i(3576124915) h(d52755f3) b64(1SdV8w==)
+  load 1 // GV_currentStep :: UInt
+  dup
+  int 7
+  <
+  bnz l6_viewStep_lt_7
+  int 7
+  ==
+  assert
+
+    // { views_retrieve_results_7
+    byte base64(AA==)
+    app_global_get
+    byte base64(AQ==)
+    app_global_get
+    concat
+    dup
+    store 3 // GV_svs :: Null
+    extract 32 128
+    // resource: R_Account
+    txna ApplicationArgs 1
+    btoi
+    callsub l7_LF_cMapLoad
+    dup
+    store 255 // fromSome object
+    extract 1 128
+    load 255 // fromSome object
+    int 0
+    getbyte
+    select
+    store 7 // GV_apiRet :: Null
+    b apiReturn_check
+    // views_retrieve_results_7 }
+
+  l6_viewStep_lt_7:
+  int 6
+  ==
+  assert
+
+    // { views_retrieve_results_6
+    byte base64(AA==)
+    app_global_get
+    byte base64(AQ==)
+    app_global_get
+    concat
+    dup
+    store 3 // GV_svs :: Null
+    extract 32 128
+    // resource: R_Account
+    txna ApplicationArgs 1
+    btoi
+    callsub l7_LF_cMapLoad
+    dup
+    store 255 // fromSome object
+    extract 1 128
+    load 255 // fromSome object
+    int 0
+    getbyte
+    select
+    store 7 // GV_apiRet :: Null
+    b apiReturn_check
+    // views_retrieve_results_6 }
+
+  // l3_views_retrieve_results }
+
+l4_method_lt_3576124915:
+dup
+int 1740127999
+<
+bnz l8_method_lt_1740127999
+int 1740127999
+==
+assert
+
+  // { l2_verifierAPI_verify
+  l2_verifierAPI_verify:
+  // API: verifierAPI_verify(uint64,address)byte
+  //  i(1740127999) h(67b83eff) b64(Z7g+/w==)
+  txna ApplicationArgs 1
+  txna ApplicationArgs 2
+  concat
+  store 255 // v865 :: Tuple(UInt, Address)
+  byte base64(AQ==)
+  load 255 // v865 :: Tuple(UInt, Address)
+  concat
+  b publish5
+  // l2_verifierAPI_verify }
+
+l8_method_lt_1740127999:
+int 1094448879
+==
+assert
+
+  // { l0_attacherAPI_insert_position
+  l0_attacherAPI_insert_position:
+  // API: attacherAPI_insert_position(byte[128],uint64)byte[128]
+  //  i(1094448879) h(413bf6ef) b64(QTv27w==)
+  txna ApplicationArgs 1
+  txna ApplicationArgs 2
+  concat
+  b publish6
+  // l0_attacherAPI_insert_position }
+
+publish:
+txna ApplicationArgs 2
+btoi
+store 4 // GV_argTime :: UInt
+txna ApplicationArgs 3
+txna ApplicationArgs 1
+btoi
+dup
+int 2
+<
+bnz l9_publish_lt_2
+dup
+int 5
+<
+bnz l10_publish_lt_5
+dup
+int 6
+<
+bnz l11_publish_lt_6
+int 6
+==
+assert
+
+  // { publish6
+  publish6:
+  // CompanionLabel False "publish6"
+  // check step
+  int 7
+  load 1 // GV_currentStep :: UInt
+  ==
+  assert
+  // check time
+  load 4 // GV_argTime :: UInt
+  dup
+  int 0
+  ==
+  swap
+  load 2 // GV_currentTime :: UInt
+  ==
+  ||
+  assert
+  byte base64(AA==)
+  app_global_get
+  byte base64(AQ==)
+  app_global_get
+  concat
+  store 3 // GV_svs :: Null
+  dup
+  store 5 // GV_argMsg :: Null
+  store 255 // .fork59.msg/370 :: Tuple(Bytes(128), UInt)
+  byte base64(ZHgj1g==)
+  load 255 // .fork59.msg/370 :: Tuple(Bytes(128), UInt)
+  concat
+  log // up to 140 bytes
+  // CompanionLabel True "api_attacherAPI_insert_position"
+  api_attacherAPI_insert_position:
+  // ^ CheckPay
+  // at ./index.rsh:92:17:dot
+  byte base64(AAAAAAAAAXY=)
+  load 255 // .fork59.msg/370 :: Tuple(Bytes(128), UInt)
+  extract 0 128
+  concat
+  log // up to 136 bytes
+  load 255 // .fork59.msg/370 :: Tuple(Bytes(128), UInt)
+  extract 0 128
+  store 7 // GV_apiRet :: Null
+  load 3 // GV_svs :: Null
+  extract 0 32
+  load 3 // GV_svs :: Null
+  extract 32 128
+  int 0
+  global Round
+  load 3 // GV_svs :: Null
+  int 160
+  extract_uint64
+  b loopBody3
+  // publish6 }
+
+l11_publish_lt_6:
+pop
+
+  // { publish5
+  publish5:
+  // CompanionLabel False "publish5"
+  // check step
+  int 6
+  load 1 // GV_currentStep :: UInt
+  ==
+  assert
+  // check time
+  load 4 // GV_argTime :: UInt
+  dup
+  int 0
+  ==
+  swap
+  load 2 // GV_currentTime :: UInt
+  ==
+  ||
+  assert
+  byte base64(AA==)
+  app_global_get
+  byte base64(AQ==)
+  app_global_get
+  concat
+  dup
+  store 3 // GV_svs :: Null
+  dup
+  dup
+  extract 0 32
+  store 255 // Creator/328 :: Address
+  extract 32 128
+  store 254 // proof_and_position/334 :: Bytes(128)
+  int 160
+  extract_uint64
+  store 253 // netBalance/397 :: UInt
+  dup
+  store 5 // GV_argMsg :: Null
+  store 252 // .fork138.msg/431 :: Data({"verifierAPI_insert_money0_138": Tuple(UInt), "verifierAPI_verify0_138": Tuple(UInt, Address)})
+  byte base64(ptkdqQ==)
+  load 252 // .fork138.msg/431 :: Data({"verifierAPI_insert_money0_138": Tuple(UInt), "verifierAPI_verify0_138": Tuple(UInt, Address)})
+  concat
+  log // up to 45 bytes
+  load 252 // .fork138.msg/431 :: Data({"verifierAPI_insert_money0_138": Tuple(UInt), "verifierAPI_verify0_138": Tuple(UInt, Address)})
+  int 0
+  getbyte
+  bnz l12_Switch_nz
+
+    // { l13_Switch_verifierAPI_insert_money0_138
+    l13_Switch_verifierAPI_insert_money0_138:
+    load 252 // .fork138.msg/431 :: Data({"verifierAPI_insert_money0_138": Tuple(UInt), "verifierAPI_verify0_138": Tuple(UInt, Address)})
+    extract 1 8
+    store 251 // data_id/434 :: Tuple(UInt)
+    // CompanionLabel True "api_verifierAPI_insert_money"
+    api_verifierAPI_insert_money:
+    load 251 // data_id/434 :: Tuple(UInt)
+    btoi
+    store 250 // money/439 :: UInt
+
+      // { checkTxn
+      load 250 // money/439 :: UInt
+      callsub l14_LF_checkTxn_net
+      // checkTxn }
+
+    // ^ CheckPay
+    // at ./index.rsh:130:19:dot
+    byte base64(AAAAAAAAAbc=)
+    load 250 // money/439 :: UInt
+    itob
+    concat
+    log // up to 16 bytes
+    load 250 // money/439 :: UInt
+    itob
+    store 7 // GV_apiRet :: Null
+    load 255 // Creator/328 :: Address
+    load 254 // proof_and_position/334 :: Bytes(128)
+    int 1
+    global Round
+    load 253 // netBalance/397 :: UInt
+    load 250 // money/439 :: UInt
+    +
+    b loopBody4
+    // l13_Switch_verifierAPI_insert_money0_138 }
+
+  l12_Switch_nz:
+
+    // { l15_Switch_verifierAPI_verify0_138
+    l15_Switch_verifierAPI_verify0_138:
+    load 252 // .fork138.msg/431 :: Data({"verifierAPI_insert_money0_138": Tuple(UInt), "verifierAPI_verify0_138": Tuple(UInt, Address)})
+    extract 1 40
+    store 251 // data_id/491 :: Tuple(UInt, Address)
+    // CompanionLabel True "api_verifierAPI_verify"
+    api_verifierAPI_verify:
+    // ^ CheckPay
+    // at ./index.rsh:130:19:dot
+    load 251 // data_id/491 :: Tuple(UInt, Address)
+    int 0
+    extract_uint64
+    store 250 // did/514 :: UInt
+    load 253 // netBalance/397 :: UInt
+    int 1000000000000000000
+    >=
+    bz l16_ifF
+
+      // { makeTxn
+      itxn_begin
+      int 0
+      itxn_field Fee
+      int 1000000000000000000
+      itxn_field Amount
+      int pay
+      itxn_field TypeEnum
+      // resource: R_Account
+      load 251 // data_id/491 :: Tuple(UInt, Address)
+      extract 8 32
+      itxn_field Receiver
+      itxn_submit
+      // makeTxn }
+
+    byte base64(AAAAAAAAAgwB)
+    log // up to 9 bytes
+    byte base64(AQ==)
+    store 7 // GV_apiRet :: Null
+    byte base64(AAAAAAAAAhQA)
+    log // up to 9 bytes
+    byte base64(AA==)
+    store 7 // GV_apiRet :: Null
+    // resource: R_Account
+    load 250 // did/514 :: UInt
+    dup
+    callsub l7_LF_cMapLoad
+    int 129
+    bzero
+    store 249 // spliceNew
+    pop
+    load 249 // spliceNew
+    dig 1
+    byte base64(AA==)
+    dig 2
+    extract 0 127
+    app_local_put
+    dig 1
+    byte base64(AQ==)
+    dig 2
+    extract 127 2
+    app_local_put
+    pop
+    pop
+    load 255 // Creator/328 :: Address
+    load 254 // proof_and_position/334 :: Bytes(128)
+    int 0
+    global Round
+    load 253 // netBalance/397 :: UInt
+    int 1000000000000000000
+    -
+    b loopBody4
+    l16_ifF:
+    byte base64(AAAAAAAAAhwA)
+    log // up to 9 bytes
+    byte base64(AA==)
+    store 7 // GV_apiRet :: Null
+    // resource: R_Account
+    load 250 // did/514 :: UInt
+    dup
+    callsub l7_LF_cMapLoad
+    int 129
+    bzero
+    store 249 // spliceNew
+    pop
+    load 249 // spliceNew
+    dig 1
+    byte base64(AA==)
+    dig 2
+    extract 0 127
+    app_local_put
+    dig 1
+    byte base64(AQ==)
+    dig 2
+    extract 127 2
+    app_local_put
+    pop
+    pop
+    load 255 // Creator/328 :: Address
+    load 254 // proof_and_position/334 :: Bytes(128)
+    int 0
+    global Round
+    load 253 // netBalance/397 :: UInt
+    b loopBody4
+    // l15_Switch_verifierAPI_verify0_138 }
+
+  // publish5 }
+
+l10_publish_lt_5:
+int 2
+==
+assert
+
+  // { publish2
+  publish2:
+  // CompanionLabel False "publish2"
+  // check step
+  int 2
+  load 1 // GV_currentStep :: UInt
+  ==
+  assert
+  // check time
+  load 4 // GV_argTime :: UInt
+  dup
+  int 0
+  ==
+  swap
+  load 2 // GV_currentTime :: UInt
+  ==
+  ||
+  assert
+  byte base64(AA==)
+  app_global_get
+  byte base64(AQ==)
+  app_global_get
+  concat
+  dup
+  store 3 // GV_svs :: Null
+  extract 0 32
+  store 255 // Creator/328 :: Address
+  byte base64(QbFATQ==)
+  log // up to 4 bytes
+  // ^ CheckPay
+  // at ./index.rsh:81:11:dot
+  load 255 // Creator/328 :: Address
+  txn Sender
+  ==
+  assert
+  // ^ Claim: sender correct
+  // at ./index.rsh:81:11:dot
+  load 255 // Creator/328 :: Address
+  load 3 // GV_svs :: Null
+  extract 32 128
+  int 1
+  global Round
+  int 0
+  b loopBody3
+  // publish2 }
+
+l9_publish_lt_2:
+dup
+int 1
+<
+bnz l17_publish_lt_1
+pop
+
+  // { publish1
+  publish1:
+  // CompanionLabel False "publish1"
+  // check step
+  int 1
+  load 1 // GV_currentStep :: UInt
+  ==
+  assert
+  // check time
+  load 4 // GV_argTime :: UInt
+  dup
+  int 0
+  ==
+  swap
+  load 2 // GV_currentTime :: UInt
+  ==
+  ||
+  assert
+  byte base64(AA==)
+  app_global_get
+  dup
+  store 3 // GV_svs :: Null
+  store 255 // Creator/328 :: Address
+  dup
+  store 5 // GV_argMsg :: Null
+  dup
+  extract 0 128
+  store 254 // proof_and_position/334 :: Bytes(128)
+  int 128
+  extract_uint64
+  store 253 // decentralized_identifier_creator/335 :: UInt
+  byte base64(DeJzPQ==)
+  load 254 // proof_and_position/334 :: Bytes(128)
+  concat
+  load 253 // decentralized_identifier_creator/335 :: UInt
+  itob
+  concat
+  log // up to 140 bytes
+  // ^ CheckPay
+  // at ./index.rsh:76:11:dot
+  load 255 // Creator/328 :: Address
+  txn Sender
+  ==
+  assert
+  // ^ Claim: sender correct
+  // at ./index.rsh:76:11:dot
+  // resource: R_Account
+  load 253 // decentralized_identifier_creator/335 :: UInt
+  dup
+  callsub l7_LF_cMapLoad
+  byte base64(AQ==)
+  load 254 // proof_and_position/334 :: Bytes(128)
+  concat
+  store 252 // spliceNew
+  pop
+  load 252 // spliceNew
+  dig 1
+  byte base64(AA==)
+  dig 2
+  extract 0 127
+  app_local_put
+  dig 1
+  byte base64(AQ==)
+  dig 2
+  extract 127 2
+  app_local_put
+  pop
+  pop
+  load 255 // Creator/328 :: Address
+  load 254 // proof_and_position/334 :: Bytes(128)
+  concat
+  byte base64(AA==)
+  dig 1
+  extract 0 127
+  app_global_put
+  byte base64(AQ==)
+  dig 1
+  extract 127 33
+  app_global_put
+  pop
+  int 2
+  store 1 // GV_currentStep :: UInt
+  global Round
+  store 2 // GV_currentTime :: UInt
+  b updateStateNoOp
+  // publish1 }
+
+l17_publish_lt_1:
+pop
+
+  // { publish0
+  publish0:
+  // CompanionCreate
+
+    // { checkTxn
+    int 100000
+    callsub l14_LF_checkTxn_net
+    // checkTxn }
+
+  // ^ CheckPay
+  // at ./index.rsh:67:11:dot
+  // CompanionLabel False "publish0"
+  // check step
+  int 0
+  load 1 // GV_currentStep :: UInt
+  ==
+  assert
+  // check time
+  load 4 // GV_argTime :: UInt
+  dup
+  int 0
+  ==
+  swap
+  load 2 // GV_currentTime :: UInt
+  ==
+  ||
+  assert
+  byte base64(Xw2r+g==)
+  log // up to 4 bytes
+  // ^ CheckPay
+  // at ./index.rsh:67:11:dot
+  txn Sender
+  byte base64(AA==)
+  dig 1
+  extract 0 32
+  app_global_put
+  pop
+  int 1
+  store 1 // GV_currentStep :: UInt
+  global Round
+  store 2 // GV_currentTime :: UInt
+  b updateStateNoOp
+  // publish0 }
+
+
+  // { loopBody3
+  loopBody3:
+  store 255 // netBalance/356 :: UInt
+  store 254 // thisConsensusTime/349 :: UInt
+  store 253 // keepGoing/348 :: Bool
+  store 252 // proof_and_position/334 :: Bytes(128)
+  store 251 // Creator/328 :: Address
+  load 253 // keepGoing/348 :: Bool
+  bz l18_ifF
+  load 251 // Creator/328 :: Address
+  load 252 // proof_and_position/334 :: Bytes(128)
+  concat
+  load 255 // netBalance/356 :: UInt
+  itob
+  concat
+  byte base64(AA==)
+  dig 1
+  extract 0 127
+  app_global_put
+  byte base64(AQ==)
+  dig 1
+  extract 127 41
+  app_global_put
+  pop
+  int 7
+  store 1 // GV_currentStep :: UInt
+  global Round
+  store 2 // GV_currentTime :: UInt
+  b updateStateNoOp
+  l18_ifF:
+  load 251 // Creator/328 :: Address
+  load 252 // proof_and_position/334 :: Bytes(128)
+  int 1
+  load 254 // thisConsensusTime/349 :: UInt
+  load 255 // netBalance/356 :: UInt
+  b loopBody4
+  // loopBody3 }
+
+
+  // { loopBody4
+  loopBody4:
+  store 255 // netBalance/397 :: UInt
+  store 254 // thisConsensusTime/390 :: UInt
+  store 253 // keepGoing2/389 :: Bool
+  store 252 // proof_and_position/334 :: Bytes(128)
+  store 251 // Creator/328 :: Address
+  load 253 // keepGoing2/389 :: Bool
+  bz l19_ifF
+  load 251 // Creator/328 :: Address
+  load 252 // proof_and_position/334 :: Bytes(128)
+  concat
+  load 255 // netBalance/397 :: UInt
+  itob
+  concat
+  byte base64(AA==)
+  dig 1
+  extract 0 127
+  app_global_put
+  byte base64(AQ==)
+  dig 1
+  extract 127 41
+  app_global_put
+  pop
+  int 6
+  store 1 // GV_currentStep :: UInt
+  global Round
+  store 2 // GV_currentTime :: UInt
+  b updateStateNoOp
+  l19_ifF:
+
+    // { makeTxn
+    itxn_begin
+    int 0
+    itxn_field Fee
+    load 255 // netBalance/397 :: UInt
+    itxn_field Amount
+    int pay
+    itxn_field TypeEnum
+    // resource: R_Account
+    load 251 // Creator/328 :: Address
+    itxn_field Receiver
+    itxn_submit
+    // makeTxn }
+
+  // CompanionDeletePre
+  b updateStateHalt
+  // loopBody4 }
+
+updateStateHalt:
+txn OnCompletion
+int DeleteApplication
+==
+assert
+// checked on completion
+// CompanionDelete
+
+  // { makeTxn
+  itxn_begin
+  int 0
+  itxn_field Fee
+  int 0
+  itxn_field Amount
+  int pay
+  itxn_field TypeEnum
+  global CreatorAddress
+  itxn_field CloseRemainderTo
+  global CurrentApplicationAddress
+  itxn_field Receiver
+  itxn_submit
+  // makeTxn }
+
+b updateState
+updateStateNoOp:
+txn OnCompletion
+int NoOp
+==
+assert
+// checked on completion
+updateState:
+byte base64()
+load 1 // GV_currentStep :: UInt
+itob
+load 2 // GV_currentTime :: UInt
+itob
+concat
+app_global_put
+load 6 // GV_wasMeth :: Bool
+bz checkSize
+apiReturn_noCheck:
+byte base64(FR98dQ==)
+load 7 // GV_apiRet :: Null
+concat
+log // up to 132 bytes
+checkSize:
+load 0 // GV_txnCounter :: UInt
+dup
+int 1
++
+global GroupSize
+==
+assert
+txn GroupIndex
+==
+assert
+done:
+int 1
+return
+apiReturn_check:
+txn OnCompletion
+int NoOp
+==
+assert
+// checked on completion
+b apiReturn_noCheck
+alloc:
+int 0
+txn GlobalNumUint
+==
+assert
+int 3
+txn GlobalNumByteSlice
+==
+assert
+int 0
+txn LocalNumUint
+==
+assert
+int 2
+txn LocalNumByteSlice
+==
+assert
+int 0
+store 1 // GV_currentStep :: UInt
+int 0
+store 2 // GV_currentTime :: UInt
+b updateStateNoOp
+l7_LF_cMapLoad:
+dup
+txn ApplicationID
+app_opted_in
+bnz l20_mapLoadDo
+l21_mapLoadDef:
+pop
+int 129
+bzero
+retsub
+l20_mapLoadDo:
+dup
+byte base64(AA==)
+app_local_get
+dig 1
+byte base64(AQ==)
+app_local_get
+concat
+swap
+pop
+retsub
+l14_LF_checkTxn_net:
+// resource: R_Txn
+load 0 // GV_txnCounter :: UInt
+dup
+dup2
+int 1
++
+store 0 // GV_txnCounter :: UInt
+gtxns Receiver
+global CurrentApplicationAddress
+==
+assert
+gtxns TypeEnum
+int pay
+==
+assert
+gtxns Amount
+==
+assert
+retsub

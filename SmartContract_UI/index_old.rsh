@@ -3,13 +3,37 @@
 
 const REWARD_FOR_PROVER = 1000000000000000000//send by VERIFIER
 
+//NOTES:
+// TODO: This smart contract is empower to validate if the positions if user are correct
+// There is a smart contract for every different position
+// TODO: The Smart Contract will expire after a specific amount of time
+// TODO: Add the geofence attribute to the smart contract (radius, etc etc ....). In this way 
+//       we can design more checks such as: the position received must be inside the geofence area.
+// TODO: The smart contract will know the verifier (?) ----> still to be decided. 
+//       Maybe using an unique password (for more verifiers) for memory reason
+// TODO: check that the proofs inserted unique and not already present
+//
+//
+// const commonInteract = {
+//   ...hasConsoleLogger,
+//   position: Bytes(128),
+//   decentralized_identifier: UInt,
+//   proof_reveived: Bytes(128),
+//   reportPosition: Fun([UInt, Maybe(Bytes(128))], Null),
 
-// 1. Compile the contract you want to use in the factory, get intermediate files too
-// $ ./reach compile --intermediate-files
+//   //for testing
+//   report_results: Fun([Bytes(128)], Null)
+// };
+// const creatorInteract = {
+//   ...commonInteract,
+// };
+// const attacherInteract = {
+//   ...commonInteract,
+// };
 
-// 2. Change the format of your Reach code so it looks like
-const make = (creationCode, isReach=false) => Reach.App(() => { 
-  const Creator = Participant('Creator',{ 
+
+export const main = Reach.App(() => {
+    const Creator = Participant('Creator',{ 
     ...hasConsoleLogger,
     position: Bytes(128),
     decentralized_identifier: UInt,
@@ -37,17 +61,10 @@ const make = (creationCode, isReach=false) => Reach.App(() => {
     retrieve_results: Fun([UInt], Bytes(128)), // View that let Verifier checks the retrieve data
   });
 
+  setOptions({untrustworthyMaps: true});
+  init();
 
-   
-    setOptions({untrustworthyMaps: true});
-    const ChildCode = ContractCode(creationCode);
-    init();
-   
-    Creator.publish();
-
-    const childNew = new Contract(ChildCode);
-      commit();
-      Creator.publish() //we need that to use the MAP below
+  Creator.publish() //we need that to use the MAP below
   const easy_map = new Map(UInt,Bytes(128));
 
   commit();
@@ -154,21 +171,4 @@ const make = (creationCode, isReach=false) => Reach.App(() => {
   
 
   exit();
- })
-
-// 3. To create the factory add
-// export const ethFactory = make({ 
-//   ETH: "./build/index.main.sol:Contract",
-//   ALGO: {
-//     approval: "./build/index.main.appApproval.teal",
-//     clearState: "./build/index.main.appClear.teal" 
-//   }
-// })
-// ( Change /path/to/... strings with the actual paths for your compile code)
-export const main3 = make({
-  ETH: 'child.sol:ReachContract',
-  ALGO: {
-    approval: 'child.approve.teal',
-    clearState: 'child.clear.teal',
-  },
 });
