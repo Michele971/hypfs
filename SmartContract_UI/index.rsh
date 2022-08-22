@@ -4,10 +4,6 @@
 const REWARD_FOR_PROVER = 1000000000000000000//send by VERIFIER
 
 
-// 1. Compile the contract you want to use in the factory, get intermediate files too
-// $ ./reach compile --intermediate-files
-
-// 2. Change the format of your Reach code so it looks like
 const make = (creationCode, isReach=false) => Reach.App(() => { 
   const Creator = Participant('Creator',{ 
     ...hasConsoleLogger,
@@ -156,15 +152,8 @@ const make = (creationCode, isReach=false) => Reach.App(() => {
   exit();
  })
 
-// 3. To create the factory add
-// export const ethFactory = make({ 
-//   ETH: "./build/index.main.sol:Contract",
-//   ALGO: {
-//     approval: "./build/index.main.appApproval.teal",
-//     clearState: "./build/index.main.appClear.teal" 
-//   }
-// })
-// ( Change /path/to/... strings with the actual paths for your compile code)
+
+// create the factory 
 export const main3 = make({
   ETH: 'child.sol:ReachContract',
   ALGO: {
