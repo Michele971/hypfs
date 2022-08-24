@@ -176,6 +176,22 @@ class Prover(Witness):
     def createAccount(self):
         acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
         return acc_prover
+        
+    # this method will interact with index.py
+    def deploySmartContract(self, proverObject):
+        ctc_creator = rpc("/acc/contract", proverObject.account)
+        creatorThread = Thread(target=play_Creator, args=(ctc_creator, proverObject.location, proverObject.did, 'proof',))
+        creatorThread.start()
+        return creatorThread, ctc_creator
+
+    # this method will interact with index.py
+    def attachToSmartContract(self, proverAttacherObject, ctc_creator):
+        attacherThread = Thread(target=play_bob, args=(ctc_creator, proverAttacherObject.account, proverAttacherObject.location, proverAttacherObject.did, 'proof',))
+        attacherThread.start()
+
+        return attacherThread
+
+
 
 
 def createWitness(did, public_key, private_key, proofs_array_computed, location):
@@ -214,20 +230,6 @@ def generateOLC(latitude, longitude):
     print('Encoded location: ', location_encoded)
     return location_encoded
 
-
-# this method will interact with index.py
-def deploySmartContract(proverObject):
-    ctc_creator = rpc("/acc/contract", proverObject.account)
-    creatorThread = Thread(target=play_Creator, args=(ctc_creator, proverObject.location, proverObject.did, 'proof',))
-    creatorThread.start()
-    return creatorThread, ctc_creator
-
-# this method will interact with index.py
-def attachToSmartContract(proverAttacherObject, ctc_creator):
-    attacherThread = Thread(target=play_bob, args=(ctc_creator, proverAttacherObject.account, proverAttacherObject.location, proverAttacherObject.did, 'proof',))
-    attacherThread.start()
-
-    return attacherThread
 
 
 
@@ -276,7 +278,7 @@ def startSimulation():
             time.sleep(3)
             if (location_in_hypercube == False):
                 print(" Deploying the smart contract ...")
-                creatorThread, contract_creator_deployed = deploySmartContract(prov)
+                creatorThread, contract_creator_deployed = prov.deploySmartContract(prov)
                 print("Smart contract deployed  🚀 ")
                 prover_thread.append(creatorThread)
                 '''
@@ -285,7 +287,7 @@ def startSimulation():
 
                 location_in_hypercube = True # TODO: remove this in production
             else:
-                proverThread = attachToSmartContract(prov, contract_creator_deployed)
+                proverThread = prov.attachToSmartContract(prov, contract_creator_deployed)
                 prover_thread.append(proverThread)
     
 
