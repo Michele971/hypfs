@@ -1,6 +1,18 @@
 ## NOTES
 
-You have to run the project on Ethereum Consensus Network
+### You have to run the project on Ethereum Consensus Network
+
+### The final version of smart contract will not contains the location for privacy reasons. Instead hash of the proof and signed hash of the proof will be inserted by the provers
+
+### Info
+
+At the moment, the following system contains 8 prover where 2 are creators and 6 are the neighbours.
+In particular:
+- **1° Smart contract associated to 7H369F4W+Q8 location:** prover with DID 2 is the creator and his neighbours are 6, 50 and 51;
+- **2° Smart contract associated to 7H369F4W+Q9 location:** prover with DID 8 is the creator and his neighbours are 9, 10 and 11.
+
+The verifier has a balance equal to 1500 and sends 500 eth to both smart contracts.
+Ther verifier will also verify all the proof and location inside the smart contracts.
 
 ## Main Features
 

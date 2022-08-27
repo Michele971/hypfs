@@ -59,6 +59,7 @@ def play_Creator(contract_creator, position, did, proof):
 def play_bob(ctc_user_creator, accc, pos, did, proof):
     # Get and attach to the creator Contract
     ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_user_creator))
+
     # Call the API
     result_counter = rpc('/ctc/apis/attacherAPI/insert_position', ctc_bob, pos, did)
     counter_int = int(result_counter.get('hex'), 16)

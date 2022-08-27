@@ -2,7 +2,7 @@
 'use strict';
 
 const REWARD_FOR_PROVER = 10000//send by VERIFIER
-const SMART_CONTRACT_MAX_USER = 4
+const SMART_CONTRACT_MAX_USER = 3
 //NOTES:
 // TODO: This smart contract is empower to validate if the positions of users are correct
 // There is a smart contract for every different position
@@ -104,7 +104,6 @@ export const main = Reach.App(() => {
     commit();
     Creator.publish();
 
-
     const keepGoing2 = 
     parallelReduce(true) 
       .invariant(balance() == balance())
@@ -133,6 +132,14 @@ export const main = Reach.App(() => {
           ret(walletAddress);
           delete easy_map[did]; //vector[0] is the did
           // Creator.only(() => interact.reportVerification(did, this));
+
+          
+          // print this for debugging
+          // Creator.only(() => interact.reportVerification(balance(), this));
+          // Creator.only(() => interact.reportVerification(REWARD_FOR_PROVER, this));
+
+
+
           return true; //TODO: THIS HAS TO BE TRUEE, false only for testing
         }
       )
@@ -148,3 +155,6 @@ export const main = Reach.App(() => {
 
   exit();
 });
+
+
+
