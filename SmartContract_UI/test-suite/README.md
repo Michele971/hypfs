@@ -40,7 +40,7 @@ If you want to try the simulation use:
 Some functionalities of scripts; initial interactions between Deployer and Prover: 
 <center><img src="img/interactionsScripts.png" width="75%" align="center"></center>
 
-Outcome:
+Outcome [not correct | fixed with the new version]:
 <center><img src="img/terminalStartSimulation.png" width="75%" align="center"></center>
 
 ## If issues comes ...
