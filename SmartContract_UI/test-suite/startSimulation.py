@@ -70,7 +70,7 @@ dictOfLocation = {
         13,
         14
     ],
-    "7H368FWV+X6": [ #Ice-cream 
+    "7H368FWV+X6": [ #Ice-cream Bologna
         15,
         16,
         17,
@@ -145,7 +145,21 @@ class Prover(Witness):
     '''
     def find_neighbours(self, locationProver, dicWitnessLocation):
         if (dicWitnessLocation.get(locationProver)):
-            return dicWitnessLocation.get(locationProver)
+            tempListNeigh = dicWitnessLocation.get(locationProver)
+            # need to copy the list in a new one to overcome the issue of "pass by reference"
+            listNeighboursFound = tempListNeigh.copy()
+            print("zaas",listNeighboursFound)
+            #count how many neighbours I have found
+            numberOfNeighboursFound = len(listNeighboursFound)
+            # remove the DID of the user that is making the request from the list; e.g. if the user with DID 2 make the request, the neighbour list could be [2,3,4,5,6], then I need to remove his DID from the list which is 2. The new list will be [3,4,5,6]
+            listNeighboursFound.remove(self.did)
+            
+            if numberOfNeighboursFound >= 1:
+                print("I have found ",numberOfNeighboursFound, " neighbours for user with DID ", self.did)
+                return listNeighboursFound
+            else:
+                print("ERROR: no neighbours foud except you")
+                return None
         else: 
             print('No Neighbours found in your location: ', locationProver)
 
@@ -232,14 +246,11 @@ def generateOLC(latitude, longitude):
 
 # START the simulation
 def startSimulation():
-    dict_location_sc = {} # keep track if the smart contract is already associated to this particular location. His lenght will be equal to NUMBER_OF_LOCATIONS
+    dict_location_sc = {} # keep track if the smart contract is already associated to this particular location. Its lenght will be equal to NUMBER_OF_LOCATIONS
     global con
     # Starting prover steps
-    for i in range(0, PROVER_NUMBER):
-        # bologna: 11.3411625, 44.4942452
-        # la vecchia stalla gelateria: 11.3474453, 44.4930181 
+    for i in range(0, PROVER_NUMBER): #for every prover of the entire system ...
         ##### TODO: Generate random LATITUDE & LONGITUDE (for every user), Then convert them to Open Location code and add to LOCATION_LIST_PROV
-        #generateOLC
         #generateOLC(11.3474453,44.4930181 )#11.356988, 44.495888) # just for testing
         #buildDict()
 
@@ -260,15 +271,13 @@ def startSimulation():
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
         if neighbours: 
-            ### TODO: do not print the id of the prover!!
+
             print('→ 🪪 Prover DID: ', prov.did,'\n 📍 Location: ', prov.location, '\n    Neighbours: ', neighbours,'\n',)
 
             '''
-                TODO: The first user that call the contract has to deploy it;
-                    the others will attach.
-            '''
-            '''
-                TODO: HERE you'll have to check if the data are already located inside the hypercube
+                TODO: HERE you'll have to check if the data are already located inside the hypercube.
+                        The first user that call the contract has to deploy it;
+                        the others will attach.
             '''
             time.sleep(3)
             # the IF will simulate the initial check inside the hypercube. If the SC is not associated to a location in the hypercube (the dictionary in this case) then deploy a new smart contract and insert its ID and location inside the hypercube
@@ -282,9 +291,9 @@ def startSimulation():
                 '''
 
 
-                dict_location_sc[prov.location] = contract_creator_deployed
+                dict_location_sc[prov.location] = contract_creator_deployed #insert the contract_id inside the dict_location_sc which track the contract deployed
             else:
-                print("User is attaching to the Smart contract ",dict_location_sc.get(prov.location),  " 🟩 🟩 ")
+                print("User is attaching to the Smart contract ",dict_location_sc.get(prov.location),  " 🟩 📎 📎 🟩 ")
                 retrieved_ctc = dict_location_sc[prov.location]
                 proverThread = prov.attachToSmartContract(prov, retrieved_ctc)
                 prover_thread.append(proverThread)
