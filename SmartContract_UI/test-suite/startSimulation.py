@@ -1,10 +1,27 @@
 
+from platform import python_branch
 from openlocationcode import openlocationcode as olc
 from reach_rpc import mk_rpc
 from index import format_address
 from index import play_Creator, play_bob, verifier_pay, verifier_api_verify
 from threading import Thread
 import time
+import eth_new_account
+
+list_private_public_key = [
+    '0x8d10e8fb1aa289828f31914f581dbc39d9ed76b2e2d1247c49f5814349ff10c0', 
+    '0x9cf648f6aaa283e0c227f9047e735e1d604875ce735223c334f1c511a0dd2b1b',
+    '0xd1d2862447f71d78ab4d0b92800034c11cb7bd13ffe5d0a5bc2851e95ce719d7',
+    '0x0fcab881cf4b6d40fbf1473b908d9501524b0d84ac7fe44196e763b8bde9545a',
+    '0x18c78ad1e9447f077611e1945579c4215bb5551852e8b4957c89b783eb1aa3c8',
+    '0x3c5baad76449c59aa1cff6d27febaa201d5150b86b382451d3645d8afd919a63',
+    '0xc662ab78a9180104c1d20f9eb1f993794c093e98e7efe78e23d5ccb02fec637f',
+    '0xbd0c0a94a5998144da5a64c5ca9c67cc92d383762fa58b7e8017eed63de908b4',
+    '0x8ad4d716b3ed5c31cf4125fed2f9549259768482941f7ea3969d0fda93413e06',
+    '0x3888a91f2bae15a5c8df4545ecc2b2a50ea2f0034ec168df7ae429987eabf405'
+]
+
+
 prover_thread = [] #list of prover thread
 prover_list_account = [] #list of prover account 
 prover_addresses = [] # list of provers addresses
@@ -15,6 +32,8 @@ verifier_list_account = [] #list of verifier account
 contract_creator_deployed = None # contrat deployed, will have to be a list of contracts
 
 rpc, rpc_callbacks = mk_rpc()
+rpc("/stdlib/setProviderByName","TestNet")
+
 STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500) # use "parseCurrency" method when you send value TO backend
 location_in_hypercube = False # simulate if the location is already stored in hypercube
 
@@ -185,12 +204,33 @@ class Prover(Witness):
         # Deploy smart contract if location is not in the hypercube
         pass
 
-    def createAccount(self):
-        acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+    def createAccount(self, i):
+        #acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        acc_prover = None
+
+
+        print("PRIVATE KEY: ", list_private_public_key[i])
+        acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
+
+     
+      
+
+        #print("aaaaaaaaaa",rpc('/stdlib/providerEnvByName'))
+        # consensus_network = rpc('/stdlib/providerEnvByName')
+        # if consensus_network == 'ETH':
+        #     #passphase_inserted = "coyote usual trigger laundry industry spoon quantum lyrics candy hood balance spell"
+        #     private_key = "0x25db347fdf2ac94fa4e5893299bac50c81a091c3d12bc54f72716f2c692a5fef"
+        #     acc_prover = rpc("/stdlib/newAccountFromSecret", private_key)
+
+        # else consensus_network == 'ALGO':
+        #         acc_prover = rpc("/stdlib/newAccountFromMnemonic", passphase_inserted)
+
+            
         return acc_prover
         
     # this method will interact with index.py
     def deploySmartContract(self, proverObject):
+        #rpc('/stdlib/setProviderByName','TestNet')
         ctc_creator = rpc("/acc/contract", proverObject.account)
         creatorThread = Thread(target=play_Creator, args=(ctc_creator, proverObject.location, proverObject.did, 'proof',))
         creatorThread.start()
@@ -262,7 +302,7 @@ def startSimulation():
             location= LOCATION_LIST_PROV[i], # The Prover Location come from an default array that contains all the Locations
             proofs_received_array=[])
 
-        account_prov = prov.createAccount()
+        account_prov = prov.createAccount(i) #passing the number of prover to create
         # TODO: create a list of object provers and remove the two line below. Refactoring
         prover_list_account.append(account_prov)
         prover_addresses.append(format_address(account_prov)) #getting the wallet addresses for prover and appending to the list
@@ -279,7 +319,7 @@ def startSimulation():
                         The first user that call the contract has to deploy it;
                         the others will attach.
             '''
-            time.sleep(3)
+            time.sleep(50)
             # the IF will simulate the initial check inside the hypercube. If the SC is not associated to a location in the hypercube (the dictionary in this case) then deploy a new smart contract and insert its ID and location inside the hypercube
             if (prov.location in dict_location_sc) == False: # if the location is not inserted inside the dict that track the SC deployed, then deploy a new smart contract and add the contract address to the dict 
                 print(" Deploying the smart contract ...")
