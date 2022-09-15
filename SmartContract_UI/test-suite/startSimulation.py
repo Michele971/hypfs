@@ -167,7 +167,7 @@ class Prover(Witness):
             tempListNeigh = dicWitnessLocation.get(locationProver)
             # need to copy the list in a new one to overcome the issue of "pass by reference"
             listNeighboursFound = tempListNeigh.copy()
-            print("zaas",listNeighboursFound)
+            #print("zaas",listNeighboursFound)
             #count how many neighbours I have found
             numberOfNeighboursFound = len(listNeighboursFound)
             # remove the DID of the user that is making the request from the list; e.g. if the user with DID 2 make the request, the neighbour list could be [2,3,4,5,6], then I need to remove his DID from the list which is 2. The new list will be [3,4,5,6]
@@ -205,14 +205,15 @@ class Prover(Witness):
         pass
 
     def createAccount(self, i):
+        # ########### #######  WORK WITH REACH DEVNET ##################
         #acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+
         acc_prover = None
 
-
-        print("PRIVATE KEY: ", list_private_public_key[i])
+        
+        #print("PRIVATE KEY: ", list_private_public_key[i])
+        # ########### #######  WORK WITH ETHEREUM TESTNET ##################
         acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
-
-     
       
 
         #print("aaaaaaaaaa",rpc('/stdlib/providerEnvByName'))
@@ -232,15 +233,19 @@ class Prover(Witness):
     def deploySmartContract(self, proverObject):
         #rpc('/stdlib/setProviderByName','TestNet')
         ctc_creator = rpc("/acc/contract", proverObject.account)
+        print("Smart contract deployed  🚀 :", ctc_creator)
+        print("Inserting Creator's information into the contract ...")
         creatorThread = Thread(target=play_Creator, args=(ctc_creator, proverObject.location, proverObject.did, 'proof',))
         creatorThread.start()
+        print("Insert operation completed")
         return creatorThread, ctc_creator
 
     # this method will interact with index.py
     def attachToSmartContract(self, proverAttacherObject, ctc_creator):
+        print("Calling play bob")
         attacherThread = Thread(target=play_bob, args=(ctc_creator, proverAttacherObject.account, proverAttacherObject.location, proverAttacherObject.did, 'proof',))
         attacherThread.start()
-
+        print("playbob called successfully")
         return attacherThread
 
 
@@ -307,7 +312,10 @@ def startSimulation():
         prover_list_account.append(account_prov)
         prover_addresses.append(format_address(account_prov)) #getting the wallet addresses for prover and appending to the list
         prov.account = account_prov
-
+        
+        #setting the gas limit
+        rpc("/acc/setGasLimit", account_prov, 5000000) # this line avoid the error displayed on etherscan which is: "out of gas"
+   
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
         if neighbours: 
@@ -319,32 +327,40 @@ def startSimulation():
                         The first user that call the contract has to deploy it;
                         the others will attach.
             '''
-            time.sleep(50)
+            time.sleep(5)
             # the IF will simulate the initial check inside the hypercube. If the SC is not associated to a location in the hypercube (the dictionary in this case) then deploy a new smart contract and insert its ID and location inside the hypercube
             if (prov.location in dict_location_sc) == False: # if the location is not inserted inside the dict that track the SC deployed, then deploy a new smart contract and add the contract address to the dict 
                 print(" Deploying the smart contract ...")
                 creatorThread, contract_creator_deployed = prov.deploySmartContract(prov)
-                print("Smart contract deployed  🚀 ")
                 prover_thread.append(creatorThread)
                 '''
                     TODO: insert the required data inside the hypercube 
                 '''
 
-
                 dict_location_sc[prov.location] = contract_creator_deployed #insert the contract_id inside the dict_location_sc which track the contract deployed
+                print("\n")
+                print("startint the creato sleep ...")
+                time.sleep(150)
             else:
-                print("User is attaching to the Smart contract ",dict_location_sc.get(prov.location),  " 🟩 📎 📎 🟩 ")
+                #print("\n User is attaching to the Smart contract ",dict_location_sc.get(prov.location),  " 🟩 📎 📎 🟩 ")
                 retrieved_ctc = dict_location_sc[prov.location]
+                print("User: ",format_address(prov.account)," Preparing the Attaching to the contract ...", retrieved_ctc)
                 proverThread = prov.attachToSmartContract(prov, retrieved_ctc)
+                print("starting the sleep ...")
+                time.sleep(60)
+                print("Attach terminated")
                 prover_thread.append(proverThread)
+                
+              
     
-
+    
     # Starting Verifier steps
     '''
         ❗️  WARNING: ❗️
         ---> Check that SMART_CONTRACT_MAX_USER variable in index.rsh has been reached here: Everybody has to attach to the contract if you want going on with verifiers
     '''
     for i in range(0, VERIFIER_NUMBER):
+        break;
         time.sleep(5)
         verifier = createVerifier(
             did= DID_LIST_VER[i],

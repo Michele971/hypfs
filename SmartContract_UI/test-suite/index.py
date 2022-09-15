@@ -58,13 +58,21 @@ def play_Creator(contract_creator, position, did, proof):
 
 def play_bob(ctc_user_creator, accc, pos, did, proof):
     # Get and attach to the creator Contract
+    print("Entering in play_bob, attaching to: ", ctc_user_creator,'\n')    
     ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_user_creator))
-
+    print("Attaching Done")
     # Call the API
+    print("\nCalling the API ...")
     result_counter = rpc('/ctc/apis/attacherAPI/insert_position', ctc_bob, pos, did)
+    print("2) waiting 10 secs ... ")
+    time.sleep(10)
     counter_int = int(result_counter.get('hex'), 16)
-    print("Number of users that can still insert their position: ", counter_int)
+    print("User ATTACHED  📎 📎 \n Number of users that can still insert their position: ", counter_int)
+
+    print("\n\n")
     rpc("/forget/ctc", ctc_bob)
+
+
 
 def verifier_pay(ctc_user_creator,accc):
         ctc_verifier = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_user_creator))
@@ -104,8 +112,6 @@ def main():
     before_bob1 = get_balance(acc_bob1)
     before_verifier1 = get_balance(acc_verifier1)
 
-    
-
     ctc_creator = rpc("/acc/contract", acc_creator)
 
 
@@ -118,10 +124,6 @@ def main():
     creator.start()
     provers_addresses.append(format_address(acc_creator))
     print("\t Creator started! Smart contract deployed. ")
-
-
-        
-    
     
     def view_getCtcBalance(accc):
         ctc_bobs = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_creator))
@@ -135,8 +137,6 @@ def main():
         reward_amount = rpc("/ctc/views/views/getReward",ctc_users)
         print("Reward to pay ", int(reward_amount[1].get('hex'), 16))
         rpc("/forget/ctc", ctc_users)
-
-
 
     print("\n\tProvers are inserting their position and, proof computed by witness, inside the smart contract")
     time.sleep(4)
@@ -160,12 +160,12 @@ def main():
     bob3.start()
     provers_addresses.append(format_address(acc_bob3))
 
-    time.sleep(4)
-    pos_bob = "San Lazzaro"
-    did_bob = 5
-    bob4 = Thread(target=play_bob(ctc_creator, acc_bob4, pos_bob, did_bob, 'proof'))
-    bob4.start()
-    provers_addresses.append(format_address(acc_bob4))
+    # time.sleep(4)
+    # pos_bob = "San Lazzaro"
+    # did_bob = 5
+    # bob4 = Thread(target=play_bob(ctc_creator, acc_bob4, pos_bob, did_bob, 'proof'))
+    # bob4.start()
+    # provers_addresses.append(format_address(acc_bob4))
 
 
     time.sleep(4)
@@ -220,9 +220,6 @@ def main():
     after_creator = get_balance(acc_creator)
     print('Creator went from %s to %s' % (before_creator, after_creator))
     
-
-
-
     rpc('/forget/acc', acc_creator, acc_bob1, acc_bob2, acc_bob3, acc_bob4, acc_verifier1) 
     rpc("/forget/ctc", ctc_creator)
 

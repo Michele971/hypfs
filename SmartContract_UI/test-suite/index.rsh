@@ -26,8 +26,6 @@ export const main = Reach.App(() => {
 
   });
 
-
-
   const attacherAPI = API('attacherAPI',{
     insert_position: Fun([Bytes(128),UInt], UInt), //PositionAndProof - DID - ReturnField
   });
@@ -56,14 +54,14 @@ export const main = Reach.App(() => {
     const decentralized_identifier_creator = declassify(interact.decentralized_identifier);
   });
 
-
   Creator.publish(proof_and_position, decentralized_identifier_creator); //TODO: add the proof_received
 
   easy_map[decentralized_identifier_creator] = proof_and_position; //setting the first value of the map with Creator values
 
   commit();
   Creator.publish();
-  //setting the view
+
+  //logging a message with the DID inserted and the data passed (e.g. proof and position)
   Creator.only(() => interact.reportPosition(decentralized_identifier_creator, easy_map[decentralized_identifier_creator]));
   
   // ************ INSERT POSITION API **************
@@ -155,6 +153,3 @@ export const main = Reach.App(() => {
 
   exit();
 });
-
-
-
