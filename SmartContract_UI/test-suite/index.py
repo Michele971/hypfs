@@ -36,7 +36,9 @@ def player(who):
     def reportPosition(did,  proof_and_position):
         did_int = int(did.get('hex'), 16)
         print("📝 DID inserted: ",did_int,"\tposition inserted: ",proof_and_position[1])
-        lock.release() # This is the only the momente when someone release the lock
+        # not always is locked, only when creator call the lock. The attacher NEVER call the lock!!!
+        if lock.locked():
+            lock.release() # This is the only the momente when someone release the lock
         print("release the lock AFTER INSERTING INFORMATION ")
 
     def reportVerification(did, verifier):
@@ -71,10 +73,10 @@ def play_Creator(contract_creator, position, did, proof):
 def play_bob(ctc_user_creator, accc, pos, did, proof):
     print("ATTACHER Lock is locked? ",lock.locked(),"\n",)
     lock.acquire()
-    if lock.locked():
-        print("\t ATTACHER: locked acquired")
-    else:
-        print("waiting for lock ...")
+    # if lock.locked():
+    #     print("\t ATTACHER: locked acquired")
+    # else:
+    #     print("waiting for lock ...")
     # Get and attach to the creator Contract
     print("Entering in play_bob, attaching to: ", ctc_user_creator,'\n')    
     ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_user_creator))
