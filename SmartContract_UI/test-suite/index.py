@@ -36,8 +36,8 @@ def player(who):
     def reportPosition(did,  proof_and_position):
         did_int = int(did.get('hex'), 16)
         print("📝 DID inserted: ",did_int,"\tposition inserted: ",proof_and_position[1])
-        lock.release()
-        print("release the lock ")
+        lock.release() # This is the only the momente when someone release the lock
+        print("release the lock AFTER INSERTING INFORMATION ")
 
     def reportVerification(did, verifier):
         did_int = int(did.get('hex'), 16)
@@ -48,10 +48,10 @@ def player(who):
             }
 
 def play_Creator(contract_creator, position, did, proof):
-    print("Lock is locked? ",lock.locked(),"\n",)
+    print("CREATOR Lock is locked? ",lock.locked(),"\n",)
     lock.acquire()
     if lock.locked():
-        print("\tlocked acquired")
+        print("\tCREATOR: locked acquired")
     else:
         print("waiting for lock ...")
         
@@ -69,10 +69,10 @@ def play_Creator(contract_creator, position, did, proof):
 
 
 def play_bob(ctc_user_creator, accc, pos, did, proof):
-    print("Lock is locked? ",lock.locked(),"\n",)
+    print("ATTACHER Lock is locked? ",lock.locked(),"\n",)
     lock.acquire()
     if lock.locked():
-        print("\tlocked acquired")
+        print("\t ATTACHER: locked acquired")
     else:
         print("waiting for lock ...")
     # Get and attach to the creator Contract
@@ -85,11 +85,8 @@ def play_bob(ctc_user_creator, accc, pos, did, proof):
     #print("2) waiting 10 secs ... ")
     #time.sleep(10)
     counter_int = int(result_counter.get('hex'), 16)
-    print("User ATTACHED  📎 📎 \n Number of users that can still insert their position: ", counter_int)
-    print("\tReleasing lock ...")
-    lock.release()
-    print("Locked? ", lock.locked())
-    print("\n\n")
+    print("ATTACHER  📎 📎 \n Number of users that can still insert their position: ", counter_int," contract: ",ctc_user_creator )
+
     rpc("/forget/ctc", ctc_bob)
 
 

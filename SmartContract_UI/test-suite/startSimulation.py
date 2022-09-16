@@ -238,7 +238,7 @@ class Prover(Witness):
         print("Smart contract deployed  🚀 :", ctc_creator)
         print("Inserting Creator's information into the contract ...")
         creatorThread = Thread(target=play_Creator, args=(ctc_creator, proverObject.location, proverObject.did, 'proof',))
-        creatorThread.start()
+        #creatorThread.start()
         
         return creatorThread, ctc_creator
 
@@ -246,7 +246,7 @@ class Prover(Witness):
     def attachToSmartContract(self, proverAttacherObject, ctc_creator):
         print("Calling play bob")
         attacherThread = Thread(target=play_bob, args=(ctc_creator, proverAttacherObject.account, proverAttacherObject.location, proverAttacherObject.did, 'proof',))
-        attacherThread.start()
+        #attacherThread.start()
         print("playbob called successfully")
         return attacherThread
 
@@ -334,7 +334,9 @@ def startSimulation():
             if (prov.location in dict_location_sc) == False: # if the location is not inserted inside the dict that track the SC deployed, then deploy a new smart contract and add the contract address to the dict 
                 print(" Deploying the smart contract ...")
                 creatorThread, contract_creator_deployed = prov.deploySmartContract(prov)
+                creatorThread.start()
                 prover_thread.append(creatorThread)
+               
                 '''
                     TODO: insert the required data inside the hypercube 
                 '''
@@ -351,6 +353,7 @@ def startSimulation():
                 #print("starting the sleep ...")
                 #time.sleep(60)
                 #print("Attach terminated")
+                proverThread.start()
                 prover_thread.append(proverThread)
                 
               
