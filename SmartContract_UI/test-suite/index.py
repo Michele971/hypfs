@@ -64,8 +64,8 @@ def play_Creator(contract_creator, position, did, proof):
 
 
 def play_bob(ctc_user_creator, accc, pos, did, proof):
-    #print("LOOCKED? ", lock.locked())
-    #lock.acquire()
+    print("Lock acquire for API ", lock.locked())
+    lock.acquire()
     # Get and attach to the creator Contract
     print("Entering in play_bob, attaching to: ", ctc_user_creator,'\n')    
     ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_user_creator))
@@ -77,8 +77,8 @@ def play_bob(ctc_user_creator, accc, pos, did, proof):
     #time.sleep(10)
     counter_int = int(result_counter.get('hex'), 16)
     print("User ATTACHED  📎 📎 \n Number of users that can still insert their position: ", counter_int)
-    #lock.release()
-    #print("LOOCKED? ", lock.locked())
+    lock.release()
+    print("Lock release for API", lock.locked())
     print("\n\n")
     rpc("/forget/ctc", ctc_bob)
 
