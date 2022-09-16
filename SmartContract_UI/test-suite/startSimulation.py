@@ -34,6 +34,8 @@ contract_creator_deployed = None # contrat deployed, will have to be a list of c
 rpc, rpc_callbacks = mk_rpc()
 rpc("/stdlib/setProviderByName","TestNet")
 
+print("\t\t The consesus network is: ", rpc('/stdlib/connector'))
+
 STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500) # use "parseCurrency" method when you send value TO backend
 location_in_hypercube = False # simulate if the location is already stored in hypercube
 
@@ -327,7 +329,7 @@ def startSimulation():
                         The first user that call the contract has to deploy it;
                         the others will attach.
             '''
-            time.sleep(5)
+            #time.sleep(5)
             # the IF will simulate the initial check inside the hypercube. If the SC is not associated to a location in the hypercube (the dictionary in this case) then deploy a new smart contract and insert its ID and location inside the hypercube
             if (prov.location in dict_location_sc) == False: # if the location is not inserted inside the dict that track the SC deployed, then deploy a new smart contract and add the contract address to the dict 
                 print(" Deploying the smart contract ...")
@@ -340,14 +342,14 @@ def startSimulation():
                 dict_location_sc[prov.location] = contract_creator_deployed #insert the contract_id inside the dict_location_sc which track the contract deployed
                 print("\n")
                 print("startint the creato sleep ...")
-                time.sleep(150)
+                #time.sleep(150)
             else:
                 #print("\n User is attaching to the Smart contract ",dict_location_sc.get(prov.location),  " 🟩 📎 📎 🟩 ")
                 retrieved_ctc = dict_location_sc[prov.location]
                 print("User: ",format_address(prov.account)," Preparing the Attaching to the contract ...", retrieved_ctc)
                 proverThread = prov.attachToSmartContract(prov, retrieved_ctc)
                 print("starting the sleep ...")
-                time.sleep(60)
+                #time.sleep(60)
                 print("Attach terminated")
                 prover_thread.append(proverThread)
                 

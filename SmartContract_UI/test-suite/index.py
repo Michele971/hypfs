@@ -1,11 +1,13 @@
 from socket import timeout
 from reach_rpc import mk_rpc
-from threading import Thread
+from threading import Thread, Lock
 import random
 import math
 import json
 import time
 import sys
+
+lock = Lock()
 
 provers_addresses = [] # this address need to be verified
 rpc, rpc_callbacks = mk_rpc()
@@ -34,6 +36,8 @@ def player(who):
     def reportPosition(did,  proof_and_position):
         did_int = int(did.get('hex'), 16)
         print("📝 DID inserted: ",did_int,"\tposition inserted: ",proof_and_position[1])
+        lock.release()
+        print("release the lock ")
 
     def reportVerification(did, verifier):
         did_int = int(did.get('hex'), 16)
@@ -44,6 +48,8 @@ def player(who):
             }
 
 def play_Creator(contract_creator, position, did, proof):
+    print("Acquire the lock ")
+    lock.acquire()
     rpc_callbacks(
         '/backend/Creator',
         contract_creator,
@@ -54,9 +60,12 @@ def play_Creator(contract_creator, position, did, proof):
             **player('Creator')
         ),
     )
+  
 
 
 def play_bob(ctc_user_creator, accc, pos, did, proof):
+    #print("LOOCKED? ", lock.locked())
+    #lock.acquire()
     # Get and attach to the creator Contract
     print("Entering in play_bob, attaching to: ", ctc_user_creator,'\n')    
     ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_user_creator))
@@ -64,11 +73,12 @@ def play_bob(ctc_user_creator, accc, pos, did, proof):
     # Call the API
     print("\nCalling the API ...")
     result_counter = rpc('/ctc/apis/attacherAPI/insert_position', ctc_bob, pos, did)
-    print("2) waiting 10 secs ... ")
-    time.sleep(10)
+    #print("2) waiting 10 secs ... ")
+    #time.sleep(10)
     counter_int = int(result_counter.get('hex'), 16)
     print("User ATTACHED  📎 📎 \n Number of users that can still insert their position: ", counter_int)
-
+    #lock.release()
+    #print("LOOCKED? ", lock.locked())
     print("\n\n")
     rpc("/forget/ctc", ctc_bob)
 
