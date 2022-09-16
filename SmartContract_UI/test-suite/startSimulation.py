@@ -239,7 +239,7 @@ class Prover(Witness):
         print("Inserting Creator's information into the contract ...")
         creatorThread = Thread(target=play_Creator, args=(ctc_creator, proverObject.location, proverObject.did, 'proof',))
         creatorThread.start()
-        print("Insert operation completed")
+        
         return creatorThread, ctc_creator
 
     # this method will interact with index.py
@@ -341,16 +341,16 @@ def startSimulation():
 
                 dict_location_sc[prov.location] = contract_creator_deployed #insert the contract_id inside the dict_location_sc which track the contract deployed
                 print("\n")
-                print("startint the creato sleep ...")
+                #print("startint the creato sleep ...")
                 #time.sleep(150)
             else:
                 #print("\n User is attaching to the Smart contract ",dict_location_sc.get(prov.location),  " 🟩 📎 📎 🟩 ")
                 retrieved_ctc = dict_location_sc[prov.location]
                 print("User: ",format_address(prov.account)," Preparing the Attaching to the contract ...", retrieved_ctc)
                 proverThread = prov.attachToSmartContract(prov, retrieved_ctc)
-                print("starting the sleep ...")
+                #print("starting the sleep ...")
                 #time.sleep(60)
-                print("Attach terminated")
+                #print("Attach terminated")
                 prover_thread.append(proverThread)
                 
               
