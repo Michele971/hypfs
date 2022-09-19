@@ -48,5 +48,8 @@ Try with
 - `./reach down`
 - `./reach update`
 
+## Test on Ganache:
+- `REACH_CONNECTOR_MODE=ETH-live ETH_NODE_URI=http://host.docker.internal:7545 REACH_ISOLATED_NETWORK=1 ./reach rpc-run python3 -u startSimulation.py`
+
 # Author
 Michele Bonini

@@ -21,9 +21,9 @@ def newAccount():
     priv = secrets.token_hex(32)
     private_key = "0x" + priv
     acct = Account.from_key(private_key)
-    # print("Address:", acct.address)
-    # print ("Private key:", private_key)
-    dict_private_public_key[acct.address] = private_key
+    print("Address:", acct.address)
+    print ("Private key:", private_key)
+    #dict_private_public_key[acct.address] = private_key
 
     return acct.address, private_key
 
@@ -54,6 +54,8 @@ def send_eth(sender_private_key, sender_addr, receiver_addr): #gas_increase
 
     #Print transaction hash in hex
     print(web3.toHex(tx_hash))
+
+newAccount()
 
 # create 10 new accounts (use only once if dict_private_public_key is empty)
 # dict_private_public_key = None #re-initialize if you want execute the code below
