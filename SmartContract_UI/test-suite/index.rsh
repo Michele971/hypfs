@@ -92,10 +92,9 @@ export const main = Reach.App(() => {
       }
     )
     // TIMEOUT WORKS ONLY ON TESTNET
-    // .timeout(relativeTime(deadline), () => { // timeout: function that executes code every amount of time decided by the first parameter
-    //   Creator.interact.log("The campaign has finished") // log on the Creator cli to inform the end of the campaign
+    // .timeout(relativeTime(1260/5), () => { // timeout: function that executes code every amount of time decided by the first parameter
     //   Anybody.publish(); // publish needed to finish the parallel reduce
-    //   return [total_balance,false]; // set keepGoing to false to finish the campaign
+    //   return counter; // set keepGoing to false to finish the campaign
     // }); 
     views.getCtcBalance.set(balance());
     views.getReward.set(REWARD_FOR_PROVER);
@@ -136,11 +135,13 @@ export const main = Reach.App(() => {
           // Creator.only(() => interact.reportVerification(balance(), this));
           // Creator.only(() => interact.reportVerification(REWARD_FOR_PROVER, this));
 
-
-
           return true; //TODO: THIS HAS TO BE TRUEE, false only for testing
         }
       )
+      .timeout(relativeTime(1260/5), () => { // timeout: function that executes code every amount of time decided by the first parameter
+        Anybody.publish(); // publish needed to finish the parallel reduce
+        return false; // set keepGoing to false to finish the campaign
+      }); 
 
 
   // TODO: the first received position has to be stored in a data structure, will be compared to the subsquent received positions

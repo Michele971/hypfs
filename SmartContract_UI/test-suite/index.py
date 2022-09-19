@@ -11,7 +11,7 @@ lock = Lock()
 
 provers_addresses = [] # this address need to be verified
 rpc, rpc_callbacks = mk_rpc()
-SMART_CONTRAT_PAYMENT = rpc("/stdlib/parseCurrency", 500)
+SMART_CONTRAT_PAYMENT = rpc("/stdlib/parseCurrency", 0.002)
 
 def fmt(x):
     return rpc("/stdlib/formatCurrency", x, 4)
@@ -39,7 +39,7 @@ def player(who):
         # not always is locked, only when creator call the lock. The attacher NEVER call the lock!!!
         if lock.locked():
             lock.release() # This is the only the momente when someone release the lock
-        print("release the lock AFTER INSERTING INFORMATION ")
+            print("release the lock AFTER INSERTING INFORMATION ")
 
     def reportVerification(did, verifier):
         did_int = int(did.get('hex'), 16)
@@ -106,7 +106,7 @@ def verifier_api_verify(ctc_user_creator, accc, did_choose, wallet_toVerify):
         # Call the API
         result_api = rpc('/ctc/apis/verifierAPI/verify', ctc_verifier, did_choose, wallet_toVerify)
         #print("User with wallet address ", result_api, " has been verified!")
-
+        print(" ✅  ",wallet_toVerify," succesfully verified! ")
         '''
             TODO: remove the address from "provers_addresses" list, if it is successfully verified!!!
         '''
