@@ -1,19 +1,9 @@
 'reach 0.1';
 'use strict';
 
+// This is only for check the Algorand testnet performances. Not use this backend in production!
 const REWARD_FOR_PROVER = 10000//send by VERIFIER
 const SMART_CONTRACT_MAX_USER = 3
-//NOTES:
-// TODO: This smart contract is empower to validate if the positions of users are correct
-// There is a smart contract for every different position
-// TODO: The Smart Contract will expire after a specific amount of time
-// TODO: Add the geofence attribute to the smart contract (radius, etc etc ....). In this way 
-//       we can design more checks such as: the position received must be inside the geofence area.
-// TODO: The smart contract will know the verifier (?) ----> still to be decided. 
-//       Maybe using an unique password (for more verifiers) for memory reason
-// TODO: check that the proofs inserted unique and not already present
-// TODO: print balance of the contract() using the view
-// TODO: print the reward that will be assign to everyone that has a valid proof, after verify it
 
 export const main = Reach.App(() => {
     const Creator = Participant('Creator',{ 
@@ -30,10 +20,7 @@ export const main = Reach.App(() => {
     insert_position: Fun([Bytes(128),UInt], UInt), //PositionAndProof - DID - ReturnField
   });
 
-  const verifierAPI = API('verifierAPI',{
-    insert_money: Fun([UInt], UInt), 
-    verify: Fun([UInt,Address], Address),
-  });
+
 
   const views = View('views', { 
     getCtcBalance: UInt, // Allow users to check the balance of the contract
@@ -46,7 +33,7 @@ export const main = Reach.App(() => {
   init();
 
   Creator.publish() //we need that to use the MAP below
-  const easy_map = new Map(UInt,Bytes(128));
+  const easy_map = new Map(Bytes(128));
   
   commit();
   Creator.only(() => { 
@@ -56,13 +43,13 @@ export const main = Reach.App(() => {
 
   Creator.publish(proof_and_position, decentralized_identifier_creator); //TODO: add the proof_received
 
-  easy_map[decentralized_identifier_creator] = proof_and_position; //setting the first value of the map with Creator values
+  easy_map[this] = proof_and_position; //setting the first value of the map with Creator values
 
   commit();
   Creator.publish();
 
   //logging a message with the DID inserted and the data passed (e.g. proof and position)
-  Creator.only(() => interact.reportPosition(decentralized_identifier_creator, easy_map[decentralized_identifier_creator]));
+  Creator.only(() => interact.reportPosition(decentralized_identifier_creator, easy_map[this]));
   
   // ************ INSERT POSITION API **************
   // the API terminated whe it reaches 3 users
@@ -75,18 +62,10 @@ export const main = Reach.App(() => {
     .api(attacherAPI.insert_position, // the name of the api that is called 
       (pos, did, y) => { // the code to execute and the returning variable of the api (y)
         y(counter); //allow the frontend to retrieve the space available 
- 
-        //TODO: notify the attacher (not the creator) when the key is already used 
-        // if(easy_map[did] != Null){ //TODO: FIX THIS CHECK. CHECK if map contain THE ID INSERTED --------------> IMPORTANT
-        //   return true; //TODO: THIS HAS TO RETURN TRUE
-        // }
-        /** 
-         * The line below manages the case when the key is already 
-         * assigned to a specific value 
-         * */
-        easy_map[did] = fromSome(easy_map[did],pos);
 
-        Creator.only(() => interact.reportPosition(did, easy_map[did]));
+        easy_map[this] = fromSome(easy_map[this],pos);
+
+        Creator.only(() => interact.reportPosition(did, easy_map[this]));
 
         return counter - 1; // the returning of the API for the parallel reduce necessary to update the initial variable 
       }
@@ -102,48 +81,7 @@ export const main = Reach.App(() => {
     commit();
     Creator.publish();
 
-    const keepGoing2 = 
-    parallelReduce(true) 
-      .invariant(balance() == balance())
-      .define(() => {views.getCtcBalance.set(balance());})
-      .while(keepGoing2)
-      .api(verifierAPI.insert_money,
-        (money) => { // the assume that have to be true to continue the execution of the API
-          assume(money > 0);
-        },      
-        (money) => money, // the payment that the users have to do when call the api
-        (money, y) => { 
-          y(money);
-        
-          return true;
-        }
-      )
-      .api(verifierAPI.verify, 
-        (did, walletAddress, ret) => { 
-          // transfer some money to the Prover (attacher)
-          if (balance()>=REWARD_FOR_PROVER){
-            Creator.only(() => interact.reportVerification(did, this));
-            transfer(REWARD_FOR_PROVER).to(walletAddress); //TODO: change amount transfered. THE TRANSFER DOES NOT WORKS.
-            ret(walletAddress);
-          }
-          //transfer(balance()).to(walletAddress); //TODO: change amount transfered
-          ret(walletAddress);
-          delete easy_map[did]; //vector[0] is the did
-          // Creator.only(() => interact.reportVerification(did, this));
 
-          
-          // print this for debugging
-          // Creator.only(() => interact.reportVerification(balance(), this));
-          // Creator.only(() => interact.reportVerification(REWARD_FOR_PROVER, this));
-
-
-
-          return true; //TODO: THIS HAS TO BE TRUEE, false only for testing
-        }
-      )
-
-
-  // TODO: the first received position has to be stored in a data structure, will be compared to the subsquent received positions
 
   //for TESTING
   transfer(balance()).to(Creator);
