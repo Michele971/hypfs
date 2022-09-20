@@ -21,6 +21,10 @@ list_private_public_key = [
     'divorce ecology panel wash curious rich chunk spy piece position hip great random fashion rice visual obey powder borrow chief fade sibling art able borrow' #7TIHVKNIGJF5H37SJDWWKOOT4FRUE4XDUGCZ77HZVKAEAHAWKLSS2LXRUQ
 ]
 
+verifiers_private = [
+    '0xc10cbcca7bd0970503e1e1f404cec87cca59b636aae4f5044370a79753401c15' #0x6636F7B4A4d9077DBa98F9A0237192B160277200
+]
+
 
 prover_thread = [] #list of prover thread
 prover_list_account = [] #list of prover account 
@@ -32,7 +36,9 @@ verifier_list_account = [] #list of verifier account
 contract_creator_deployed = None # contrat deployed, will have to be a list of contracts
 
 rpc, rpc_callbacks = mk_rpc()
-rpc("/stdlib/setProviderByName","TestNet")
+#rpc("/stdlib/setProviderByName","TestNet")
+
+print("\t\t The consesus network is: ", rpc('/stdlib/connector'))
 
 STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500) # use "parseCurrency" method when you send value TO backend
 location_in_hypercube = False # simulate if the location is already stored in hypercube
@@ -144,11 +150,13 @@ class Verifier():
         print(" Verifier is going to verify some provers ")
         verifierThread = Thread(target=verifier_api_verify, args=(ctc_creator,verifierObject.account, didProver, proverToVerify)) 
         verifierThread.start()
-        print(" ✅  ",proverToVerify," succesfully verified! ")
+        # print(" ✅  ",proverToVerify," succesfully verified! ")
         return verifierThread
 
     def createAccount(self):
         acc_verifier = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        #acc_verifier = rpc("/stdlib/newAccountFromSecret", verifiers_private[0])
+
         return acc_verifier
 
 class Prover(Witness):
@@ -206,13 +214,14 @@ class Prover(Witness):
 
     def createAccount(self, i):
         # ########### #######  WORK WITH REACH DEVNET ##################
-        #acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
 
-        acc_prover = None
 
         
         #print("PRIVATE KEY: ", list_private_public_key[i])
         # ########### #######  WORK WITH ETHEREUM TESTNET ##################
+        #acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
+
         acc_prover = rpc("/stdlib/newAccountFromMnemonic", list_private_public_key[i])
       
         return acc_prover
@@ -224,15 +233,15 @@ class Prover(Witness):
         print("Smart contract deployed  🚀 :", ctc_creator)
         print("Inserting Creator's information into the contract ...")
         creatorThread = Thread(target=play_Creator, args=(ctc_creator, proverObject.location, proverObject.did, 'proof',))
-        creatorThread.start()
-        print("Insert operation completed")
+        #creatorThread.start()
+        
         return creatorThread, ctc_creator
 
     # this method will interact with index.py
     def attachToSmartContract(self, proverAttacherObject, ctc_creator):
         print("Calling play bob")
         attacherThread = Thread(target=play_bob, args=(ctc_creator, proverAttacherObject.account, proverAttacherObject.location, proverAttacherObject.did, 'proof',))
-        attacherThread.start()
+        #attacherThread.start()
         print("playbob called successfully")
         return attacherThread
 
@@ -280,7 +289,11 @@ def generateOLC(latitude, longitude):
 # START the simulation
 def startSimulation():
     dict_location_sc = {} # keep track if the smart contract is already associated to this particular location. Its lenght will be equal to NUMBER_OF_LOCATIONS
-    global con
+    
+    '''
+        TODO: here START the timer for the DEPLOYING and INSERTING phase
+    '''
+
     # Starting prover steps
     for i in range(0, PROVER_NUMBER): #for every prover of the entire system ...
         ##### TODO: Generate random LATITUDE & LONGITUDE (for every user), Then convert them to Open Location code and add to LOCATION_LIST_PROV
@@ -315,18 +328,22 @@ def startSimulation():
                         The first user that call the contract has to deploy it;
                         the others will attach.
             '''
-            time.sleep(5)
+            #time.sleep(5)
             # the IF will simulate the initial check inside the hypercube. If the SC is not associated to a location in the hypercube (the dictionary in this case) then deploy a new smart contract and insert its ID and location inside the hypercube
             if (prov.location in dict_location_sc) == False: # if the location is not inserted inside the dict that track the SC deployed, then deploy a new smart contract and add the contract address to the dict 
                 print(" Deploying the smart contract ...")
                 creatorThread, contract_creator_deployed = prov.deploySmartContract(prov)
+                creatorThread.start()
                 prover_thread.append(creatorThread)
+               
                 '''
                     TODO: insert the required data inside the hypercube 
                 '''
 
                 dict_location_sc[prov.location] = contract_creator_deployed #insert the contract_id inside the dict_location_sc which track the contract deployed
                 print("\n")
+                #print("startint the creato sleep ...")
+
                 print("startint the creato sleep ...")
                 #time.sleep(150)
             else:
@@ -334,22 +351,34 @@ def startSimulation():
                 retrieved_ctc = dict_location_sc[prov.location]
                 print("User: ",format_address(prov.account)," Preparing the Attaching to the contract ...", retrieved_ctc)
                 proverThread = prov.attachToSmartContract(prov, retrieved_ctc)
+
+                #print("starting the sleep ...")
+                #time.sleep(60)
+                #print("Attach terminated")
+                proverThread.start()
+
                 print("starting the sleep ...")
                 #time.sleep(60)
                 print("Attach terminated")
+
                 prover_thread.append(proverThread)
                 
-              
+    '''
+        TODO: here STOP the timer for the DEPLOYING and INSERTING phase
+    '''      
     
-    
+    '''
+        TODO: here START the timer for the VERIFY phase
+    '''
     # Starting Verifier steps
     '''
         ❗️  WARNING: ❗️
         ---> Check that SMART_CONTRACT_MAX_USER variable in index.rsh has been reached here: Everybody has to attach to the contract if you want going on with verifiers
     '''
+    time.sleep(35)
     for i in range(0, VERIFIER_NUMBER):
-        break;
-        time.sleep(5)
+    
+    
         verifier = createVerifier(
             did= DID_LIST_VER[i],
             account= ""
@@ -359,7 +388,7 @@ def startSimulation():
         #assign the account to the verifier
         verifier.account = accountVerifier
 
-        contract_creator_deployed = dict_location_sc.get('7H369F4W+Q8') # JUST FOR TESTING
+        contract_creator_deployed = dict_location_sc.get('7H369F4W+Q8') # JUST FOR TESTING: verify 7H369F4W+Q8 contract
         # is not mandatory, but the verifier can insert funds inside the smart contract
         print(" 💰💰  Verifier is going to insert funds inside the contract ", contract_creator_deployed, ' ...')
         print("verifier.account", verifier.account)
@@ -367,11 +396,11 @@ def startSimulation():
         
 
         # verify some provers
-        time.sleep(3)
+        time.sleep(10)
         didProverToVerify = DID_LIST_PROV[1]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[1], didProverToVerify)
 
-        time.sleep(3)
+        time.sleep(10)
         didProverToVerify = DID_LIST_PROV[2]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[2], didProverToVerify)
 
@@ -411,10 +440,16 @@ def startSimulation():
         # didProverToVerify = DID_LIST_PROV[4]
         # verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[4], didProverToVerify)
 
-        prover_addresses.remove(prover_addresses[1]) #remove the address from the provers that will need to be verify
-        prover_addresses.remove(prover_addresses[1]) 
+        #prover_addresses.remove(prover_addresses[1]) #remove the address from the provers that will need to be verify
+        #prover_addresses.remove(prover_addresses[1]) 
         # prover_addresses.remove(prover_addresses[1]) 
         # prover_addresses.remove(prover_addresses[1]) 
+
+
+    '''
+        TODO: here STOP the timer for the VERIFY phase
+    '''
+
 
     # Joining the thread of provers and verifiers
     for provUser in prover_thread:

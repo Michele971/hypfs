@@ -71,16 +71,14 @@ export const main = Reach.App(() => {
       }
     )
     // TIMEOUT WORKS ONLY ON TESTNET
-    // .timeout(relativeTime(deadline), () => { // timeout: function that executes code every amount of time decided by the first parameter
-    //   Creator.interact.log("The campaign has finished") // log on the Creator cli to inform the end of the campaign
+    // .timeout(relativeTime(1260/5), () => { // timeout: function that executes code every amount of time decided by the first parameter
     //   Anybody.publish(); // publish needed to finish the parallel reduce
-    //   return [total_balance,false]; // set keepGoing to false to finish the campaign
+    //   return counter; // set keepGoing to false to finish the campaign
     // }); 
     views.getCtcBalance.set(balance());
     views.getReward.set(REWARD_FOR_PROVER);
     commit();
     Creator.publish();
-
 
 
   //for TESTING
