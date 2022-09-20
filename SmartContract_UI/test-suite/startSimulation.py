@@ -9,16 +9,16 @@ import time
 import eth_new_account
 
 list_private_public_key = [
-    '0x8d10e8fb1aa289828f31914f581dbc39d9ed76b2e2d1247c49f5814349ff10c0', 
-    '0x9cf648f6aaa283e0c227f9047e735e1d604875ce735223c334f1c511a0dd2b1b',
-    '0xd1d2862447f71d78ab4d0b92800034c11cb7bd13ffe5d0a5bc2851e95ce719d7',
-    '0x0fcab881cf4b6d40fbf1473b908d9501524b0d84ac7fe44196e763b8bde9545a',
-    '0x18c78ad1e9447f077611e1945579c4215bb5551852e8b4957c89b783eb1aa3c8',
-    '0x3c5baad76449c59aa1cff6d27febaa201d5150b86b382451d3645d8afd919a63',
-    '0xc662ab78a9180104c1d20f9eb1f993794c093e98e7efe78e23d5ccb02fec637f',
-    '0xbd0c0a94a5998144da5a64c5ca9c67cc92d383762fa58b7e8017eed63de908b4',
-    '0x8ad4d716b3ed5c31cf4125fed2f9549259768482941f7ea3969d0fda93413e06',
-    '0x3888a91f2bae15a5c8df4545ecc2b2a50ea2f0034ec168df7ae429987eabf405'
+    'enact spoon inquiry wolf wait process weather earn raven glare winner enter tell mandate cement harbor garment problem crowd banner replace lounge sight abstract topple', # GIM3KUP5473BIGGJZ3GNDREHC2YT2P4W4WJZXDILWLAYI57A4GAML33DRY
+    'hazard slender clap suggest basic attack cargo cabbage club siege era replace mobile slow column bread ring industry night peasant man about basic', #6ZG5KW4FATXOOTB2ZFN7ZFM77O33MISCV2SOTU622XCKLYVWGIZLANOAGE
+    'seed record photo dress unique that uniform urban bone ritual drive nose wolf miracle neither old gentle trend stage crisp rate fitness legal ability empty', #C5PCYMHJJPL5HBVL7KOJ5EXXNYOZCWYRKEP5NMNC6Z44CQLWABDDSZFBKI
+    'describe reunion balcony empower pool work gown armed supreme negative garage minute crucial endless robust divide accuse resemble lava announce share quarter dentist abstract sight', #7EH36BDEHMHFYJUISRA4QZYIHCCN5U4ZEQ3Q64T7OAYSMIRARZ3Q6C6F3E
+    'stool west normal magic option valve enrich vibrant knee total always shrug volcano fury ignore law second portion few uncover disease wreck green absorb bag', #5RW4HL5YY6FMYSICN5LYCCWM4LRXGNGJPU3RYW3SVRKADB7N2Z7OOIKZ7E
+    'nose shell amount fossil manual letter shove cage damage fault initial insect border assume draft dawn number market giant movie parrot gentle police able hospital', #X56EISCBSSPAS75S2RZFJVBEXMGCVI2WG4QMIHRRCAHUGTCUGF7RE6643M
+    'stable actress ordinary coral end potato approve coyote swap armed color clock eyebrow reject section thank host sense agree put sure replace area absorb echo', #2PDAQC47IFBJNU5AETJA2OV3I6NKDF4AAIZRG72ALDXMAUCEOO4KZPOO4E
+    'people menu yellow vote twist guitar bargain will horse mammal usual hammer enroll input liar flower noise shy window ill clinic grape bar abstract estate', #BDFYNQR2I3YQR6WMTBYRYDJXCXDLIW5T22DVKT4IVL6R4ZQVI336E3VDNQ
+    'lift decade sausage turtle pipe cup piece caution educate carpet provide barrel asset library topic hood flip swallow hotel assist dignity winner chimney absorb cost', #3YMI5U6ZKH3MZ3DNYWO3YL3SCH75KBBCWO2XOO2HEVFQSX3G2Y4UYPOWWA
+    'divorce ecology panel wash curious rich chunk spy piece position hip great random fashion rice visual obey powder borrow chief fade sibling art able borrow' #7TIHVKNIGJF5H37SJDWWKOOT4FRUE4XDUGCZ77HZVKAEAHAWKLSS2LXRUQ
 ]
 
 verifiers_private = [
@@ -221,19 +221,9 @@ class Prover(Witness):
         #print("PRIVATE KEY: ", list_private_public_key[i])
         # ########### #######  WORK WITH ETHEREUM TESTNET ##################
         #acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
+
+        acc_prover = rpc("/stdlib/newAccountFromMnemonic", list_private_public_key[i])
       
-
-        #print("aaaaaaaaaa",rpc('/stdlib/providerEnvByName'))
-        # consensus_network = rpc('/stdlib/providerEnvByName')
-        # if consensus_network == 'ETH':
-        #     #passphase_inserted = "coyote usual trigger laundry industry spoon quantum lyrics candy hood balance spell"
-        #     private_key = "0x25db347fdf2ac94fa4e5893299bac50c81a091c3d12bc54f72716f2c692a5fef"
-        #     acc_prover = rpc("/stdlib/newAccountFromSecret", private_key)
-
-        # else consensus_network == 'ALGO':
-        #         acc_prover = rpc("/stdlib/newAccountFromMnemonic", passphase_inserted)
-
-            
         return acc_prover
         
     # this method will interact with index.py
@@ -353,16 +343,24 @@ def startSimulation():
                 dict_location_sc[prov.location] = contract_creator_deployed #insert the contract_id inside the dict_location_sc which track the contract deployed
                 print("\n")
                 #print("startint the creato sleep ...")
+
+                print("startint the creato sleep ...")
                 #time.sleep(150)
             else:
                 #print("\n User is attaching to the Smart contract ",dict_location_sc.get(prov.location),  " 🟩 📎 📎 🟩 ")
                 retrieved_ctc = dict_location_sc[prov.location]
                 print("User: ",format_address(prov.account)," Preparing the Attaching to the contract ...", retrieved_ctc)
                 proverThread = prov.attachToSmartContract(prov, retrieved_ctc)
+
                 #print("starting the sleep ...")
                 #time.sleep(60)
                 #print("Attach terminated")
                 proverThread.start()
+
+                print("starting the sleep ...")
+                #time.sleep(60)
+                print("Attach terminated")
+
                 prover_thread.append(proverThread)
                 
     '''
@@ -479,44 +477,3 @@ if __name__ == '__main__':
 
 
 
-
-
-
-#### this method should build the input DICT in an automatic way 
-# def buildDict():
-#     list_temp_id_wit = []
-#     list_temp_loc_wit = []
-#     for i in range(0,WITNESS_NUMBER):
-#         if wit[DID_LIST_WIT[i]]: #if exists
-#             list_temp_id_wit.append(wit.get(DID_LIST_WIT[i]))
-#         else:
-#             list_temp_id_wit.append(DID_LIST_WIT[i])
-#         wit = createWitness(  
-#             did= list_temp_id_wit,
-#             public_key= "SHJDAJAKRHAKD",
-#             private_key= "xxxxx",
-#             proofs_array_computed= [],
-#             location= LOCATION_LIST_WIT[round(random.uniform(0, 1))])
-      
-#         list_temp_id_wit = []
-
-       
-#         #insert the witness in the dict of neighbours
-#         dictOfLocation[list_temp_loc_wit[i]] = list_temp_id_wit[i] #TODO: FIX HERE --> THE VALUE MUST BE A LIST!!G
-        
-
-#     print(json.dumps(dictOfLocation, indent=4))
-
-#     for i in range(0, PROVER_NUMBER):
-#         prov = createProver(
-#             did= DID_LIST_PROV[i],
-#             public_key= "FFFFFFFFF",
-#             private_key= "xxxxxxx",
-#             proofs_array_computed= [],
-#             location= LOCATION_LIST_PROV[round(random.uniform(0, 1))],
-#             proofs_received_array=[])
-        
-#         # Find neighbours
-#         locationProver = prov.location
-#         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
-#         print('Hi Prover, your DID is: ', prov.did,'\n Your location is: ', prov.location, '\n Your neighbours are: ', neighbours)
