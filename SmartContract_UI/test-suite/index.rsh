@@ -138,7 +138,7 @@ export const main = Reach.App(() => {
           return true; //TODO: THIS HAS TO BE TRUEE, false only for testing
         }
       )
-      .timeout(relativeTime(1260/5), () => { // timeout: function that executes code every amount of time decided by the first parameter
+      .timeout(relativeTime(120/5), () => { // timeout: function that executes code every amount of time decided by the first parameter
         Anybody.publish(); // publish needed to finish the parallel reduce
         return false; // set keepGoing to false to finish the campaign
       }); 
