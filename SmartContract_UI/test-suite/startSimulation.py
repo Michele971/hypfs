@@ -10,7 +10,7 @@ import eth_new_account
 
 list_private_public_key = [
     'enact spoon inquiry wolf wait process weather earn raven glare winner enter tell mandate cement harbor garment problem crowd banner replace lounge sight abstract topple', # GIM3KUP5473BIGGJZ3GNDREHC2YT2P4W4WJZXDILWLAYI57A4GAML33DRY
-    'hazard slender clap suggest basic attack cargo cabbage club siege era replace mobile slow column bread ring industry night peasant man about basic', #6ZG5KW4FATXOOTB2ZFN7ZFM77O33MISCV2SOTU622XCKLYVWGIZLANOAGE
+    'honey city during awkward flush destroy decrease hero rhythm fog insect year miss ship mention wage fan crop angle harsh demise banner addict absent what', #O47RCDX6L725MCPKEQNWWCMZAMR3UNIUYSKKV7N5UEAZDC2A6HPPID4C7Q
     'seed record photo dress unique that uniform urban bone ritual drive nose wolf miracle neither old gentle trend stage crisp rate fitness legal ability empty', #C5PCYMHJJPL5HBVL7KOJ5EXXNYOZCWYRKEP5NMNC6Z44CQLWABDDSZFBKI
     'describe reunion balcony empower pool work gown armed supreme negative garage minute crucial endless robust divide accuse resemble lava announce share quarter dentist abstract sight', #7EH36BDEHMHFYJUISRA4QZYIHCCN5U4ZEQ3Q64T7OAYSMIRARZ3Q6C6F3E
     'stool west normal magic option valve enrich vibrant knee total always shrug volcano fury ignore law second portion few uncover disease wreck green absorb bag', #5RW4HL5YY6FMYSICN5LYCCWM4LRXGNGJPU3RYW3SVRKADB7N2Z7OOIKZ7E
@@ -36,11 +36,10 @@ verifier_list_account = [] #list of verifier account
 contract_creator_deployed = None # contrat deployed, will have to be a list of contracts
 
 rpc, rpc_callbacks = mk_rpc()
-#rpc("/stdlib/setProviderByName","TestNet")
+rpc("/stdlib/setProviderByName","TestNet")
 
 print("\t\t The consesus network is: ", rpc('/stdlib/connector'))
 
-STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500) # use "parseCurrency" method when you send value TO backend
 location_in_hypercube = False # simulate if the location is already stored in hypercube
 
 '''
@@ -154,8 +153,9 @@ class Verifier():
         return verifierThread
 
     def createAccount(self):
-        acc_verifier = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        #acc_verifier = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
         #acc_verifier = rpc("/stdlib/newAccountFromSecret", verifiers_private[0])
+        acc_verifier = rpc("/stdlib/newAccountFromMnemonic", verifiers_private[0])
 
         return acc_verifier
 
@@ -214,7 +214,7 @@ class Prover(Witness):
 
     def createAccount(self, i):
         # ########### #######  WORK WITH REACH DEVNET ##################
-        acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        #acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
 
 
         
@@ -288,7 +288,7 @@ def generateOLC(latitude, longitude):
 
 # START the simulation
 def startSimulation():
-    dict_location_sc = {} # keep track if the smart contract is already associated to this particular location. Its lenght will be equal to NUMBER_OF_LOCATIONS
+    dict_location_sc = {} # keep track if the smart contract is newAccountFromMnemonicalready associated to this particular location. Its lenght will be equal to NUMBER_OF_LOCATIONS
     
     '''
         TODO: here START the timer for the DEPLOYING and INSERTING phase
@@ -314,8 +314,6 @@ def startSimulation():
         prover_addresses.append(format_address(account_prov)) #getting the wallet addresses for prover and appending to the list
         prov.account = account_prov
         
-        #setting the gas limit
-        rpc("/acc/setGasLimit", account_prov, 5000000) # this line avoid the error displayed on etherscan which is: "out of gas"
    
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
@@ -344,7 +342,7 @@ def startSimulation():
                 print("\n")
                 #print("startint the creato sleep ...")
 
-                print("startint the creato sleep ...")
+                #print("startint the creato sleep ...")
                 #time.sleep(150)
             else:
                 #print("\n User is attaching to the Smart contract ",dict_location_sc.get(prov.location),  " 🟩 📎 📎 🟩 ")
@@ -357,7 +355,7 @@ def startSimulation():
                 #print("Attach terminated")
                 proverThread.start()
 
-                print("starting the sleep ...")
+                #print("starting the sleep ...")
                 #time.sleep(60)
                 print("Attach terminated")
 
@@ -378,7 +376,7 @@ def startSimulation():
     time.sleep(35)
     for i in range(0, VERIFIER_NUMBER):
     
-    
+        break;
         verifier = createVerifier(
             did= DID_LIST_VER[i],
             account= ""

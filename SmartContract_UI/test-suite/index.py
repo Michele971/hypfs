@@ -11,7 +11,7 @@ lock = Lock()
 
 provers_addresses = [] # this address need to be verified
 rpc, rpc_callbacks = mk_rpc()
-SMART_CONTRAT_PAYMENT = rpc("/stdlib/parseCurrency", 0.002)
+SMART_CONTRAT_PAYMENT = rpc("/stdlib/parseCurrency", 0.5)
 
 def fmt(x):
     return rpc("/stdlib/formatCurrency", x, 4)
