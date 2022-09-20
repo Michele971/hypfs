@@ -1,4 +1,4 @@
-## NOTES
+## This script must be run on ETHEREUM testnet
 
 ### You have to run the project on Ethereum Consensus Network
 
@@ -39,6 +39,10 @@ If you want to try the simulation use:
 
 Some functionalities of scripts; initial interactions between Deployer and Prover: 
 <center><img src="img/interactionsScripts.png" width="75%" align="center"></center>
+
+Performance evaluation with Ethereum (x: accounts, y: seconds):
+<center><img src="img/ethPerf.png" width="75%" align="center"></center>
+Account 1° and 4° deploy new smart contract.
 
 Outcome [not correct | fixed with the new version]:
 <center><img src="img/terminalStartSimulation.png" width="75%" align="center"></center>
