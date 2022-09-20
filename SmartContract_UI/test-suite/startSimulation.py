@@ -7,19 +7,42 @@ from index import play_Creator, play_bob, verifier_pay, verifier_api_verify
 from threading import Thread
 import time
 import eth_new_account
+from index import start_list, end_list
+import numpy as np
+import matplotlib.pyplot as plt
+
+'''
+    ---------------------------------------------------------------------------------------
+    ------------------    THIS SCRIPT MUST BE RUN ON ALGORAND TESTNET    ------------------
+    ---------------------------------------------------------------------------------------
+'''
+
+# list_private_public_key = [
+#     '0x8d10e8fb1aa289828f31914f581dbc39d9ed76b2e2d1247c49f5814349ff10c0', 
+#     '0x9cf648f6aaa283e0c227f9047e735e1d604875ce735223c334f1c511a0dd2b1b',
+#     '0xd1d2862447f71d78ab4d0b92800034c11cb7bd13ffe5d0a5bc2851e95ce719d7',
+#     '0x0fcab881cf4b6d40fbf1473b908d9501524b0d84ac7fe44196e763b8bde9545a',
+#     '0x18c78ad1e9447f077611e1945579c4215bb5551852e8b4957c89b783eb1aa3c8',
+#     '0x3c5baad76449c59aa1cff6d27febaa201d5150b86b382451d3645d8afd919a63',
+#     '0xc662ab78a9180104c1d20f9eb1f993794c093e98e7efe78e23d5ccb02fec637f',
+#     '0xbd0c0a94a5998144da5a64c5ca9c67cc92d383762fa58b7e8017eed63de908b4',
+#     '0x8ad4d716b3ed5c31cf4125fed2f9549259768482941f7ea3969d0fda93413e06',
+#     '0x3888a91f2bae15a5c8df4545ecc2b2a50ea2f0034ec168df7ae429987eabf405'
+# ]
 
 list_private_public_key = [
-    '0x8d10e8fb1aa289828f31914f581dbc39d9ed76b2e2d1247c49f5814349ff10c0', 
-    '0x9cf648f6aaa283e0c227f9047e735e1d604875ce735223c334f1c511a0dd2b1b',
-    '0xd1d2862447f71d78ab4d0b92800034c11cb7bd13ffe5d0a5bc2851e95ce719d7',
-    '0x0fcab881cf4b6d40fbf1473b908d9501524b0d84ac7fe44196e763b8bde9545a',
-    '0x18c78ad1e9447f077611e1945579c4215bb5551852e8b4957c89b783eb1aa3c8',
-    '0x3c5baad76449c59aa1cff6d27febaa201d5150b86b382451d3645d8afd919a63',
-    '0xc662ab78a9180104c1d20f9eb1f993794c093e98e7efe78e23d5ccb02fec637f',
-    '0xbd0c0a94a5998144da5a64c5ca9c67cc92d383762fa58b7e8017eed63de908b4',
-    '0x8ad4d716b3ed5c31cf4125fed2f9549259768482941f7ea3969d0fda93413e06',
-    '0x3888a91f2bae15a5c8df4545ecc2b2a50ea2f0034ec168df7ae429987eabf405'
+    'enact spoon inquiry wolf wait process weather earn raven glare winner enter tell mandate cement harbor garment problem crowd banner replace lounge sight abstract topple', # GIM3KUP5473BIGGJZ3GNDREHC2YT2P4W4WJZXDILWLAYI57A4GAML33DRY
+    'honey city during awkward flush destroy decrease hero rhythm fog insect year miss ship mention wage fan crop angle harsh demise banner addict absent what', #O47RCDX6L725MCPKEQNWWCMZAMR3UNIUYSKKV7N5UEAZDC2A6HPPID4C7Q
+    'seed record photo dress unique that uniform urban bone ritual drive nose wolf miracle neither old gentle trend stage crisp rate fitness legal ability empty', #C5PCYMHJJPL5HBVL7KOJ5EXXNYOZCWYRKEP5NMNC6Z44CQLWABDDSZFBKI
+    'describe reunion balcony empower pool work gown armed supreme negative garage minute crucial endless robust divide accuse resemble lava announce share quarter dentist abstract sight', #7EH36BDEHMHFYJUISRA4QZYIHCCN5U4ZEQ3Q64T7OAYSMIRARZ3Q6C6F3E
+    'stool west normal magic option valve enrich vibrant knee total always shrug volcano fury ignore law second portion few uncover disease wreck green absorb bag', #5RW4HL5YY6FMYSICN5LYCCWM4LRXGNGJPU3RYW3SVRKADB7N2Z7OOIKZ7E
+    'nose shell amount fossil manual letter shove cage damage fault initial insect border assume draft dawn number market giant movie parrot gentle police able hospital', #X56EISCBSSPAS75S2RZFJVBEXMGCVI2WG4QMIHRRCAHUGTCUGF7RE6643M
+    'stable actress ordinary coral end potato approve coyote swap armed color clock eyebrow reject section thank host sense agree put sure replace area absorb echo', #2PDAQC47IFBJNU5AETJA2OV3I6NKDF4AAIZRG72ALDXMAUCEOO4KZPOO4E
+    'people menu yellow vote twist guitar bargain will horse mammal usual hammer enroll input liar flower noise shy window ill clinic grape bar abstract estate', #BDFYNQR2I3YQR6WMTBYRYDJXCXDLIW5T22DVKT4IVL6R4ZQVI336E3VDNQ
+    'lift decade sausage turtle pipe cup piece caution educate carpet provide barrel asset library topic hood flip swallow hotel assist dignity winner chimney absorb cost', #3YMI5U6ZKH3MZ3DNYWO3YL3SCH75KBBCWO2XOO2HEVFQSX3G2Y4UYPOWWA
+    'divorce ecology panel wash curious rich chunk spy piece position hip great random fashion rice visual obey powder borrow chief fade sibling art able borrow' #7TIHVKNIGJF5H37SJDWWKOOT4FRUE4XDUGCZ77HZVKAEAHAWKLSS2LXRUQ
 ]
+
 
 verifiers_private = [
     '0xc10cbcca7bd0970503e1e1f404cec87cca59b636aae4f5044370a79753401c15' #0x6636F7B4A4d9077DBa98F9A0237192B160277200
@@ -36,11 +59,10 @@ verifier_list_account = [] #list of verifier account
 contract_creator_deployed = None # contrat deployed, will have to be a list of contracts
 
 rpc, rpc_callbacks = mk_rpc()
-#rpc("/stdlib/setProviderByName","TestNet")
+rpc("/stdlib/setProviderByName","TestNet")
 
 print("\t\t The consesus network is: ", rpc('/stdlib/connector'))
-
-STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500) # use "parseCurrency" method when you send value TO backend
+STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500) 
 location_in_hypercube = False # simulate if the location is already stored in hypercube
 
 '''
@@ -154,8 +176,9 @@ class Verifier():
         return verifierThread
 
     def createAccount(self):
-        acc_verifier = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        #acc_verifier = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
         #acc_verifier = rpc("/stdlib/newAccountFromSecret", verifiers_private[0])
+        acc_verifier = rpc("/stdlib/newAccountFromMnemonic", verifiers_private[0])
 
         return acc_verifier
 
@@ -214,26 +237,16 @@ class Prover(Witness):
 
     def createAccount(self, i):
         # ########### #######  WORK WITH REACH DEVNET ##################
-        acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        #acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
 
 
         
         #print("PRIVATE KEY: ", list_private_public_key[i])
         # ########### #######  WORK WITH ETHEREUM TESTNET ##################
         #acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
+
+        acc_prover = rpc("/stdlib/newAccountFromMnemonic", list_private_public_key[i])
       
-
-        #print("aaaaaaaaaa",rpc('/stdlib/providerEnvByName'))
-        # consensus_network = rpc('/stdlib/providerEnvByName')
-        # if consensus_network == 'ETH':
-        #     #passphase_inserted = "coyote usual trigger laundry industry spoon quantum lyrics candy hood balance spell"
-        #     private_key = "0x25db347fdf2ac94fa4e5893299bac50c81a091c3d12bc54f72716f2c692a5fef"
-        #     acc_prover = rpc("/stdlib/newAccountFromSecret", private_key)
-
-        # else consensus_network == 'ALGO':
-        #         acc_prover = rpc("/stdlib/newAccountFromMnemonic", passphase_inserted)
-
-            
         return acc_prover
         
     # this method will interact with index.py
@@ -244,7 +257,7 @@ class Prover(Witness):
         print("Inserting Creator's information into the contract ...")
         creatorThread = Thread(target=play_Creator, args=(ctc_creator, proverObject.location, proverObject.did, 'proof',))
         #creatorThread.start()
-        
+       
         return creatorThread, ctc_creator
 
     # this method will interact with index.py
@@ -298,7 +311,7 @@ def generateOLC(latitude, longitude):
 
 # START the simulation
 def startSimulation():
-    dict_location_sc = {} # keep track if the smart contract is already associated to this particular location. Its lenght will be equal to NUMBER_OF_LOCATIONS
+    dict_location_sc = {} # keep track if the smart contract is newAccountFromMnemonicalready associated to this particular location. Its lenght will be equal to NUMBER_OF_LOCATIONS
     
     '''
         TODO: here START the timer for the DEPLOYING and INSERTING phase
@@ -325,7 +338,8 @@ def startSimulation():
         prov.account = account_prov
         
         #setting the gas limit
-        rpc("/acc/setGasLimit", account_prov, 5000000) # this line avoid the error displayed on etherscan which is: "out of gas"
+        #rpc("/acc/setGasLimit", account_prov, 5000000) # this line avoid the error displayed on etherscan which is: "out of gas"
+   
    
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
@@ -353,16 +367,24 @@ def startSimulation():
                 dict_location_sc[prov.location] = contract_creator_deployed #insert the contract_id inside the dict_location_sc which track the contract deployed
                 print("\n")
                 #print("startint the creato sleep ...")
+
+                #print("startint the creato sleep ...")
                 #time.sleep(150)
             else:
                 #print("\n User is attaching to the Smart contract ",dict_location_sc.get(prov.location),  " 🟩 📎 📎 🟩 ")
                 retrieved_ctc = dict_location_sc[prov.location]
                 print("User: ",format_address(prov.account)," Preparing the Attaching to the contract ...", retrieved_ctc)
                 proverThread = prov.attachToSmartContract(prov, retrieved_ctc)
+
+                #print("starting the sleep ...")
+                #time.sleep(60)
+        
+                proverThread.start()
+
                 #print("starting the sleep ...")
                 #time.sleep(60)
                 #print("Attach terminated")
-                proverThread.start()
+
                 prover_thread.append(proverThread)
                 
     '''
@@ -380,7 +402,7 @@ def startSimulation():
     time.sleep(35)
     for i in range(0, VERIFIER_NUMBER):
     
-    
+        break;
         verifier = createVerifier(
             did= DID_LIST_VER[i],
             account= ""
@@ -454,9 +476,41 @@ def startSimulation():
 
 
     # Joining the thread of provers and verifiers
-    for provUser in prover_thread:
-        provUser.join()
+    print("num threads: ",len(prover_thread))
+    print("end_list (time)", end_list)
+
+    wallet_pub_key  = [
+        "GIM3KUP5473BIGGJZ3GNDREHC2YT2P4W4WJZXDILWLAYI57A4GAML33DRY",
+        "O47RCDX6L725MCPKEQNWWCMZAMR3UNIUYSKKV7N5UEAZDC2A6HPPID4C7Q",
+        "C5PCYMHJJPL5HBVL7KOJ5EXXNYOZCWYRKEP5NMNC6Z44CQLWABDDSZFBKI",
+        "7EH36BDEHMHFYJUISRA4QZYIHCCN5U4ZEQ3Q64T7OAYSMIRARZ3Q6C6F3E",
+        "5RW4HL5YY6FMYSICN5LYCCWM4LRXGNGJPU3RYW3SVRKADB7N2Z7OOIKZ7E",
+        "X56EISCBSSPAS75S2RZFJVBEXMGCVI2WG4QMIHRRCAHUGTCUGF7RE6643M",
+        "2PDAQC47IFBJNU5AETJA2OV3I6NKDF4AAIZRG72ALDXMAUCEOO4KZPOO4E",
+        "BDFYNQR2I3YQR6WMTBYRYDJXCXDLIW5T22DVKT4IVL6R4ZQVI336E3VDNQ",
+    ]
+
+    # wallet_pub_key = [
+    #     "0x832e977393410e0388f994bb773d78E83Ae9619E",
+    #     "0x119d2BA2e52e21A88210Cd29DA0c7d45D2AC077A",
+    #     "0xf373B8b4BcDEbD88efC8396b5420A41fE7c94011",
+    #     "0x1eAd4c7aa92bABF7c923a8E597972CB3255Ab6C2",
+    #     "0xe648143d83F7dD8eaaD587B9DDE0E40b7eFE0d62",
+    #     "0x7211170e1CF574642857f98f7afA14990C39c75c",
+    #     "0xC57D9AD7164af80AC324081D2A206179F567fECE",
+    #     "0xBAa6cD46581b66E379c3B5436fa678976B34A518"
+    # ]
+
+    time_delta_list = []
+ 
+    for (i,t) in enumerate(prover_thread):
+        t.join()
+        delta = end_list[i]-start_list[i]
+        time_delta_list.insert(i, delta)
+        print("new delta: ", delta)
+        
     
+
     for verifierUser in verifier_addresses:
         verifierUser.join()
 
@@ -467,8 +521,22 @@ def startSimulation():
     for verifierUser in verifier_list_account:
         rpc("/forget/ctc", verifierUser)
 
+    # plotting the time of deploy and transaction for each account
+    height = time_delta_list
+    bars = (wallet_pub_key)
+    x_pos = np.arange(len(bars))
+    plt.bar(x_pos, height)
+    plt.xticks(x_pos, bars, rotation=90)
+    plt.xlabel('Accounts')
+    plt.ylabel('Seconds')  
 
-        
+    # Create names on the x-axis
+    plt.xticks(x_pos, bars)
+
+    # Show graphic
+    plt.show()
+
+            
 def main():
     startSimulation()
 
@@ -479,44 +547,3 @@ if __name__ == '__main__':
 
 
 
-
-
-
-#### this method should build the input DICT in an automatic way 
-# def buildDict():
-#     list_temp_id_wit = []
-#     list_temp_loc_wit = []
-#     for i in range(0,WITNESS_NUMBER):
-#         if wit[DID_LIST_WIT[i]]: #if exists
-#             list_temp_id_wit.append(wit.get(DID_LIST_WIT[i]))
-#         else:
-#             list_temp_id_wit.append(DID_LIST_WIT[i])
-#         wit = createWitness(  
-#             did= list_temp_id_wit,
-#             public_key= "SHJDAJAKRHAKD",
-#             private_key= "xxxxx",
-#             proofs_array_computed= [],
-#             location= LOCATION_LIST_WIT[round(random.uniform(0, 1))])
-      
-#         list_temp_id_wit = []
-
-       
-#         #insert the witness in the dict of neighbours
-#         dictOfLocation[list_temp_loc_wit[i]] = list_temp_id_wit[i] #TODO: FIX HERE --> THE VALUE MUST BE A LIST!!G
-        
-
-#     print(json.dumps(dictOfLocation, indent=4))
-
-#     for i in range(0, PROVER_NUMBER):
-#         prov = createProver(
-#             did= DID_LIST_PROV[i],
-#             public_key= "FFFFFFFFF",
-#             private_key= "xxxxxxx",
-#             proofs_array_computed= [],
-#             location= LOCATION_LIST_PROV[round(random.uniform(0, 1))],
-#             proofs_received_array=[])
-        
-#         # Find neighbours
-#         locationProver = prov.location
-#         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
-#         print('Hi Prover, your DID is: ', prov.did,'\n Your location is: ', prov.location, '\n Your neighbours are: ', neighbours)

@@ -6,12 +6,13 @@ import math
 import json
 import time
 import sys
+from datetime import datetime
 
 lock = Lock()
 
 provers_addresses = [] # this address need to be verified
 rpc, rpc_callbacks = mk_rpc()
-SMART_CONTRAT_PAYMENT = rpc("/stdlib/parseCurrency", 0.002)
+SMART_CONTRAT_PAYMENT = rpc("/stdlib/parseCurrency", 0.5)
 
 def fmt(x):
     return rpc("/stdlib/formatCurrency", x, 4)
@@ -41,6 +42,9 @@ def player(who):
             lock.release() # This is the only the momente when someone release the lock
             print("release the lock AFTER INSERTING INFORMATION ")
 
+            end_list.append(time.time())
+
+
     def reportVerification(did, verifier):
         did_int = int(did.get('hex'), 16)
         print("DID ", did_int, " has been verified by Verifier ", verifier)
@@ -49,14 +53,21 @@ def player(who):
             'reportVerification':reportVerification,
             }
 
+start_list = []
+end_list = []
+
 def play_Creator(contract_creator, position, did, proof):
     print("CREATOR Lock is locked? ",lock.locked(),"\n",)
     lock.acquire()
     if lock.locked():
         print("\tCREATOR: locked acquired")
+
+
+      
     else:
         print("waiting for lock ...")
         
+    start_list.append(time.time())
     rpc_callbacks(
         '/backend/Creator',
         contract_creator,
@@ -71,8 +82,12 @@ def play_Creator(contract_creator, position, did, proof):
 
 
 def play_bob(ctc_user_creator, accc, pos, did, proof):
+    
     print("ATTACHER Lock is locked? ",lock.locked(),"\n",)
     lock.acquire()
+  
+    start_list.append(time.time())
+
     # if lock.locked():
     #     print("\t ATTACHER: locked acquired")
     # else:
