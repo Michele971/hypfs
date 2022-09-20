@@ -377,7 +377,7 @@ def startSimulation():
         ❗️  WARNING: ❗️
         ---> Check that SMART_CONTRACT_MAX_USER variable in index.rsh has been reached here: Everybody has to attach to the contract if you want going on with verifiers
     '''
-    time.sleep(25)
+    time.sleep(35)
     for i in range(0, VERIFIER_NUMBER):
     
     
