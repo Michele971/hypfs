@@ -17,19 +17,6 @@ import matplotlib.pyplot as plt
     ---------------------------------------------------------------------------------------
 '''
 
-# list_private_public_key = [
-#     '0x8d10e8fb1aa289828f31914f581dbc39d9ed76b2e2d1247c49f5814349ff10c0', 
-#     '0x9cf648f6aaa283e0c227f9047e735e1d604875ce735223c334f1c511a0dd2b1b',
-#     '0xd1d2862447f71d78ab4d0b92800034c11cb7bd13ffe5d0a5bc2851e95ce719d7',
-#     '0x0fcab881cf4b6d40fbf1473b908d9501524b0d84ac7fe44196e763b8bde9545a',
-#     '0x18c78ad1e9447f077611e1945579c4215bb5551852e8b4957c89b783eb1aa3c8',
-#     '0x3c5baad76449c59aa1cff6d27febaa201d5150b86b382451d3645d8afd919a63',
-#     '0xc662ab78a9180104c1d20f9eb1f993794c093e98e7efe78e23d5ccb02fec637f',
-#     '0xbd0c0a94a5998144da5a64c5ca9c67cc92d383762fa58b7e8017eed63de908b4',
-#     '0x8ad4d716b3ed5c31cf4125fed2f9549259768482941f7ea3969d0fda93413e06',
-#     '0x3888a91f2bae15a5c8df4545ecc2b2a50ea2f0034ec168df7ae429987eabf405'
-# ]
-
 list_private_public_key = [
     'enact spoon inquiry wolf wait process weather earn raven glare winner enter tell mandate cement harbor garment problem crowd banner replace lounge sight abstract topple', # GIM3KUP5473BIGGJZ3GNDREHC2YT2P4W4WJZXDILWLAYI57A4GAML33DRY
     'honey city during awkward flush destroy decrease hero rhythm fog insect year miss ship mention wage fan crop angle harsh demise banner addict absent what', #O47RCDX6L725MCPKEQNWWCMZAMR3UNIUYSKKV7N5UEAZDC2A6HPPID4C7Q
@@ -241,10 +228,7 @@ class Prover(Witness):
 
 
         
-        #print("PRIVATE KEY: ", list_private_public_key[i])
-        # ########### #######  WORK WITH ETHEREUM TESTNET ##################
-        #acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
-
+        # use newAccountFromMnemonic for Algorand testnet
         acc_prover = rpc("/stdlib/newAccountFromMnemonic", list_private_public_key[i])
       
         return acc_prover
@@ -337,10 +321,6 @@ def startSimulation():
         prover_addresses.append(format_address(account_prov)) #getting the wallet addresses for prover and appending to the list
         prov.account = account_prov
         
-        #setting the gas limit
-        #rpc("/acc/setGasLimit", account_prov, 5000000) # this line avoid the error displayed on etherscan which is: "out of gas"
-   
-   
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
         if neighbours: 
@@ -490,16 +470,6 @@ def startSimulation():
         "BDFYNQR2I3YQR6WMTBYRYDJXCXDLIW5T22DVKT4IVL6R4ZQVI336E3VDNQ",
     ]
 
-    # wallet_pub_key = [
-    #     "0x832e977393410e0388f994bb773d78E83Ae9619E",
-    #     "0x119d2BA2e52e21A88210Cd29DA0c7d45D2AC077A",
-    #     "0xf373B8b4BcDEbD88efC8396b5420A41fE7c94011",
-    #     "0x1eAd4c7aa92bABF7c923a8E597972CB3255Ab6C2",
-    #     "0xe648143d83F7dD8eaaD587B9DDE0E40b7eFE0d62",
-    #     "0x7211170e1CF574642857f98f7afA14990C39c75c",
-    #     "0xC57D9AD7164af80AC324081D2A206179F567fECE",
-    #     "0xBAa6cD46581b66E379c3B5436fa678976B34A518"
-    # ]
 
     time_delta_list = []
  
