@@ -54,18 +54,18 @@ location_in_hypercube = False # simulate if the location is already stored in hy
     - Every Smart Contract must have 4 Provers: 1 Creator - 3 user-prover. So, the variable inside backend SMART_CONTRACT_MAX_USER is equal to 3 (number of user nearby)
 '''
 
-WITNESS_NUMBER = 4 # number of witnesses
-PROVER_NUMBER = 8 # number of provers for the entire system
-DID_LIST_WIT = [0, 3, 4, 5] # list of DID witnesses
-LOCATION_LIST_WIT = ["7H369FXP+FH", "7H369F4W+Q8", "7H369F4W+Q9"] # list of witnesses locations
+#WITNESS_NUMBER = 4 # number of witnesses
+PROVER_NUMBER = 16 # number of provers for the entire system
+#DID_LIST_WIT = [0, 3, 4, 5] # list of DID witnesses
+#LOCATION_LIST_WIT = ["7H369FXP+FH", "7H369F4W+Q8", "7H369F4W+Q9"] # list of witnesses locations
 
 '''
     ❗️❗️❗️❗️  WARNING: ❗️❗️❗️❗️
     ---> len(DID_LIST_PROV) and len(LOCATION_LIST_PROV) MUST TO BE EQUALS !!! You can decrease the PROVER_NUMBER during the testing
     ---> PROVER_NUMBER are all the provers of the system
 '''
-DID_LIST_PROV = [2, 6, 50, 51, 8, 9, 10, 11, 14, 19] # DID of provers that will ask for a Proof Of Location and a verify process
-LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q9", "7H369F4W+Q9", "7H369F4W+Q9", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6"] # list of Provers locatios. Used for build the prover object
+DID_LIST_PROV = [2, 6, 50, 51, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 22] # DID of provers that will ask for a Proof Of Location and a verify process
+LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q9", "7H369F4W+Q9", "7H369F4W+Q9", "7H369F4W+Q9", "7H368FRV+FM", "7H368FRV+FM", "7H368FRV+FM", "7H368FRV+FM", "7H368FWV+X6", "7H368FWV+X6", "7H368FWV+X6", "7H368FWV+X6", "7H369FXP+FH"] # list of Provers locatios. Used for build the prover object
 
 VERIFIER_NUMBER = 1 #number of verifiers
 DID_LIST_VER = [99] #list of DID associated to verifiers
@@ -93,18 +93,25 @@ dictOfLocation = {
     "7H368FRV+FM":[ #Bologna
         12,
         13,
-        14
+        14,
+        15
     ],
     "7H368FWV+X6": [ #Ice-cream Bologna
-        15,
         16,
         17,
         18,
         19
-    ],
+    ], 
+    "7H369FXP+FH": [ # Ranzani 13: 44.4864416,11.3986586
+        22,
+        30,
+        44,
+        26
+    ]
+            
 }
 
-NUMBER_OF_LOCATIONS = 5 #number of different locations. For each location there could be a smart contract
+NUMBER_OF_LOCATIONS = 6 #number of different locations. For each location there could be a smart contract
 
 
 class Witness:
@@ -299,10 +306,7 @@ def generateOLC(latitude, longitude):
 # START the simulation
 def startSimulation():
     dict_location_sc = {} # keep track if the smart contract is already associated to this particular location. Its lenght will be equal to NUMBER_OF_LOCATIONS
-    
-    '''
-        TODO: here START the timer for the DEPLOYING and INSERTING phase
-    '''
+
 
     # Starting prover steps
     for i in range(0, PROVER_NUMBER): #for every prover of the entire system ...
@@ -364,11 +368,10 @@ def startSimulation():
                 #print("Attach terminated")
                 proverThread.start()
                 prover_thread.append(proverThread)
-                
-    '''
-        TODO: here STOP the timer for the DEPLOYING and INSERTING phase
-    '''      
-    
+
+
+    print("[DEBUG PROV ADDR] ", prover_addresses)
+    print("\n\nDict location smart contract ", dict_location_sc)
     '''
         TODO: here START the timer for the VERIFY phase
     '''
@@ -429,9 +432,54 @@ def startSimulation():
         didProverToVerify = DID_LIST_PROV[6]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[6], didProverToVerify)
 
-        time.sleep(3)
+        time.sleep(6)
+        print("AAAAA INIZIO DID ", DID_LIST_PROV[7], "prov addr ",prover_addresses[7])
         didProverToVerify = DID_LIST_PROV[7]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[7], didProverToVerify)
+        print("AAAAA  FINE")
+        # Third position
+        contract_creator_deployed = dict_location_sc.get("7H368FRV+FM")
+        time.sleep(3)
+        print(" 💰💰  Verifier is going to insert funds inside the contract ", contract_creator_deployed, ' ...')
+        print("verifier.account", verifier.account)
+        verifier.paySmartContract(verifier, contract_creator_deployed)
+
+        # verify some provers
+        time.sleep(3)
+        didProverToVerify = DID_LIST_PROV[9]
+        verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[9], didProverToVerify)
+
+        time.sleep(3)
+        didProverToVerify = DID_LIST_PROV[10]
+        verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[10], didProverToVerify)
+
+        time.sleep(6)
+        didProverToVerify = DID_LIST_PROV[11]
+        verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[11], didProverToVerify)
+       
+
+        # Four position
+
+        contract_creator_deployed = dict_location_sc.get("7H368FWV+X6")
+        time.sleep(6)
+        print(" 💰💰  Verifier is going to insert funds inside the contract ", contract_creator_deployed, ' ...')
+        print("verifier.account", verifier.account)
+        verifier.paySmartContract(verifier, contract_creator_deployed)
+
+        # verify some provers
+        time.sleep(3)
+        didProverToVerify = DID_LIST_PROV[13]
+        verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[13], didProverToVerify)
+
+        time.sleep(3)
+        didProverToVerify = DID_LIST_PROV[14]
+        verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[14], didProverToVerify)
+
+        time.sleep(6)
+        didProverToVerify = DID_LIST_PROV[15]
+        verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[15], didProverToVerify)
+
+
 
 
         # time.sleep(3)
@@ -477,46 +525,3 @@ if __name__ == '__main__':
     main()
 
 
-
-
-
-
-
-#### this method should build the input DICT in an automatic way 
-# def buildDict():
-#     list_temp_id_wit = []
-#     list_temp_loc_wit = []
-#     for i in range(0,WITNESS_NUMBER):
-#         if wit[DID_LIST_WIT[i]]: #if exists
-#             list_temp_id_wit.append(wit.get(DID_LIST_WIT[i]))
-#         else:
-#             list_temp_id_wit.append(DID_LIST_WIT[i])
-#         wit = createWitness(  
-#             did= list_temp_id_wit,
-#             public_key= "SHJDAJAKRHAKD",
-#             private_key= "xxxxx",
-#             proofs_array_computed= [],
-#             location= LOCATION_LIST_WIT[round(random.uniform(0, 1))])
-      
-#         list_temp_id_wit = []
-
-       
-#         #insert the witness in the dict of neighbours
-#         dictOfLocation[list_temp_loc_wit[i]] = list_temp_id_wit[i] #TODO: FIX HERE --> THE VALUE MUST BE A LIST!!G
-        
-
-#     print(json.dumps(dictOfLocation, indent=4))
-
-#     for i in range(0, PROVER_NUMBER):
-#         prov = createProver(
-#             did= DID_LIST_PROV[i],
-#             public_key= "FFFFFFFFF",
-#             private_key= "xxxxxxx",
-#             proofs_array_computed= [],
-#             location= LOCATION_LIST_PROV[round(random.uniform(0, 1))],
-#             proofs_received_array=[])
-        
-#         # Find neighbours
-#         locationProver = prov.location
-#         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
-#         print('Hi Prover, your DID is: ', prov.did,'\n Your location is: ', prov.location, '\n Your neighbours are: ', neighbours)
