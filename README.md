@@ -1,3 +1,5 @@
 ## Connect the DApp to the Hypercube
 
-Work in progress ...
+
+
+<center><img src="useCase.png" width="75%" align="center"></center>
