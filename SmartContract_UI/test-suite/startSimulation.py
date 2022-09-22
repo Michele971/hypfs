@@ -6,8 +6,7 @@ from index import format_address
 from index import play_Creator, play_bob, verifier_pay, verifier_api_verify
 from threading import Thread
 import time
-import eth_new_account
-from index import start_list, end_list
+from index import start_list, end_list # list that contain start and end time for each thread
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -27,7 +26,14 @@ list_private_public_key = [
     'stable actress ordinary coral end potato approve coyote swap armed color clock eyebrow reject section thank host sense agree put sure replace area absorb echo', #2PDAQC47IFBJNU5AETJA2OV3I6NKDF4AAIZRG72ALDXMAUCEOO4KZPOO4E
     'people menu yellow vote twist guitar bargain will horse mammal usual hammer enroll input liar flower noise shy window ill clinic grape bar abstract estate', #BDFYNQR2I3YQR6WMTBYRYDJXCXDLIW5T22DVKT4IVL6R4ZQVI336E3VDNQ
     'lift decade sausage turtle pipe cup piece caution educate carpet provide barrel asset library topic hood flip swallow hotel assist dignity winner chimney absorb cost', #3YMI5U6ZKH3MZ3DNYWO3YL3SCH75KBBCWO2XOO2HEVFQSX3G2Y4UYPOWWA
-    'divorce ecology panel wash curious rich chunk spy piece position hip great random fashion rice visual obey powder borrow chief fade sibling art able borrow' #7TIHVKNIGJF5H37SJDWWKOOT4FRUE4XDUGCZ77HZVKAEAHAWKLSS2LXRUQ
+    'divorce ecology panel wash curious rich chunk spy piece position hip great random fashion rice visual obey powder borrow chief fade sibling art able borrow', #7TIHVKNIGJF5H37SJDWWKOOT4FRUE4XDUGCZ77HZVKAEAHAWKLSS2LXRUQ
+    
+    'steak gauge carpet assume swamp tuna orphan athlete script inhale garment quiz critic exotic among turn obscure kitten modify width jacket tilt miss ability fence', # HKCHIEF5XKK6NYAYUBWHTX3JB7H62QQ36RWPUPNBGL75SXQB27ZWX5Q6DQ
+    'chaos average someone regular luggage arena era parrot reason imitate yellow buyer clean enrich library pulse buddy shaft flip finger flip network theme abandon proof', # 22X4O3I5FSGYK4XTMWL6OEPKX7FPBI3QH4BB42VIZ75J7GVUDJZYCJ56OA
+    'escape leg warm silver biology silk swallow wet ticket decrease seat speed drift nice give clerk find gather verb cube assume around gather abandon month', # QF25BWUJIY3NDFS47EILAOV4DAAHIYC2PRVIGERSQVTJ7RXHY44QBA6KO4
+    'decline auction milk please lens quiz eight rough affair possible forum brand sing bless comfort believe exist twenty invest apart mask gesture match abstract marine', # MJXSIP7ULI25QH3XJP7AVQT7ZYO3TARYVUYRD6ARR6L6HWGH22ECU5MHAE
+    'whisper giggle spot sadness loyal menu cliff sense flash share guide exit oak loud field inch during slender clump loyal stove enter album abstract wool', # XSKXAH4SIWFOLFUWS6H73JUJ5HJOWUCBKTA6LFXFCYS6VDZMQL6RI5HGQM
+    'wide theme range pulse husband clever cruel kid double right choice match ill bless garlic flash zoo around ability creek exist armed hand able service' # JI7VRGDIANFNABPJL6PWVGCP42NZGQVV7T3QVJD6P47EKQP2BXSFMPU7RA
 ]
 
 
@@ -63,18 +69,18 @@ location_in_hypercube = False # simulate if the location is already stored in hy
     - Every Smart Contract must have 4 Provers: 1 Creator - 3 user-prover. So, the variable inside backend SMART_CONTRACT_MAX_USER is equal to 3 (number of user nearby)
 '''
 
-WITNESS_NUMBER = 4 # number of witnesses
-PROVER_NUMBER = 8 # number of provers for the entire system
-DID_LIST_WIT = [0, 3, 4, 5] # list of DID witnesses
-LOCATION_LIST_WIT = ["7H369FXP+FH", "7H369F4W+Q8", "7H369F4W+Q9"] # list of witnesses locations
+#WITNESS_NUMBER = 4 # number of witnesses
+PROVER_NUMBER = 16 # number of provers for the entire system
+#DID_LIST_WIT = [0, 3, 4, 5] # list of DID witnesses
+#LOCATION_LIST_WIT = ["7H369FXP+FH", "7H369F4W+Q8", "7H369F4W+Q9"] # list of witnesses locations
 
 '''
     ❗️❗️❗️❗️  WARNING: ❗️❗️❗️❗️
     ---> len(DID_LIST_PROV) and len(LOCATION_LIST_PROV) MUST TO BE EQUALS !!! You can decrease the PROVER_NUMBER during the testing
     ---> PROVER_NUMBER are all the provers of the system
 '''
-DID_LIST_PROV = [2, 6, 50, 51, 8, 9, 10, 11, 14, 19] # DID of provers that will ask for a Proof Of Location and a verify process
-LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q9", "7H369F4W+Q9", "7H369F4W+Q9", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6"] # list of Provers locatios. Used for build the prover object
+DID_LIST_PROV = [2, 6, 50, 51, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 22] # DID of provers that will ask for a Proof Of Location and a verify process
+LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q9", "7H369F4W+Q9", "7H369F4W+Q9", "7H369F4W+Q9", "7H368FRV+FM", "7H368FRV+FM", "7H368FRV+FM", "7H368FRV+FM", "7H368FWV+X6", "7H368FWV+X6", "7H368FWV+X6", "7H368FWV+X6", "7H369FXP+FH"] # list of Provers locatios. Used for build the prover object
 
 VERIFIER_NUMBER = 1 #number of verifiers
 DID_LIST_VER = [99] #list of DID associated to verifiers
@@ -102,18 +108,25 @@ dictOfLocation = {
     "7H368FRV+FM":[ #Bologna
         12,
         13,
-        14
+        14,
+        15
     ],
     "7H368FWV+X6": [ #Ice-cream Bologna
-        15,
         16,
         17,
         18,
         19
-    ],
+    ], 
+    "7H369FXP+FH": [ # Ranzani 13: 44.4864416,11.3986586
+        22,
+        30,
+        44,
+        26
+    ]
+            
 }
 
-NUMBER_OF_LOCATIONS = 5 #number of different locations. For each location there could be a smart contract
+NUMBER_OF_LOCATIONS = 6 #number of different locations. For each location there could be a smart contract
 
 
 class Witness:
@@ -468,7 +481,16 @@ def startSimulation():
         "X56EISCBSSPAS75S2RZFJVBEXMGCVI2WG4QMIHRRCAHUGTCUGF7RE6643M",
         "2PDAQC47IFBJNU5AETJA2OV3I6NKDF4AAIZRG72ALDXMAUCEOO4KZPOO4E",
         "BDFYNQR2I3YQR6WMTBYRYDJXCXDLIW5T22DVKT4IVL6R4ZQVI336E3VDNQ",
+        "3YMI5U6ZKH3MZ3DNYWO3YL3SCH75KBBCWO2XOO2HEVFQSX3G2Y4UYPOWWA",
+        "7TIHVKNIGJF5H37SJDWWKOOT4FRUE4XDUGCZ77HZVKAEAHAWKLSS2LXRUQ",
+        "HKCHIEF5XKK6NYAYUBWHTX3JB7H62QQ36RWPUPNBGL75SXQB27ZWX5Q6DQ",
+        "22X4O3I5FSGYK4XTMWL6OEPKX7FPBI3QH4BB42VIZ75J7GVUDJZYCJ56OA",
+        "QF25BWUJIY3NDFS47EILAOV4DAAHIYC2PRVIGERSQVTJ7RXHY44QBA6KO4",
+        "MJXSIP7ULI25QH3XJP7AVQT7ZYO3TARYVUYRD6ARR6L6HWGH22ECU5MHAE",
+        "XSKXAH4SIWFOLFUWS6H73JUJ5HJOWUCBKTA6LFXFCYS6VDZMQL6RI5HGQM",
+        "JI7VRGDIANFNABPJL6PWVGCP42NZGQVV7T3QVJD6P47EKQP2BXSFMPU7RA",
     ]
+
 
 
     time_delta_list = []
@@ -491,6 +513,7 @@ def startSimulation():
     for verifierUser in verifier_list_account:
         rpc("/forget/ctc", verifierUser)
 
+    print(time_delta_list)
     # plotting the time of deploy and transaction for each account
     height = time_delta_list
     bars = (wallet_pub_key)

@@ -2,9 +2,13 @@ from algosdk import account, mnemonic
 
 def generate_algorand_keypair():
     private_key, address = account.generate_account()
-    print(private_key)
-    print("My address: {}".format(address))
-    print("My passphrase:\n{}".format(mnemonic.from_private_key(private_key)))
+    #print(private_key)
+    # print("My address: {}".format(address))
+    # print("My passphrase:\n{}".format(mnemonic.from_private_key(private_key)))
+    print("'",mnemonic.from_private_key(private_key),"', #",address)
+
+#generate_algorand_keypair()
 
 
-generate_algorand_keypair()
+for i in range(0, 6):
+    generate_algorand_keypair()

@@ -44,6 +44,10 @@ Performance evaluation with Algorand (x: accounts, y: seconds):
 <center><img src="img/algorandPerf.png" width="75%" align="center"></center>
 Account 1° and 5° deploy new smart contract.
 
+Performance with 16 accounts:
+<center><img src="img/algoPer_16tx.png" width="75%" align="center"></center>
+
+
 Outcome [not correct | fixed with the new version]:
 <center><img src="img/terminalStartSimulation.png" width="75%" align="center"></center>
 
