@@ -11,7 +11,7 @@ lock = Lock()
 
 provers_addresses = [] # this address need to be verified
 rpc, rpc_callbacks = mk_rpc()
-SMART_CONTRAT_PAYMENT = rpc("/stdlib/parseCurrency", 0.002)
+SMART_CONTRAT_PAYMENT = rpc("/stdlib/parseCurrency", 50)
 
 def fmt(x):
     return rpc("/stdlib/formatCurrency", x, 4)
@@ -44,6 +44,7 @@ def player(who):
     def reportVerification(did, verifier):
         did_int = int(did.get('hex'), 16)
         print("DID ", did_int, " has been verified by Verifier ", verifier)
+        
     return {'stdlib.hasConsoleLogger': True,
             'reportPosition': reportPosition,
             'reportVerification':reportVerification,

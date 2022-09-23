@@ -2,11 +2,12 @@
 from platform import python_branch
 from openlocationcode import openlocationcode as olc
 from reach_rpc import mk_rpc
-from index import format_address
+from index import format_address, get_balance
 from index import play_Creator, play_bob, verifier_pay, verifier_api_verify
 from threading import Thread
 import time
 import eth_new_account
+from typing import List
 
 list_private_public_key = [
     '0x8d10e8fb1aa289828f31914f581dbc39d9ed76b2e2d1247c49f5814349ff10c0', 
@@ -26,8 +27,8 @@ verifiers_private = [
 ]
 
 
-prover_thread = [] #list of prover thread
 prover_list_account = [] #list of prover account 
+prover_thread = [] #list of prover thread
 prover_addresses = [] # list of provers addresses
 
 verifier_addresses = [] #list of verifier thread
@@ -296,6 +297,7 @@ def generateOLC(latitude, longitude):
 
 
 
+
 # START the simulation
 def startSimulation():
     dict_location_sc = {} # keep track if the smart contract is already associated to this particular location. Its lenght will be equal to NUMBER_OF_LOCATIONS
@@ -320,9 +322,14 @@ def startSimulation():
 
         account_prov = prov.createAccount(i) #passing the number of prover to create
         # TODO: create a list of object provers and remove the two line below. Refactoring
+       
         prover_list_account.append(account_prov)
         prover_addresses.append(format_address(account_prov)) #getting the wallet addresses for prover and appending to the list
         prov.account = account_prov
+
+
+        print("BALANCE OF ",format_address(account_prov), " is ",get_balance(account_prov))
+
         
         #setting the gas limit
         rpc("/acc/setGasLimit", account_prov, 5000000) # this line avoid the error displayed on etherscan which is: "out of gas"
@@ -377,6 +384,10 @@ def startSimulation():
         ❗️  WARNING: ❗️
         ---> Check that SMART_CONTRACT_MAX_USER variable in index.rsh has been reached here: Everybody has to attach to the contract if you want going on with verifiers
     '''
+    # DEBUG
+    print("DICT: ", dict_location_sc)
+    # END DEBUG
+
     time.sleep(35)
     for i in range(0, VERIFIER_NUMBER):
     
@@ -451,14 +462,22 @@ def startSimulation():
     '''
         TODO: here STOP the timer for the VERIFY phase
     '''
+    time.sleep(10)
+    # DEBUG
+    for provUser in prover_list_account:
+        print("BALANCE OF ",format_address(provUser), " is ",get_balance(provUser))
 
+    #END DEBUG
 
     # Joining the thread of provers and verifiers
     for provUser in prover_thread:
         provUser.join()
-    
+
+
     for verifierUser in verifier_addresses:
+        print("sono quiii verifier join!")
         verifierUser.join()
+
 
 
     for provUser in prover_list_account:
