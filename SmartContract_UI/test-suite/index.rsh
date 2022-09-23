@@ -1,7 +1,7 @@
 'reach 0.1';
 'use strict';
 
-const REWARD_FOR_PROVER = 10//send by VERIFIER
+const REWARD_FOR_PROVER = 100000000000000000//send by VERIFIER
 const SMART_CONTRACT_MAX_USER = 3
 //NOTES:
 // TODO: This smart contract is empower to validate if the positions of users are correct
@@ -138,10 +138,10 @@ export const main = Reach.App(() => {
           return true; //TODO: THIS HAS TO BE TRUEE, false only for testing
         }
       )
-      .timeout(relativeTime(120/5), () => { // timeout: function that executes code every amount of time decided by the first parameter
-        Anybody.publish(); // publish needed to finish the parallel reduce
-        return false; // set keepGoing to false to finish the campaign
-      }); 
+      // .timeout(relativeTime(350/5), () => { // timeout: function that executes code every amount of time decided by the first parameter
+      //   Anybody.publish(); // publish needed to finish the parallel reduce
+      //   return false; // set keepGoing to false to finish the campaign
+      // }); 
 
 
   // TODO: the first received position has to be stored in a data structure, will be compared to the subsquent received positions

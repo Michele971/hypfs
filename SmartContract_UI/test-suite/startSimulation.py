@@ -37,7 +37,7 @@ verifier_list_account = [] #list of verifier account
 contract_creator_deployed = None # contrat deployed, will have to be a list of contracts
 
 rpc, rpc_callbacks = mk_rpc()
-#rpc("/stdlib/setProviderByName","TestNet")
+rpc("/stdlib/setProviderByName","TestNet")
 
 print("\t\t The consesus network is: ", rpc('/stdlib/connector'))
 
@@ -56,7 +56,7 @@ location_in_hypercube = False # simulate if the location is already stored in hy
 '''
 
 WITNESS_NUMBER = 4 # number of witnesses
-PROVER_NUMBER = 8 # number of provers for the entire system
+PROVER_NUMBER = 4 # number of provers for the entire system
 DID_LIST_WIT = [0, 3, 4, 5] # list of DID witnesses
 LOCATION_LIST_WIT = ["7H369FXP+FH", "7H369F4W+Q8", "7H369F4W+Q9"] # list of witnesses locations
 
@@ -155,8 +155,8 @@ class Verifier():
         return verifierThread
 
     def createAccount(self):
-        acc_verifier = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
-        #acc_verifier = rpc("/stdlib/newAccountFromSecret", verifiers_private[0])
+        #acc_verifier = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        acc_verifier = rpc("/stdlib/newAccountFromSecret", verifiers_private[0])
 
         return acc_verifier
 
@@ -215,25 +215,13 @@ class Prover(Witness):
 
     def createAccount(self, i):
         # ########### #######  WORK WITH REACH DEVNET ##################
-        acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        #acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
 
 
         
-        #print("PRIVATE KEY: ", list_private_public_key[i])
         # ########### #######  WORK WITH ETHEREUM TESTNET ##################
-        #acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
+        acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
       
-
-        #print("aaaaaaaaaa",rpc('/stdlib/providerEnvByName'))
-        # consensus_network = rpc('/stdlib/providerEnvByName')
-        # if consensus_network == 'ETH':
-        #     #passphase_inserted = "coyote usual trigger laundry industry spoon quantum lyrics candy hood balance spell"
-        #     private_key = "0x25db347fdf2ac94fa4e5893299bac50c81a091c3d12bc54f72716f2c692a5fef"
-        #     acc_prover = rpc("/stdlib/newAccountFromSecret", private_key)
-
-        # else consensus_network == 'ALGO':
-        #         acc_prover = rpc("/stdlib/newAccountFromMnemonic", passphase_inserted)
-
             
         return acc_prover
         
@@ -388,7 +376,7 @@ def startSimulation():
     print("DICT: ", dict_location_sc)
     # END DEBUG
 
-    time.sleep(35)
+    time.sleep(500)
     for i in range(0, VERIFIER_NUMBER):
     
     
@@ -407,23 +395,23 @@ def startSimulation():
         print("verifier.account", verifier.account)
         verifier.paySmartContract(verifier, contract_creator_deployed)
         
-
+        print("WAITING 70")
         # verify some provers
-        time.sleep(10)
+        time.sleep(70)
         didProverToVerify = DID_LIST_PROV[1]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[1], didProverToVerify)
-
-        time.sleep(10)
+        print("WAITING 50")
+        time.sleep(50)
         didProverToVerify = DID_LIST_PROV[2]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[2], didProverToVerify)
 
-        time.sleep(3)
+        time.sleep(50)
         didProverToVerify = DID_LIST_PROV[3]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[3], didProverToVerify)
         '''
             verify the second smart contract
         '''
-        time.sleep(3)
+        time.sleep(70)
         contract_creator_deployed = dict_location_sc.get('7H369F4W+Q9') # JUST FOR TESTING
         # is not mandatory, but the verifier can insert funds inside the smart contract
         print(" 💰💰  Verifier is going to insert funds inside the contract ", contract_creator_deployed, ' ...')
@@ -432,38 +420,26 @@ def startSimulation():
         
 
         # verify some provers
-        time.sleep(3)
+        time.sleep(70)
         didProverToVerify = DID_LIST_PROV[5]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[5], didProverToVerify)
 
-        time.sleep(3)
+        time.sleep(70)
         didProverToVerify = DID_LIST_PROV[6]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[6], didProverToVerify)
 
-        time.sleep(3)
+        time.sleep(70)
         didProverToVerify = DID_LIST_PROV[7]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[7], didProverToVerify)
 
 
-        # time.sleep(3)
-        # didProverToVerify = DID_LIST_PROV[3]
-        # verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[3], didProverToVerify)
-
-        # time.sleep(3)
-        # didProverToVerify = DID_LIST_PROV[4]
-        # verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[4], didProverToVerify)
-
-        #prover_addresses.remove(prover_addresses[1]) #remove the address from the provers that will need to be verify
-        #prover_addresses.remove(prover_addresses[1]) 
-        # prover_addresses.remove(prover_addresses[1]) 
-        # prover_addresses.remove(prover_addresses[1]) 
 
 
     '''
         TODO: here STOP the timer for the VERIFY phase
     '''
-    time.sleep(10)
-    # DEBUG
+    time.sleep(70)
+    # START DEBUG
     for provUser in prover_list_account:
         print("BALANCE OF ",format_address(provUser), " is ",get_balance(provUser))
 
