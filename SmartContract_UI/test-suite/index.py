@@ -11,7 +11,7 @@ lock = Lock()
 
 provers_addresses = [] # this address need to be verified
 rpc, rpc_callbacks = mk_rpc()
-SMART_CONTRAT_PAYMENT = rpc("/stdlib/parseCurrency", 5)
+SMART_CONTRAT_PAYMENT = rpc("/stdlib/parseCurrency", 40)
 
 def fmt(x):
     return rpc("/stdlib/formatCurrency", x, 4)
@@ -44,10 +44,14 @@ def player(who):
     def reportVerification(did, verifier):
         did_int = int(did.get('hex'), 16)
         print("DID ", did_int, " has been verified by Verifier ", verifier)
+
+    def issueDuringVerification(did):
+        print("DID ",did, "has NOT been verified. Maybe there is an error inside the smart contract backend\t Maybe the contract balance is insufficient for execute the transfer")
         
     return {'stdlib.hasConsoleLogger': True,
             'reportPosition': reportPosition,
             'reportVerification':reportVerification,
+            'issueDuringVerification':issueDuringVerification,
             }
 
 def play_Creator(contract_creator, position, did, proof):
@@ -55,6 +59,8 @@ def play_Creator(contract_creator, position, did, proof):
     lock.acquire()
     if lock.locked():
         print("\tCREATOR: locked acquired")
+        print("Smart contract deployed  🚀 :", contract_creator)
+
     else:
         print("waiting for lock ...")
         
@@ -97,7 +103,6 @@ def play_bob(ctc_user_creator, accc, pos, did, proof):
 def verifier_pay(ctc_user_creator,accc):
         ctc_verifier = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_user_creator))
         # Call the API
-        print("verifier is going to pay: ",SMART_CONTRAT_PAYMENT)
         money_payed = rpc('/ctc/apis/verifierAPI/insert_money', ctc_verifier, SMART_CONTRAT_PAYMENT)
         #money_payed_int = int(money_payed.get('hex'), 16)
         #print("money_payed by verifier to the contract ", ftm_eth(money_payed_int))
@@ -108,7 +113,7 @@ def verifier_api_verify(ctc_user_creator, accc, did_choose, wallet_toVerify):
         # Call the API
         result_api = rpc('/ctc/apis/verifierAPI/verify', ctc_verifier, did_choose, wallet_toVerify)
         #print("User with wallet address ", result_api, " has been verified!")
-        print(" ✅  ",wallet_toVerify," succesfully verified! ")
+        print(" ✅  ",result_api," succesfully verified! ")
         '''
             TODO: remove the address from "provers_addresses" list, if it is successfully verified!!!
         '''

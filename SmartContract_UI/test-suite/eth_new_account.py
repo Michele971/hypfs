@@ -36,7 +36,7 @@ def send_eth(sender_private_key, sender_addr, receiver_addr): #gas_increase
     nonce = web3.eth.getTransactionCount(from_address)
     #gas = int('50')+gas_increase*10
     gasPrice = web3.toWei('50', 'gwei') #str(gas)
-    value = web3.toWei(0.4, 'ether')
+    value = web3.toWei(10, 'ether')
 
     tx = {
         'nonce': nonce,
@@ -55,7 +55,11 @@ def send_eth(sender_private_key, sender_addr, receiver_addr): #gas_increase
     #Print transaction hash in hex
     print(web3.toHex(tx_hash))
 
-newAccount()
+#newAccount()
+
+#fund the verifier
+#send_eth("0x8d10e8fb1aa289828f31914f581dbc39d9ed76b2e2d1247c49f5814349ff10c0", "0x832e977393410e0388f994bb773d78E83Ae9619E","0x6636F7B4A4d9077DBa98F9A0237192B160277200")
+
 
 # create 10 new accounts (use only once if dict_private_public_key is empty)
 # dict_private_public_key = None #re-initialize if you want execute the code below

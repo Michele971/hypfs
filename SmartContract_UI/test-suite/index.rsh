@@ -1,7 +1,7 @@
 'reach 0.1';
 'use strict';
 
-const REWARD_FOR_PROVER = 100000000000000000//send by VERIFIER
+const REWARD_FOR_PROVER = 10000000000000000000//send by VERIFIER
 const SMART_CONTRACT_MAX_USER = 3
 //NOTES:
 // TODO: This smart contract is empower to validate if the positions of users are correct
@@ -23,6 +23,7 @@ export const main = Reach.App(() => {
     proof_reveived: Bytes(128),
     reportPosition: Fun([UInt, Maybe(Bytes(128))], Null),
     reportVerification: Fun([UInt, Address], Null),
+    issueDuringVerification: Fun([UInt], Null),
 
   });
 
@@ -101,11 +102,11 @@ export const main = Reach.App(() => {
     commit();
     Creator.publish();
 
-    const keepGoing2 = 
-    parallelReduce(true) 
+    const keepGoing2_counter = 
+    parallelReduce(SMART_CONTRACT_MAX_USER) 
       .invariant(balance() == balance())
       .define(() => {views.getCtcBalance.set(balance());})
-      .while(keepGoing2)
+      .while(keepGoing2_counter > 0) 
       .api(verifierAPI.insert_money,
         (money) => { // the assume that have to be true to continue the execution of the API
           assume(money > 0);
@@ -114,7 +115,7 @@ export const main = Reach.App(() => {
         (money, y) => { 
           y(money);
         
-          return true;
+          return keepGoing2_counter;
         }
       )
       .api(verifierAPI.verify, 
@@ -123,22 +124,20 @@ export const main = Reach.App(() => {
           if (balance()>=REWARD_FOR_PROVER){
             transfer(REWARD_FOR_PROVER).to(walletAddress); //TODO: change amount transfered. THE TRANSFER DOES NOT WORKS.
             Creator.only(() => interact.reportVerification(did, this));
+            delete easy_map[did]; //vector[0] is the did
             ret(walletAddress);
+            return keepGoing2_counter -1; //TODO: THIS HAS TO BE TRUEE, false only for testing
+       
+          }else{
+            Creator.only(() => interact.issueDuringVerification(did));
+            ret(walletAddress);
+            return keepGoing2_counter ; //TODO: THIS HAS TO BE TRUEE, false only for testing  
           }
-          //transfer(balance()).to(walletAddress); //TODO: change amount transfered
-          ret(walletAddress);
-          delete easy_map[did]; //vector[0] is the did
-          // Creator.only(() => interact.reportVerification(did, this));
+        
 
-          
-          // print this for debugging
-          // Creator.only(() => interact.reportVerification(balance(), this));
-          // Creator.only(() => interact.reportVerification(REWARD_FOR_PROVER, this));
-
-          return true; //TODO: THIS HAS TO BE TRUEE, false only for testing
         }
       )
-      // .timeout(relativeTime(350/5), () => { // timeout: function that executes code every amount of time decided by the first parameter
+      // .timeout(relativeTime(700/5), () => { // timeout: function that executes code every amount of time decided by the first parameter
       //   Anybody.publish(); // publish needed to finish the parallel reduce
       //   return false; // set keepGoing to false to finish the campaign
       // }); 
