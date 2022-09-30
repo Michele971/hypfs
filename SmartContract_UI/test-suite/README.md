@@ -1,6 +1,6 @@
 ## This script must be run on ALGORAND testnet
 
-### You have to run the project on Ethereum Consensus Network
+### You have to run the project on Algorand Consensus Network
 
 ### The final version of smart contract will not contains the location for privacy reasons. Instead hash of the proof and signed hash of the proof will be inserted by the provers
 
@@ -9,10 +9,10 @@
 At the moment, the following system contains 8 prover where 2 are creators and 6 are the neighbours.
 In particular:
 - **1° Smart contract associated to 7H369F4W+Q8 location:** prover with DID 2 is the creator and his neighbours are 6, 50 and 51;
-- **2° Smart contract associated to 7H369F4W+Q9 location:** prover with DID 8 is the creator and his neighbours are 9, 10 and 11.
+- **2° Smart contract associated to 7H369F4W+Q9 location:** prover with DID 8 is the creator and his neighbours are 9, 10 and 11;
+- **3° Smart contract associated to 7H368FRV+FM location:** prover with DID 12 is the creator and his neighbours are 13, 14 and 15;
+- **4° Smart contract associated to 7H368FWV+X6 location:** prover with DID 16 is the creator and his neighbours are 17, 18 and 19.
 
-The verifier has a balance, on Reach Devnet, equal to 1500 and sends 500 eth to both smart contracts.
-Ther verifier will also verify all the proof and location inside the smart contracts.
 
 ## Main Features
 
