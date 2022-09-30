@@ -58,7 +58,7 @@ def send_eth(sender_private_key, sender_addr, receiver_addr): #gas_increase
 #newAccount()
 
 #fund the verifier
-#send_eth("0x8d10e8fb1aa289828f31914f581dbc39d9ed76b2e2d1247c49f5814349ff10c0", "0x832e977393410e0388f994bb773d78E83Ae9619E","0x6636F7B4A4d9077DBa98F9A0237192B160277200")
+#send_eth("0x9cf648f6aaa283e0c227f9047e735e1d604875ce735223c334f1c511a0dd2b1b", "0x119d2BA2e52e21A88210Cd29DA0c7d45D2AC077A","0x6636F7B4A4d9077DBa98F9A0237192B160277200")
 
 
 # create 10 new accounts (use only once if dict_private_public_key is empty)

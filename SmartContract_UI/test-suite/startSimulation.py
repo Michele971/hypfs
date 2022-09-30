@@ -37,7 +37,7 @@ verifier_list_account = [] #list of verifier account
 contract_creator_deployed = None # contrat deployed, will have to be a list of contracts
 
 rpc, rpc_callbacks = mk_rpc()
-#rpc("/stdlib/setProviderByName","TestNet")
+rpc("/stdlib/setProviderByName","TestNet")
 
 print("\t\t The consesus network is: ", rpc('/stdlib/connector'))
 
@@ -155,8 +155,8 @@ class Verifier():
         return verifierThread
 
     def createAccount(self):
-        acc_verifier = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
-        #acc_verifier = rpc("/stdlib/newAccountFromSecret", verifiers_private[0])
+        #acc_verifier = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        acc_verifier = rpc("/stdlib/newAccountFromSecret", verifiers_private[0])
 
         return acc_verifier
 
@@ -214,12 +214,12 @@ class Prover(Witness):
 
     def createAccount(self, i):
         # ########### #######  WORK WITH REACH DEVNET ##################
-        acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        #acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
 
 
         
         # ########### #######  WORK WITH ETHEREUM TESTNET ##################
-        #acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
+        acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
       
             
         return acc_prover
@@ -372,7 +372,7 @@ def startSimulation():
     '''
 
 
-    time.sleep(10)
+    time.sleep(600)
     for i in range(0, VERIFIER_NUMBER):
     
     
@@ -391,21 +391,21 @@ def startSimulation():
 
         verifier.paySmartContract(verifier, contract_creator_deployed)
         
-        print("WAITING 10")
+        print("WAITING 50")
         # verify some provers
-        time.sleep(5)
+        time.sleep(50)
         didProverToVerify = DID_LIST_PROV[1]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[1], didProverToVerify)
         print("Verifier is going to insert data in hypercube")
         #TODO: insert data inside the hypercube
 
 
-        print("WAITING 10 x  2")
-        time.sleep(5)
+        print("WAITING 50 ...")
+        time.sleep(50)
         didProverToVerify = DID_LIST_PROV[2]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[2], didProverToVerify)
 
-        time.sleep(5)
+        time.sleep(50)
         didProverToVerify = DID_LIST_PROV[3]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[3], didProverToVerify)
         '''
