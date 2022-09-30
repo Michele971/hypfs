@@ -9,7 +9,7 @@ import time
 from index import start_list, end_list # list that contain start and end time for each thread
 import numpy as np
 import matplotlib.pyplot as plt
-
+from makeTransaction import *
 '''
     ---------------------------------------------------------------------------------------
     ------------------    THIS SCRIPT MUST BE RUN ON ALGORAND TESTNET    ------------------
@@ -52,7 +52,7 @@ verifier_list_account = [] #list of verifier account
 contract_creator_deployed = None # contrat deployed, will have to be a list of contracts
 
 rpc, rpc_callbacks = mk_rpc()
-rpc("/stdlib/setProviderByName","TestNet")
+#rpc("/stdlib/setProviderByName","TestNet")
 
 print("\t\t The consesus network is: ", rpc('/stdlib/connector'))
 STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500) 
@@ -183,9 +183,23 @@ class Verifier():
         return acc_verifier
 
 class Prover(Witness):
-    def __init__(self, did, account, private_key, proofs_array_computed, location, proofs_received_array):
+    def __init__(self, did, account, private_key, proofs_array_computed, location, proofs_received_array, title_report, description_report):
         super().__init__(did, account, private_key, proofs_array_computed, location)
         self.proofs_received_array = proofs_received_array
+        title_report = title_report
+        description_report = description_report
+
+
+    '''
+        - writeDataOnBlockchain:  
+            -> allow the prover to insert data in the blockchain encripting them with the verifier public key
+            @input_params:
+                * prover's passphase;
+                * data to insert inside the transaction
+    '''
+    def writeDataOnBlockchain(self, passphase, title, description):
+        data = [title, description]
+        make_transaction(passphase, data)
 
     '''
         This method will return the list of neihbours. 
@@ -277,14 +291,16 @@ def createWitness(did, public_key, private_key, proofs_array_computed, location)
 
     return wit
 
-def createProver(did, account, private_key, proofs_array_computed, location, proofs_received_array):
+def createProver(did, account, private_key, proofs_array_computed, location, proofs_received_array, title_report, description_report):
     prov = Prover(
         did= did,
         account= account,
         private_key= private_key,
         proofs_array_computed= proofs_array_computed,
         location= location,
-        proofs_received_array= proofs_received_array) #store the received proofs
+        proofs_received_array= proofs_received_array,
+        title_report=title_report,
+        description_report=description_report) #store the received proofs
     
     return prov
 
@@ -302,8 +318,6 @@ def generateOLC(latitude, longitude):
     location_encoded = olc.encode(latitude, longitude) #lat - long - N° digits. Default is 10 digits which allow 14m of precisions
     print('Encoded location: ', location_encoded)
     return location_encoded
-
-
 
 
 # START the simulation
@@ -326,14 +340,19 @@ def startSimulation():
             private_key= "xxxxxxx",
             proofs_array_computed= [],
             location= LOCATION_LIST_PROV[i], # The Prover Location come from an default array that contains all the Locations
-            proofs_received_array=[])
-
+            proofs_received_array=[],
+            title_report="Report Title",
+            description_report="Descrition of the report ...")
+        
         account_prov = prov.createAccount(i) #passing the number of prover to create
         # TODO: create a list of object provers and remove the two line below. Refactoring
         prover_list_account.append(account_prov)
         prover_addresses.append(format_address(account_prov)) #getting the wallet addresses for prover and appending to the list
         prov.account = account_prov
-        
+
+        #store data inside the blockchain
+        prov.writeDataOnBlockchain(list_private_public_key[i], "prov.title_report", "prov.description_report")
+
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
         if neighbours: 
