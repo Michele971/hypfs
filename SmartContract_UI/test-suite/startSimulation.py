@@ -44,7 +44,7 @@ prover_addresses = [] # list of provers addresses
 contract_creator_deployed = None # contrat deployed, will have to be a list of contracts
 
 rpc, rpc_callbacks = mk_rpc()
-#rpc("/stdlib/setProviderByName","TestNet")
+rpc("/stdlib/setProviderByName","TestNet")
 
 print("\t\t The consesus network is: ", rpc('/stdlib/connector'))
 STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500) 
@@ -296,11 +296,11 @@ def startSimulation():
         #store data inside the blockchain
         #tx_id = prov.writeDataOnBlockchain(list_private_public_key[i], prov.title_report, prov.description_report)
         #waiting for the transaction id
-        # with concurrent.futures.ThreadPoolExecutor() as executor:
-        #     write_tx_thread = executor.submit(prov.writeDataOnBlockchain, list_private_public_key[i], prov.title_report, prov.description_report)
-        #     tx_id = write_tx_thread.result()
-        #     #print(tx_id)
-        #     prov.tx_id_data = tx_id
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            write_tx_thread = executor.submit(prov.writeDataOnBlockchain, list_private_public_key[i], prov.title_report, prov.description_report)
+            tx_id = write_tx_thread.result()
+            #print(tx_id)
+            prov.tx_id_data = tx_id
 
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
@@ -337,7 +337,6 @@ def startSimulation():
                 prover_thread.append(proverThread)
                 
 
-
     # Joining the thread of provers and verifiers
     print("num threads: ",len(prover_thread))
     print("end_list (time)", end_list)
@@ -361,8 +360,6 @@ def startSimulation():
         "JI7VRGDIANFNABPJL6PWVGCP42NZGQVV7T3QVJD6P47EKQP2BXSFMPU7RA",
     ]
 
-
-
     time_delta_list = []
  
     for (i,t) in enumerate(prover_thread):
@@ -370,18 +367,10 @@ def startSimulation():
         delta = end_list[i]-start_list[i]
         time_delta_list.insert(i, delta)
         print("new delta: ", delta)
-        
-    
-
-    for verifierUser in verifier_addresses:
-        verifierUser.join()
-
 
     for provUser in prover_list_account:
         rpc("/forget/ctc", provUser)
 
-    for verifierUser in verifier_list_account:
-        rpc("/forget/ctc", verifierUser)
 
     print(time_delta_list)
     # plotting the time of deploy and transaction for each account
