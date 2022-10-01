@@ -33,7 +33,7 @@ def make_transaction(algorand_wallet_passphase,obj_hash):
         transaction of Algorand Blockchain.
         In particular, we insert the hash inside the note field.
 
-        Sequently, the id of transaction will be stored inside the DHT.
+        Subsequently, the id of transaction will be stored inside the DHT.
 
         The original project, without Algorand, stored hash of IPFS in the DHT not the transaction ID. 
     '''
