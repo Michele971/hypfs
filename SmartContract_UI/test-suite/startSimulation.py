@@ -10,6 +10,7 @@ from index import start_list, end_list # list that contain start and end time fo
 import numpy as np
 import matplotlib.pyplot as plt
 from makeTransaction import *
+import concurrent.futures
 '''
     ---------------------------------------------------------------------------------------
     ------------------    THIS SCRIPT MUST BE RUN ON ALGORAND TESTNET    ------------------
@@ -70,7 +71,7 @@ location_in_hypercube = False # simulate if the location is already stored in hy
 '''
 
 #WITNESS_NUMBER = 4 # number of witnesses
-PROVER_NUMBER = 16 # number of provers for the entire system
+PROVER_NUMBER = 4 # number of provers for the entire system
 #DID_LIST_WIT = [0, 3, 4, 5] # list of DID witnesses
 #LOCATION_LIST_WIT = ["7H369FXP+FH", "7H369F4W+Q8", "7H369F4W+Q9"] # list of witnesses locations
 
@@ -183,11 +184,12 @@ class Verifier():
         return acc_verifier
 
 class Prover(Witness):
-    def __init__(self, did, account, private_key, proofs_array_computed, location, proofs_received_array, title_report, description_report):
+    def __init__(self, did, account, private_key, proofs_array_computed, location, proofs_received_array, title_report, description_report, tx_id_data):
         super().__init__(did, account, private_key, proofs_array_computed, location)
         self.proofs_received_array = proofs_received_array
-        title_report = title_report
-        description_report = description_report
+        self.title_report = title_report
+        self.description_report = description_report
+        self.tx_id_data = tx_id_data
 
 
     '''
@@ -199,8 +201,8 @@ class Prover(Witness):
     '''
     def writeDataOnBlockchain(self, passphase, title, description):
         data = [title, description]
-        make_transaction(passphase, data)
-
+        transaction_id = make_transaction(passphase, data)
+        return transaction_id
     '''
         This method will return the list of neihbours. 
         listWitnessLocation is the input dict that own the location of every users:
@@ -291,7 +293,7 @@ def createWitness(did, public_key, private_key, proofs_array_computed, location)
 
     return wit
 
-def createProver(did, account, private_key, proofs_array_computed, location, proofs_received_array, title_report, description_report):
+def createProver(did, account, private_key, proofs_array_computed, location, proofs_received_array, title_report, description_report, tx_id_data):
     prov = Prover(
         did= did,
         account= account,
@@ -300,7 +302,8 @@ def createProver(did, account, private_key, proofs_array_computed, location, pro
         location= location,
         proofs_received_array= proofs_received_array,
         title_report=title_report,
-        description_report=description_report) #store the received proofs
+        description_report=description_report,
+        tx_id_data=tx_id_data) #store the received proofs
     
     return prov
 
@@ -324,10 +327,6 @@ def generateOLC(latitude, longitude):
 def startSimulation():
     dict_location_sc = {} # keep track if the smart contract is newAccountFromMnemonicalready associated to this particular location. Its lenght will be equal to NUMBER_OF_LOCATIONS
     
-    '''
-        TODO: here START the timer for the DEPLOYING and INSERTING phase
-    '''
-
     # Starting prover steps
     for i in range(0, PROVER_NUMBER): #for every prover of the entire system ...
         ##### TODO: Generate random LATITUDE & LONGITUDE (for every user), Then convert them to Open Location code and add to LOCATION_LIST_PROV
@@ -336,13 +335,14 @@ def startSimulation():
 
         prov = createProver(
             did= DID_LIST_PROV[i], # The Prover ID come from an default array that contains all the IDs
-            account= "FFFFFFFFF",
-            private_key= "xxxxxxx",
+            account= "None",
+            private_key= "None",
             proofs_array_computed= [],
             location= LOCATION_LIST_PROV[i], # The Prover Location come from an default array that contains all the Locations
             proofs_received_array=[],
-            title_report="Report Title",
-            description_report="Descrition of the report ...")
+            title_report="Report Title here ...",
+            description_report="Descrition of the report ...",
+            tx_id_data="None")
         
         account_prov = prov.createAccount(i) #passing the number of prover to create
         # TODO: create a list of object provers and remove the two line below. Refactoring
@@ -351,7 +351,13 @@ def startSimulation():
         prov.account = account_prov
 
         #store data inside the blockchain
-        prov.writeDataOnBlockchain(list_private_public_key[i], "prov.title_report", "prov.description_report")
+        #tx_id = prov.writeDataOnBlockchain(list_private_public_key[i], prov.title_report, prov.description_report)
+        #waiting for the transaction id
+        # with concurrent.futures.ThreadPoolExecutor() as executor:
+        #     write_tx_thread = executor.submit(prov.writeDataOnBlockchain, list_private_public_key[i], prov.title_report, prov.description_report)
+        #     tx_id = write_tx_thread.result()
+        #     #print(tx_id)
+        #     prov.tx_id_data = tx_id
 
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
@@ -399,13 +405,7 @@ def startSimulation():
 
                 prover_thread.append(proverThread)
                 
-    '''
-        TODO: here STOP the timer for the DEPLOYING and INSERTING phase
-    '''      
-    
-    '''
-        TODO: here START the timer for the VERIFY phase
-    '''
+
     # Starting Verifier steps
     '''
         ❗️  WARNING: ❗️
@@ -481,10 +481,6 @@ def startSimulation():
         # prover_addresses.remove(prover_addresses[1]) 
         # prover_addresses.remove(prover_addresses[1]) 
 
-
-    '''
-        TODO: here STOP the timer for the VERIFY phase
-    '''
 
 
     # Joining the thread of provers and verifiers

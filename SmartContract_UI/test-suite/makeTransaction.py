@@ -23,7 +23,7 @@ def wait_for_confirmation(client, txid):
     return txid, txinfo
 
 def make_transaction(algorand_wallet_passphase, data):
-    print("\t 1° transaction) WRITING DATA ON THE BLOCKCHAHIN ...")
+    print("\t Writing data on the blockchain. Sending the transaction ...")
     account_a_private_key = mnemonic.to_private_key(algorand_wallet_passphase)
     algorand_wallet_address = mnemonic.to_public_key(algorand_wallet_passphase)
     params = acl.suggested_params()
@@ -36,7 +36,7 @@ def make_transaction(algorand_wallet_passphase, data):
     note0 = '{"title":"'+data[0]+'", "description":"'+data[1]+'"}'
     note = note0.encode() 
 
-    # -----------> TODO: Send the transaction to a specific address: the address of the COMPANY 
+    # -----------> TODO: Send the transaction to the Verifier
     # Create and sign transaction. The transaction is sent to itself (the same address). 
     receiver = algorand_wallet_address
     tx = transaction.PaymentTxn(algorand_wallet_address, tx_fee, first_valid_round, last_valid_round, gen_hash, receiver, tx_amount, None, note)
