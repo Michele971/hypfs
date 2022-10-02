@@ -8,11 +8,10 @@ const SMART_CONTRACT_MAX_USER = 3
 export const main = Reach.App(() => {
     const Creator = Participant('Creator',{ 
     ...hasConsoleLogger,
-    position: Bytes(128),
+    proof_and_tx_id: Bytes(128),
     decentralized_identifier: UInt,
-    proof_reveived: Bytes(128),
-    reportPosition: Fun([UInt, Maybe(Bytes(128))], Null),
-    reportVerification: Fun([UInt, Address], Null),
+    reportPosition: Fun([UInt, Maybe(Bytes(128))], Null), // report the data stored inside the map: proofs, tx_id, etc.
+    reportVerification: Fun([UInt, Address], Null), //report the output of verification 
 
   });
 
@@ -37,7 +36,7 @@ export const main = Reach.App(() => {
   
   commit();
   Creator.only(() => { 
-    const proof_and_position = declassify(interact.position);
+    const proof_and_position = declassify(interact.proof_and_tx_id);
     const decentralized_identifier_creator = declassify(interact.decentralized_identifier);
   });
 
@@ -60,10 +59,10 @@ export const main = Reach.App(() => {
     //.define(() => {views.retrieve_results.set(did_user);}) // define: the code inside is executed when a function in the while is called (ex. the api call)
     .while(counter > 0)
     .api(attacherAPI.insert_position, // the name of the api that is called 
-      (pos, did, y) => { // the code to execute and the returning variable of the api (y)
+      (pos_and_tx_id, did, y) => { // the code to execute and the returning variable of the api (y)
         y(counter); //allow the frontend to retrieve the space available 
 
-        easy_map[this] = fromSome(easy_map[this],pos);
+        easy_map[this] = fromSome(easy_map[this],pos_and_tx_id);
 
         Creator.only(() => interact.reportPosition(did, easy_map[this]));
 

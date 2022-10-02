@@ -3,7 +3,7 @@ from platform import python_branch
 from openlocationcode import openlocationcode as olc
 from reach_rpc import mk_rpc
 from index import format_address
-from index import play_Creator, play_bob, verifier_pay, verifier_api_verify
+from index import play_Creator, play_bob
 from threading import Thread
 import time
 from index import start_list, end_list # list that contain start and end time for each thread
@@ -218,14 +218,14 @@ class Prover(Witness):
         ctc_creator = rpc("/acc/contract", proverObject.account)
         print("Smart contract deployed  🚀 :", ctc_creator)
         print("Inserting Creator's information into the contract ...")
-        creatorThread = Thread(target=play_Creator, args=(ctc_creator, proverObject.location, proverObject.did, 'proof',))
+        creatorThread = Thread(target=play_Creator, args=(ctc_creator, proverObject.location, proverObject.did, 'proof', proverObject.tx_id_data))
        
         return creatorThread, ctc_creator
 
     # this method will interact with index.py
     def attachToSmartContract(self, proverAttacherObject, ctc_creator):
         print("Calling play bob")
-        attacherThread = Thread(target=play_bob, args=(ctc_creator, proverAttacherObject.account, proverAttacherObject.location, proverAttacherObject.did, 'proof',))
+        attacherThread = Thread(target=play_bob, args=(ctc_creator, proverAttacherObject.account, proverAttacherObject.location, proverAttacherObject.did, 'proof', proverAttacherObject.tx_id_data))
         #attacherThread.start()
         print("playbob called successfully")
         return attacherThread
