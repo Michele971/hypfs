@@ -18,8 +18,8 @@ import random
 '''
 SMART_CONTRACT_MAX_USER = 3 # this is the same variable of index.rsh. They must be equals!
 
-LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6"] # list of Provers locatios. Used for build the prover object
-PROVER_NUMBER = 16 # number of provers for the entire system
+LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V"] # list of Provers locatios. Used for build the prover object
+PROVER_NUMBER = 24 # number of provers for the entire system
 
 assert(PROVER_NUMBER/len(LOCATION_LIST_PROV) == 4) #There must be (SMART_CONTRACT_MAX_USER+1) users for each location. So increase the number of locations in LOCATION_LIST_PROV, or decrease the PROVER_NUMBER
 
@@ -100,8 +100,19 @@ list_private_public_key = [
     'escape leg warm silver biology silk swallow wet ticket decrease seat speed drift nice give clerk find gather verb cube assume around gather abandon month', # QF25BWUJIY3NDFS47EILAOV4DAAHIYC2PRVIGERSQVTJ7RXHY44QBA6KO4
     'decline auction milk please lens quiz eight rough affair possible forum brand sing bless comfort believe exist twenty invest apart mask gesture match abstract marine', # MJXSIP7ULI25QH3XJP7AVQT7ZYO3TARYVUYRD6ARR6L6HWGH22ECU5MHAE
     'whisper giggle spot sadness loyal menu cliff sense flash share guide exit oak loud field inch during slender clump loyal stove enter album abstract wool', # XSKXAH4SIWFOLFUWS6H73JUJ5HJOWUCBKTA6LFXFCYS6VDZMQL6RI5HGQM
-    'wide theme range pulse husband clever cruel kid double right choice match ill bless garlic flash zoo around ability creek exist armed hand able service' # JI7VRGDIANFNABPJL6PWVGCP42NZGQVV7T3QVJD6P47EKQP2BXSFMPU7RA
+    'wide theme range pulse husband clever cruel kid double right choice match ill bless garlic flash zoo around ability creek exist armed hand able service', # JI7VRGDIANFNABPJL6PWVGCP42NZGQVV7T3QVJD6P47EKQP2BXSFMPU7RA
+
+    'ethics candy explain paddle broccoli violin uncle merit jealous snack turkey trust alley spike champion boost artwork liberty brass monkey cereal strategy used abstract afraid', # 7QO73MI5LUZH4GJNXKUAYY2RFSB35IAY4ERSJAZAYZZRG3MYLW3BBXRQ4E
+    'second around tag early favorite embody apple pitch love wide auction only puzzle essence judge baby random match shallow boy crop gate table absent theme', # HPNXA2SB3RM22SV2QL3LI6YGOQZ6RQCAG6ANZ27DL657EOFWTRJKFGOTN4
+    'soul copy country island suffer soap bunker salt please theme glance harvest inflict citizen nut biology hood never banner gold donate feature nothing ability exclude', # ITJVBY6NAGIHNHUB2YUYATZZK5BSDDNSV43MZA7F675GO3QROB27UMRY44
+    'piece list portion scare reveal bottom bar tomorrow gossip age silver case tone wing march emotion exact card sword skull budget estate grace above million', # KYRUST4GUA4ZWSSXD6XS27IYMUTGRGQE4VRZNK3I77KFQLHFZI2VXUKPMA
+    
+    'play drum afford elite promote refuse random twelve bright icon prosper chief boost cannon carbon monkey attack end better reward merit ride fit abandon find', # NCPVP7WVVZ6MKILOYQASO2AM26JIWVWSWJN4UTI3QBJBCKMZHGFMG7AG54
+    'rhythm pole visual cart judge focus fiscal accident blame crouch aspect shiver refuse morning course midnight salmon toast rain desert imitate portion negative above glare', # WIXIIBVJIZTDKYDVLDATSWEHOOBQ27QHJEO2E76Q4YZ35E42L5FCE2G3L4
+    'plate build physical type cruise bench sauce portion face dress dentist effort canyon faith tiger load flock polar cup merit push sister earth abstract taste', # HEWT2HVPM4GKUBBSOV4BSY3URKYYGLICPSSU4H43DWCSWCO3CXQT2IQPDY
+    'dutch assist faith scare modify equip detail exotic flee chronic journey session flight clarify able misery make mountain entry easily clap sign lock abandon taxi' # R3Z7QT5YLA2QISYKQOGQYDK7RHRKDSAVWS7IGXZNHERJ5GGIORFK7C6IYQ
 ]
+
 
 prover_thread = [] #list of prover thread
 prover_list_account = [] #list of prover account 
@@ -325,6 +336,16 @@ def startSimulation():
         "MJXSIP7ULI25QH3XJP7AVQT7ZYO3TARYVUYRD6ARR6L6HWGH22ECU5MHAE",
         "XSKXAH4SIWFOLFUWS6H73JUJ5HJOWUCBKTA6LFXFCYS6VDZMQL6RI5HGQM",
         "JI7VRGDIANFNABPJL6PWVGCP42NZGQVV7T3QVJD6P47EKQP2BXSFMPU7RA",
+
+        "7QO73MI5LUZH4GJNXKUAYY2RFSB35IAY4ERSJAZAYZZRG3MYLW3BBXRQ4E",
+        "HPNXA2SB3RM22SV2QL3LI6YGOQZ6RQCAG6ANZ27DL657EOFWTRJKFGOTN4",
+        "ITJVBY6NAGIHNHUB2YUYATZZK5BSDDNSV43MZA7F675GO3QROB27UMRY44",
+        "KYRUST4GUA4ZWSSXD6XS27IYMUTGRGQE4VRZNK3I77KFQLHFZI2VXUKPMA",
+
+        "NCPVP7WVVZ6MKILOYQASO2AM26JIWVWSWJN4UTI3QBJBCKMZHGFMG7AG54",
+        "WIXIIBVJIZTDKYDVLDATSWEHOOBQ27QHJEO2E76Q4YZ35E42L5FCE2G3L4",
+        "HEWT2HVPM4GKUBBSOV4BSY3URKYYGLICPSSU4H43DWCSWCO3CXQT2IQPDY",
+        "R3Z7QT5YLA2QISYKQOGQYDK7RHRKDSAVWS7IGXZNHERJ5GGIORFK7C6IYQ"
     ]
 
     time_delta_list = []
@@ -361,6 +382,9 @@ def startSimulation():
             
 def main():
     startSimulation()
+
+    # print(generateOLC(11.2958754,44.4791156)) #san luca
+    # print(generateOLC(11.3077561,44.4921623)) #stadio renato dall'ara
 
 
 if __name__ == '__main__':

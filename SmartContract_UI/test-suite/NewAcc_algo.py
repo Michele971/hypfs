@@ -10,5 +10,5 @@ def generate_algorand_keypair():
 #generate_algorand_keypair()
 
 
-for i in range(0, 6):
+for i in range(0, 8):
     generate_algorand_keypair()
