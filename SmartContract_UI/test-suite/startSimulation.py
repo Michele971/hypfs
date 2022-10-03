@@ -294,13 +294,11 @@ def startSimulation():
         prov.account = account_prov
 
         #store data inside the blockchain
-        #tx_id = prov.writeDataOnBlockchain(list_private_public_key[i], prov.title_report, prov.description_report)
-        #waiting for the transaction id
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            write_tx_thread = executor.submit(prov.writeDataOnBlockchain, list_private_public_key[i], prov.title_report, prov.description_report)
-            tx_id = write_tx_thread.result()
-            #print(tx_id)
-            prov.tx_id_data = tx_id
+        # with concurrent.futures.ThreadPoolExecutor() as executor:
+        #     write_tx_thread = executor.submit(prov.writeDataOnBlockchain, list_private_public_key[i], prov.title_report, prov.description_report)
+        #     tx_id = write_tx_thread.result()
+        #     #print(tx_id)
+        #     prov.tx_id_data = tx_id
 
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
