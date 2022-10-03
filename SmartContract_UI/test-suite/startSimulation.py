@@ -10,24 +10,94 @@ import eth_new_account
 from index import start_list, end_list
 import numpy as np
 import matplotlib.pyplot as plt
-
+import random
 '''
     ---------------------------------------------------------------------------------------
     ------------------    THIS SCRIPT MUST BE RUN ON ETHEREUM TESTNET    ------------------
     ---------------------------------------------------------------------------------------
 '''
 
+SMART_CONTRACT_MAX_USER = 3 # this is the same variable of index.rsh. They must be equals!
+
+LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6"] # list of Provers locatios. Used for build the prover object
+PROVER_NUMBER = 16 # number of provers for the entire system
+
+assert(PROVER_NUMBER/len(LOCATION_LIST_PROV) == 4) #There must be (SMART_CONTRACT_MAX_USER+1) users for each location. So increase the number of locations in LOCATION_LIST_PROV, or decrease the PROVER_NUMBER
+
+DID_list = [] #will be fill at runtime
+mapping_list_did = {} #will be fill at runtime
+
+'''
+    This method will generate n° prover objects setting their attribute such as DID, location or the consensus network account.
+    The DID created will be unique.
+    This method will create mapping_list_did dictionary, which will be used to check the users nearby.
+'''
+def generateProvers(n_users_to_generate):
+    proversObjectList = []
+    count = 0
+    for i in range(n_users_to_generate):
+        #use to assign each ID to the location
+        if count == len(LOCATION_LIST_PROV):
+            count = 0
+
+        # choose the location from the list of locations
+        chooseLocation = LOCATION_LIST_PROV[count] #there are SMART_CONTRACT_MAX_USER + 1 elements for each location
+        goOn = True
+        #generate a random ID that does not still exists
+        while goOn == True:
+            DID_generated = random.randint(0, 100)
+            if DID_generated not in DID_list:
+                DID_list.append(DID_generated)
+                goOn = False
+            else:
+                goOn = True
+
+        # update the map that keep track of the locations and their users 
+        mapping_list_did.setdefault(chooseLocation,[]).append(DID_generated) #the dict will be used to find the neighbours and othe operations
+
+        #create a Prover object
+        prov = createProver(
+            did= DID_generated, 
+            account= "Noone",
+            private_key= "None",
+            proofs_array_computed= [],
+            location= chooseLocation, 
+            proofs_received_array=[])
+        
+        #update some attributes of the prover objects
+        account_prov = prov.createAccount(i) #passing the number of prover to create
+        prov.account = account_prov
+        rpc("/acc/setGasLimit", account_prov, 5000000)
+
+        prover_addresses.append(format_address(account_prov))
+
+        proversObjectList.append(prov)
+
+        count += 1
+
+    return proversObjectList
+
+
 list_private_public_key = [
     '0x8d10e8fb1aa289828f31914f581dbc39d9ed76b2e2d1247c49f5814349ff10c0', 
     '0x9cf648f6aaa283e0c227f9047e735e1d604875ce735223c334f1c511a0dd2b1b',
     '0xd1d2862447f71d78ab4d0b92800034c11cb7bd13ffe5d0a5bc2851e95ce719d7',
     '0x0fcab881cf4b6d40fbf1473b908d9501524b0d84ac7fe44196e763b8bde9545a',
+
     '0x18c78ad1e9447f077611e1945579c4215bb5551852e8b4957c89b783eb1aa3c8',
     '0x3c5baad76449c59aa1cff6d27febaa201d5150b86b382451d3645d8afd919a63',
     '0xc662ab78a9180104c1d20f9eb1f993794c093e98e7efe78e23d5ccb02fec637f',
     '0xbd0c0a94a5998144da5a64c5ca9c67cc92d383762fa58b7e8017eed63de908b4',
+    
     '0x8ad4d716b3ed5c31cf4125fed2f9549259768482941f7ea3969d0fda93413e06',
-    '0x3888a91f2bae15a5c8df4545ecc2b2a50ea2f0034ec168df7ae429987eabf405'
+    '0x3888a91f2bae15a5c8df4545ecc2b2a50ea2f0034ec168df7ae429987eabf405',
+    '0xf5568735c8cb26c544944dc1e6025dd94c9a9d7f7422ea8168f417167d513867',
+    '0x512981281c472444fa4d8b73866cc2b1235424bec8129eb448661c36134ff8ac',
+
+    '0x8daea43f6969c5af179e890a2b05d7bbe4e65f33eaae2b1bacc12e70da03ab3e',
+    '0x58db0a6d84722ba10fb1b6f57c127b9858c4d5be2c15ff9d15d6c9173dcaca86',
+    '0xa8597bc7404aa73371e6631e4471eb9d10204a5622fe3441a657bd226a296c8b',
+    '0xafea88fd0911cbd04c2755d02792951da04bd542e0243e6e6cba2d2a0becb804'
 ]
 
 
@@ -40,58 +110,9 @@ contract_creator_deployed = None # contrat deployed, will have to be a list of c
 
 rpc, rpc_callbacks = mk_rpc()
 rpc("/stdlib/setProviderByName","TestNet")
-
 print("\t\t The consesus network is: ", rpc('/stdlib/connector'))
-STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500) 
 
-
-PROVER_NUMBER = 4 # number of provers for the entire system
-
-'''
-    ❗️❗️❗️❗️  WARNING: ❗️❗️❗️❗️
-    ---> len(DID_LIST_PROV) and len(LOCATION_LIST_PROV) MUST TO BE EQUALS !!! You can decrease the PROVER_NUMBER during the testing
-    ---> PROVER_NUMBER are all the provers of the system
-'''
-DID_LIST_PROV = [2, 6, 50, 51, 8, 9, 10, 11, 14, 19] # DID of provers that will ask for a Proof Of Location and a verify process
-LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q9", "7H369F4W+Q9", "7H369F4W+Q9", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6"] # list of Provers locatios. Used for build the prover object
-
-
-#### We know the position of every witness because it is stored in dictOfLocation. The position is the KEY, the values are the DID of user in that position
-dictOfLocation = {
-    "7H369FXP+FH":[
-        0, 
-        3,
-        4,
-        5
-    ],
-    "7H369F4W+Q8":[
-        2,
-        6,
-        50,
-        51
-    ],
-    "7H369F4W+Q9":[
-        8,
-        9,
-        10,
-        11
-    ],
-    "7H368FRV+FM":[ #Bologna
-        12,
-        13,
-        14
-    ],
-    "7H368FWV+X6": [ #Ice-cream Bologna
-        15,
-        16,
-        17,
-        18,
-        19
-    ],
-}
-
-NUMBER_OF_LOCATIONS = 5 #number of different locations. For each location there could be a smart contract
-
+#STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500)  # only  for devnet
 
 class Witness:
     def __init__(self, did, public_key, private_key, proofs_array_computed, location):
@@ -138,7 +159,10 @@ class Prover(Witness):
             listNeighboursFound = tempListNeigh.copy()
             #count how many neighbours I have found
             numberOfNeighboursFound = len(listNeighboursFound)
-            # remove the DID of the user that is making the request from the list; e.g. if the user with DID 2 make the request, the neighbour list could be [2,3,4,5,6], then I need to remove his DID from the list which is 2. The new list will be [3,4,5,6]
+
+            # remove the DID of the user that is making the request from the list; 
+            # e.g. if the user with DID 2 make the request, the neighbour list could be [2,3,4,5,6],
+            #  then I need to remove his DID from the list which is 2. The new list will be [3,4,5,6]
             listNeighboursFound.remove(self.did)
             
             if numberOfNeighboursFound >= 1:
@@ -159,28 +183,13 @@ class Prover(Witness):
         super(Prover, self).computed_distance_from_prover(olc_witness, olc_prover)
         pass
 
-    ''' 
-        When a user want to send his location to the smart contract,
-        we have to check if the location is already sent (checking inside the
-        hypercube).
-        
-        If the location is still not sent, user will have to deploy the contract.
-    '''
-    def retrieve_position_hypercube(self):
-        # Check hypercube
-
-        # Deploy smart contract if location is not in the hypercube
-        pass
-
     def createAccount(self, i):
         # ########### #######  WORK WITH REACH DEVNET ##################
         #acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
         
-        #print("PRIVATE KEY: ", list_private_public_key[i])
         # ########### #######  WORK WITH ETHEREUM TESTNET ##################
         acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
 
-      
         return acc_prover
         
     # this method will interact with index.py
@@ -203,15 +212,6 @@ class Prover(Witness):
 
 
 
-def createWitness(did, public_key, private_key, proofs_array_computed, location):
-    wit = Witness(
-        did= did, # Decentralized IDentifier 
-        public_key= public_key, # Public key of the wallet
-        private_key= private_key, # Private key of the wallet
-        proofs_array_computed= proofs_array_computed, # Witness will store every proof that has computed for someone (in the local mobile db e.g Room Database with Android) 
-        location= location)
-
-    return wit
 
 def createProver(did, account, private_key, proofs_array_computed, location, proofs_received_array):
     prov = Prover(
@@ -236,42 +236,25 @@ def generateOLC(latitude, longitude):
 
 
 
-
 # START the simulation
 def startSimulation():
+    #generate N random provers
+    generate_prover_list = generateProvers(PROVER_NUMBER) # try with 8, 12, 16 etc.
+
+
+    print("\n\n----------- START -----------")
     dict_location_sc = {} # keep track if the smart contract is newAccountFromMnemonicalready associated to this particular location. Its lenght will be equal to NUMBER_OF_LOCATIONS
-    
-    '''
-        TODO: here START the timer for the DEPLOYING and INSERTING phase
-    '''
 
     # Starting prover steps
     for i in range(0, PROVER_NUMBER): #for every prover of the entire system ...
         ##### TODO: Generate random LATITUDE & LONGITUDE (for every user), Then convert them to Open Location code and add to LOCATION_LIST_PROV
         #generateOLC(11.3474453,44.4930181 )#11.356988, 44.495888) # just for testing
-        #buildDict()
 
-        prov = createProver(
-            did= DID_LIST_PROV[i], # The Prover ID come from an default array that contains all the IDs
-            account= "FFFFFFFFF",
-            private_key= "xxxxxxx",
-            proofs_array_computed= [],
-            location= LOCATION_LIST_PROV[i], # The Prover Location come from an default array that contains all the Locations
-            proofs_received_array=[])
+        prov = generate_prover_list[i]
 
-        account_prov = prov.createAccount(i) #passing the number of prover to create
-        # TODO: create a list of object provers and remove the two line below. Refactoring
-        prover_list_account.append(account_prov)
-        prover_addresses.append(format_address(account_prov)) #getting the wallet addresses for prover and appending to the list
-        prov.account = account_prov
-        
-        #setting the gas limit
-        rpc("/acc/setGasLimit", account_prov, 5000000) # this line avoid the error displayed on etherscan which is: "out of gas"
-   
         # Find neighbours
-        neighbours = prov.find_neighbours(prov.location, dictOfLocation)
+        neighbours = prov.find_neighbours(prov.location, mapping_list_did)
         if neighbours: 
-
             print('→ 🪪 Prover DID: ', prov.did,'\n 📍 Location: ', prov.location, '\n    Neighbours: ', neighbours,'\n',)
 
             '''
@@ -319,10 +302,21 @@ def startSimulation():
         "0x119d2BA2e52e21A88210Cd29DA0c7d45D2AC077A",
         "0xf373B8b4BcDEbD88efC8396b5420A41fE7c94011",
         "0x1eAd4c7aa92bABF7c923a8E597972CB3255Ab6C2",
+
         "0xe648143d83F7dD8eaaD587B9DDE0E40b7eFE0d62",
         "0x7211170e1CF574642857f98f7afA14990C39c75c",
         "0xC57D9AD7164af80AC324081D2A206179F567fECE",
         "0xBAa6cD46581b66E379c3B5436fa678976B34A518"
+
+        '0x6dd3FdD9752c5f935F1bF88542ab26D65eAC2B40',
+        '0x4c992e7D1fBfBa8Cd4cc429C5d1105ACbd9BAC45',
+        '0x5a2a37163523509Dee3B48D6740E5F25A8654Cb6', 
+        '0x5DE99700870d455DF99B3afCa0e7Cd85e8fF2f3d', 
+
+        '0x0E6ccE4c7C1AA5057c01c9c776168dC412d593f4', 
+        '0x199986ccBe425ef98a53C373A579b0d64F5daD3D', 
+        '0xA7953c30BD1Ae955ed19C162B0AEc2483c51c73D', 
+        '0x16C09e450A17B6De918D6637343700d7C6dB5d0d' 
     ]
 
     time_delta_list = []
@@ -354,7 +348,7 @@ def startSimulation():
     # Show graphic
     plt.show()
 
-            
+
 def main():
     startSimulation()
 
