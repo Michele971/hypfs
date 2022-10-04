@@ -27,7 +27,7 @@ export const main = Reach.App(() => {
   setOptions({untrustworthyMaps: true});
   init();
   
-  commit();
+
   Creator.only(() => { 
     const proof_and_position = declassify(interact.proof_and_tx_id);
     const decentralized_identifier_creator = declassify(interact.decentralized_identifier);

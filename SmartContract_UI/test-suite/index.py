@@ -79,7 +79,7 @@ def play_Creator(contract_creator, position, did, proof, tx_id_data):
 def play_bob(ctc_user_creator, accc, position, did, proof, tx_id_data):
     pos_and_tx_id = proof + tx_id_data
     print("ATTACHER Lock is locked? ",lock.locked(),"\n",)
-    lock.acquire()
+    #lock.acquire()
 
     #start the timer
     start_list.append(time.time())
