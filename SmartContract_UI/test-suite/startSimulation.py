@@ -69,7 +69,6 @@ def generateProvers(n_users_to_generate):
         #update some attributes of the prover objects
         account_prov = prov.createAccount(i) #passing the number of prover to create
         prov.account = account_prov
-        rpc("/acc/setGasLimit", account_prov, 5000000)
 
         prover_addresses.append(format_address(account_prov))
 
@@ -216,17 +215,17 @@ class Prover(Witness):
         #rpc('/stdlib/setProviderByName','TestNet')
         ctc_creator = rpc("/acc/contract", proverObject.account)
         print("Smart contract deployed  🚀 :", ctc_creator)
-        print("Inserting Creator's information into the contract ...")
+        #print("Inserting Creator's information into the contract ...")
         creatorThread = Thread(target=play_Creator, args=(ctc_creator, proverObject.location, proverObject.did, 'proof', proverObject.tx_id_data))
        
         return creatorThread, ctc_creator
 
     # this method will interact with index.py
     def attachToSmartContract(self, proverAttacherObject, ctc_creator):
-        print("Calling play bob")
+        #print("Calling play bob")
         attacherThread = Thread(target=play_bob, args=(ctc_creator, proverAttacherObject.account, proverAttacherObject.location, proverAttacherObject.did, 'proof', proverAttacherObject.tx_id_data))
         #attacherThread.start()
-        print("playbob called successfully")
+        #print("playbob called successfully")
         return attacherThread
 
 
@@ -260,6 +259,8 @@ def startSimulation():
     #generate N random provers
     generate_prover_list = generateProvers(PROVER_NUMBER) # try with 8, 12, 16 etc.
 
+    initial_test = 0
+
     print("\n\n----------- START -----------")
     dict_location_sc = {} # keep track if the smart contract is newAccountFromMnemonicalready associated to this particular location. Its lenght will be equal to NUMBER_OF_LOCATIONS
 
@@ -291,7 +292,7 @@ def startSimulation():
             #time.sleep(5)
             # the IF will simulate the initial check inside the hypercube. If the SC is not associated to a location in the hypercube (the dictionary in this case) then deploy a new smart contract and insert its ID and location inside the hypercube
             if (prov.location in dict_location_sc) == False: # if the location is not inserted inside the dict that track the SC deployed, then deploy a new smart contract and add the contract address to the dict 
-                print(" Deploying the smart contract ...")
+                #print(" Deploying the smart contract ...")
                 creatorThread, contract_creator_deployed = prov.deploySmartContract(prov)
                 creatorThread.start()
                 prover_thread.append(creatorThread)
@@ -302,9 +303,14 @@ def startSimulation():
 
                 dict_location_sc[prov.location] = contract_creator_deployed #insert the contract_id inside the dict_location_sc which track the contract deployed
             else:
+                print("ELABORATING USER WITH DID: ",prov.did)
+                if initial_test == 0:
+                    print("Waiting some time...")
+                    time.sleep(0)
+                    initial_test = 1
                 #print("\n User is attaching to the Smart contract ",dict_location_sc.get(prov.location),  " 🟩 📎 📎 🟩 ")
                 retrieved_ctc = dict_location_sc[prov.location]
-                print("User: ",format_address(prov.account)," Preparing the Attaching to the contract ...", retrieved_ctc)
+                #print("User: ",format_address(prov.account)," Preparing the Attaching to the contract ...", retrieved_ctc)
                 proverThread = prov.attachToSmartContract(prov, retrieved_ctc)
 
                 proverThread.start()
