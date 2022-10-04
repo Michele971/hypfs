@@ -1,9 +1,5 @@
 ## This script must be run on ETHEREUM testnet
 
-### You have to run the project on Ethereum Consensus Network
-
-### The final version of smart contract will not contains the location for privacy reasons. Instead hash of the proof and signed hash of the proof will be inserted by the provers
-
 ### Info
 
 Example of Smart contract association with location and prover:
