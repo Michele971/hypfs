@@ -12,27 +12,20 @@ export const main = Reach.App(() => {
     decentralized_identifier: UInt,
     reportPosition: Fun([UInt, Maybe(Bytes(128))], Null), // report the data stored inside the map: proofs, tx_id, etc.
     reportVerification: Fun([UInt, Address], Null), //report the output of verification 
-
   });
 
   const attacherAPI = API('attacherAPI',{
     insert_position: Fun([Bytes(128),UInt], UInt), //PositionAndProof - DID - ReturnField
   });
 
-
-
   const views = View('views', { 
     getCtcBalance: UInt, // Allow users to check the balance of the contract
     getReward: UInt, // Allow the users and verifier to get the reward
-
   });
 
  
   setOptions({untrustworthyMaps: true});
   init();
-
-  Creator.publish() //we need that to use the MAP below
-  const easy_map = new Map(Bytes(128));
   
   commit();
   Creator.only(() => { 
@@ -41,7 +34,8 @@ export const main = Reach.App(() => {
   });
 
   Creator.publish(proof_and_position, decentralized_identifier_creator); //TODO: add the proof_received
-
+ 
+  const easy_map = new Map(Bytes(128));
   easy_map[this] = proof_and_position; //setting the first value of the map with Creator values
 
   commit();

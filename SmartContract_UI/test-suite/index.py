@@ -57,13 +57,10 @@ def player(who):
 def play_Creator(contract_creator, position, did, proof, tx_id_data):
     #concat the proof with txd
     pos_and_tx_id = proof + tx_id_data
-
-
     print("CREATOR Lock is locked? ",lock.locked(),"\n",)
     lock.acquire()
     if lock.locked():
         print("\tCREATOR: locked acquired")
-
     else:
         print("waiting for lock ...")
         
@@ -77,7 +74,6 @@ def play_Creator(contract_creator, position, did, proof, tx_id_data):
             **player('Creator')
         ),
     )
-  
 
 
 def play_bob(ctc_user_creator, accc, position, did, proof, tx_id_data):
@@ -88,11 +84,11 @@ def play_bob(ctc_user_creator, accc, position, did, proof, tx_id_data):
     #start the timer
     start_list.append(time.time())
 
-    print("Entering in play_bob, attaching to: ", ctc_user_creator,'\n')    
+    #print("Entering in play_bob, attaching to: ", ctc_user_creator,'\n')    
     ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_user_creator))
-    print("Attaching Done")
+    #print("Attaching Done")
     # Call the API
-    print("\nCalling the API ...")
+    #print("\nCalling the API ...")
     result_counter = rpc('/ctc/apis/attacherAPI/insert_position', ctc_bob, pos_and_tx_id, did)
     counter_int = int(result_counter.get('hex'), 16)
     print("ATTACHER  📎 📎 \n Number of users that can still insert their position: ", counter_int," contract: ",ctc_user_creator )
