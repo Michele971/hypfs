@@ -36,6 +36,7 @@ def player(who):
         did_int = int(did.get('hex'), 16)
         print("📝 DID inserted: ",did_int,"\tposition inserted: ",proof_and_position[1])
         # not always is locked, only when creator call the lock. The attacher NEVER call the lock!!!
+        print("The lock is locked? ", lock.locked())
         if lock.locked():
             lock.release() # This is the only the momente when someone release the lock
             print("release the lock AFTER INSERTING INFORMATION ")
@@ -80,11 +81,9 @@ def play_bob(ctc_user_creator, accc, pos, did, proof):
     start_list.append(time.time())
 
     # Get and attach to the creator Contract
-    print("Entering in play_bob, attaching to: ", ctc_user_creator,'\n')    
+    #print("Entering in play_bob, attaching to: ", ctc_user_creator,'\n')    
     ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_user_creator))
-    print("Attaching Done")
     # Call the API
-    print("\nCalling the API ...")
     result_counter = rpc('/ctc/apis/attacherAPI/insert_position', ctc_bob, pos, did)
 
     counter_int = int(result_counter.get('hex'), 16)

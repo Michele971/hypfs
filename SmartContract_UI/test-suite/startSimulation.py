@@ -41,7 +41,7 @@ def generateProvers(n_users_to_generate):
             count = 0
 
         # choose the location from the list of locations
-        chooseLocation = LOCATION_LIST_PROV[count] #there are SMART_CONTRACT_MAX_USER + 1 elements for each location
+        chooseLocation = LOCATION_LIST_PROV[count] #there are SMART_CONTRACT_MAX_USER + 1 elements for each location. So: 0 < count <= (SMART_CONTRACT_MAX_USER+1)
         goOn = True
         #generate a random ID that does not still exists
         while goOn == True:
@@ -119,10 +119,10 @@ prover_addresses = [] # list of provers addresses
 contract_creator_deployed = None # contrat deployed, will have to be a list of contracts
 
 rpc, rpc_callbacks = mk_rpc()
-#rpc("/stdlib/setProviderByName","TestNet")
+rpc("/stdlib/setProviderByName","TestNet")
 print("\t\t The consesus network is: ", rpc('/stdlib/connector'))
 
-STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500)  # only  for devnet
+#STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500)  # only  for devnet
 
 class Witness:
     def __init__(self, did, public_key, private_key, proofs_array_computed, location):
@@ -195,10 +195,10 @@ class Prover(Witness):
 
     def createAccount(self, i):
         # ########### #######  WORK WITH REACH DEVNET ##################
-        acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        #acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
         
         # ########### #######  WORK WITH ETHEREUM TESTNET ##################
-        #acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
+        acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
 
         return acc_prover
         
@@ -214,10 +214,10 @@ class Prover(Witness):
 
     # this method will interact with index.py
     def attachToSmartContract(self, proverAttacherObject, ctc_creator):
-        print("Calling play bob")
+        #print("Calling play bob")
         attacherThread = Thread(target=play_bob, args=(ctc_creator, proverAttacherObject.account, proverAttacherObject.location, proverAttacherObject.did, 'proof',))
 
-        print("playbob called successfully")
+        #print("playbob called successfully")
         return attacherThread
 
 
@@ -251,6 +251,7 @@ def startSimulation():
     #generate N random provers
     generate_prover_list = generateProvers(PROVER_NUMBER) # try with 8, 12, 16 etc.
 
+    first_test = 0
 
     print("\n\n----------- START -----------")
     dict_location_sc = {} # keep track if the smart contract is newAccountFromMnemonicalready associated to this particular location. Its lenght will be equal to NUMBER_OF_LOCATIONS
@@ -285,21 +286,17 @@ def startSimulation():
 
                 dict_location_sc[prov.location] = contract_creator_deployed #insert the contract_id inside the dict_location_sc which track the contract deployed
             else:
+                if first_test == 0:
+                    print("\n\n\tsleeping test 10 secs")
+                    #time.sleep(700)
+                    first_test = 1
                 retrieved_ctc = dict_location_sc[prov.location]
-                print("User: ",format_address(prov.account)," Preparing the Attaching to the contract ...", retrieved_ctc)
+                #print("User: ",format_address(prov.account)," Preparing the Attaching to the contract ...", retrieved_ctc)
                 proverThread = prov.attachToSmartContract(prov, retrieved_ctc)
 
-        
                 proverThread.start()
                 prover_thread.append(proverThread)
                 
-   
-    '''
-        ❗️  WARNING: ❗️
-        ---> Check that SMART_CONTRACT_MAX_USER variable in index.rsh has been reached here: Everybody has to attach to the contract if you want going on with verifiers
-    '''
-
-
 
     # Joining the thread of provers and verifiers
     print("num threads: ",len(prover_thread))
