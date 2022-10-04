@@ -19,8 +19,8 @@ import random
 
 SMART_CONTRACT_MAX_USER = 3 # this is the same variable of index.rsh. They must be equals!
 
-LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM"]#, "7H368FWV+X6"] # list of Provers locatios. Used for build the prover object
-PROVER_NUMBER = 16 # number of provers for the entire system
+LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V"] # list of Provers locatios. Used for build the prover object
+PROVER_NUMBER = 24 # number of provers for the entire system
 
 assert(PROVER_NUMBER/len(LOCATION_LIST_PROV) == 4) #There must be (SMART_CONTRACT_MAX_USER+1) users for each location. So increase the number of locations in LOCATION_LIST_PROV, or decrease the PROVER_NUMBER
 
@@ -97,7 +97,17 @@ list_private_public_key = [
     '0x8daea43f6969c5af179e890a2b05d7bbe4e65f33eaae2b1bacc12e70da03ab3e',
     '0x58db0a6d84722ba10fb1b6f57c127b9858c4d5be2c15ff9d15d6c9173dcaca86',
     '0xa8597bc7404aa73371e6631e4471eb9d10204a5622fe3441a657bd226a296c8b',
-    '0xafea88fd0911cbd04c2755d02792951da04bd542e0243e6e6cba2d2a0becb804'
+    '0xafea88fd0911cbd04c2755d02792951da04bd542e0243e6e6cba2d2a0becb804',
+
+    '0x2a2f8106946f72489c73de1615c75a01cc7ea01167af3bdc7d85ec39067df728',
+    '0xcaf6a8ddbd47dcd58f46ae5b5dcc2158ab63efc5c485c87dd87299e14621cd90',
+    '0xb1b0b5b9a147a1b9c1368e34d6e66f347ce73b20c49543e3943e42e90f608322',
+    '0xd62941f0dea36bf8f4f65c603adcd6eba881276e883caeea1b693961a5b1018f',
+
+    '0x727f53bb6985612015ee07c19dd8d000a5a0786581b2a664cb909c3204a0e517',
+    '0x5c677c0d81505f99b36cc3db9bdcae3d8296de0e70a5b98a628ee76fb1edcce3',
+    '0xb70e021693dc22605961131f7cebac24020c25961d07e195fd13bd41900f441e',
+    '0xbc6b37148c9032a04a0890a0e3f3ff2e93a58ee9d1f90e5031b9bec9cb40bfc5'
 ]
 
 
@@ -316,7 +326,17 @@ def startSimulation():
         '0x0E6ccE4c7C1AA5057c01c9c776168dC412d593f4', 
         '0x199986ccBe425ef98a53C373A579b0d64F5daD3D', 
         '0xA7953c30BD1Ae955ed19C162B0AEc2483c51c73D', 
-        '0x16C09e450A17B6De918D6637343700d7C6dB5d0d' 
+        '0x16C09e450A17B6De918D6637343700d7C6dB5d0d',
+       
+        '0x1756CF5d7fac449F9211e41D3683E2f98b6f212c',
+        '0xF46eB2383D5FAe3C08916EB033A897C9E4de42bc',
+        '0x22eF5FE989C23D8F1136FE37Dc98d1Dd6b399145',
+        '0x350f42E342a573bFE301523C2Ec124a85109E318',
+            
+        '0xf65B5f4066ea0Db43C0acc66bd9D3374065f9261',
+        '0xe68308bC0451fb9DD87084E9c6f04D0475AD1C56',
+        '0xBA3118B38cF737657d186efCd9827519E941cd31',
+        '0x0A1988095FD99756453DFFbB22a2154725eAF658' 
     ]
 
     time_delta_list = []
@@ -347,6 +367,9 @@ def startSimulation():
 
     # Show graphic
     plt.show()
+
+    plt.savefig('./outputPerformance.png')
+    
 
 
 def main():
