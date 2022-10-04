@@ -97,3 +97,10 @@ def send_eth(sender_private_key, sender_addr, receiver_addr, gas_increase): #gas
 #     count += 1
 
 #send_eth("0x8d10e8fb1aa289828f31914f581dbc39d9ed76b2e2d1247c49f5814349ff10c0","0x832e977393410e0388f994bb773d78E83Ae9619E", "0x4c992e7D1fBfBa8Cd4cc429C5d1105ACbd9BAC45")
+
+
+
+
+#estimate the gas required by the smart contract
+# address = "0x7402FD163860F2F561e9BB648B56ac2B5b9ED0E6"
+# counter = Web3.eth.contract(address=address, abi=abi)

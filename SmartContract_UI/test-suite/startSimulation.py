@@ -119,10 +119,10 @@ prover_addresses = [] # list of provers addresses
 contract_creator_deployed = None # contrat deployed, will have to be a list of contracts
 
 rpc, rpc_callbacks = mk_rpc()
-rpc("/stdlib/setProviderByName","TestNet")
+#rpc("/stdlib/setProviderByName","TestNet")
 print("\t\t The consesus network is: ", rpc('/stdlib/connector'))
 
-#STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500)  # only  for devnet
+STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500)  # only  for devnet
 
 class Witness:
     def __init__(self, did, public_key, private_key, proofs_array_computed, location):
@@ -195,10 +195,10 @@ class Prover(Witness):
 
     def createAccount(self, i):
         # ########### #######  WORK WITH REACH DEVNET ##################
-        #acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
         
         # ########### #######  WORK WITH ETHEREUM TESTNET ##################
-        acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
+        #acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
 
         return acc_prover
         
@@ -316,7 +316,7 @@ def startSimulation():
         "0xe648143d83F7dD8eaaD587B9DDE0E40b7eFE0d62",
         "0x7211170e1CF574642857f98f7afA14990C39c75c",
         "0xC57D9AD7164af80AC324081D2A206179F567fECE",
-        "0xBAa6cD46581b66E379c3B5436fa678976B34A518"
+        "0xBAa6cD46581b66E379c3B5436fa678976B34A518",
 
         '0x6dd3FdD9752c5f935F1bF88542ab26D65eAC2B40',
         '0x4c992e7D1fBfBa8Cd4cc429C5d1105ACbd9BAC45',
