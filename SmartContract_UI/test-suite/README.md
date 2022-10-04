@@ -6,8 +6,7 @@
 
 ### Info
 
-At the moment, the following system contains 8 prover where 2 are creators and 6 are the neighbours.
-In particular:
+Example of Smart contract association with location and prover:
 - **1° Smart contract associated to 7H369F4W+Q8 location:** prover with DID 2 is the creator and his neighbours are 6, 50 and 51;
 - **2° Smart contract associated to 7H369F4W+Q9 location:** prover with DID 8 is the creator and his neighbours are 9, 10 and 11.
 
