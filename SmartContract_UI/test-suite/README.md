@@ -6,9 +6,6 @@ Example of Smart contract association with location and prover:
 - **1° Smart contract associated to 7H369F4W+Q8 location:** prover with DID 2 is the creator and his neighbours are 6, 50 and 51;
 - **2° Smart contract associated to 7H369F4W+Q9 location:** prover with DID 8 is the creator and his neighbours are 9, 10 and 11.
 
-The verifier has a balance, on Reach Devnet, equal to 1500 and sends 500 eth to both smart contracts.
-Ther verifier will also verify all the proof and location inside the smart contracts.
-
 ## Main Features
 
 - [Open Location Code](https://www.placekey.io/blog/google-maps-plus-codes-location-keys)
