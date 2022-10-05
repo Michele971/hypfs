@@ -18,13 +18,14 @@ import random
 '''
 SMART_CONTRACT_MAX_USER = 3 # this is the same variable of index.rsh. They must be equals!
 
+# ❗️ Every location must contains 4 provers which corresponds to (SMART_CONTRACT_MAX_USER + 1) users
 LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V"] # list of Provers locatios. Used for build the prover object
 PROVER_NUMBER = 24 # number of provers for the entire system
 
 assert(PROVER_NUMBER/len(LOCATION_LIST_PROV) == 4) #There must be (SMART_CONTRACT_MAX_USER+1) users for each location. So increase the number of locations in LOCATION_LIST_PROV, or decrease the PROVER_NUMBER
 
-DID_list = [] #will be fill at runtime
-mapping_list_did = {} #will be fill at runtime
+DID_list = [] #Contain the list of DID already generated (generated with a random process). Will be filled at runtime
+mapping_list_did = {} #The Key is the location; the Value is an array (contains all the DID in that location). Will be filled at runtime
 
 '''
     This method will generate n° prover objects setting their attribute such as DID, location or the consensus network account.
@@ -289,7 +290,6 @@ def startSimulation():
                         The first user that call the contract has to deploy it;
                         the others will attach.
             '''
-            #time.sleep(5)
             # the IF will simulate the initial check inside the hypercube. If the SC is not associated to a location in the hypercube (the dictionary in this case) then deploy a new smart contract and insert its ID and location inside the hypercube
             if (prov.location in dict_location_sc) == False: # if the location is not inserted inside the dict that track the SC deployed, then deploy a new smart contract and add the contract address to the dict 
                 #print(" Deploying the smart contract ...")
