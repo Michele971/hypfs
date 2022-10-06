@@ -32,12 +32,15 @@ If you want to try the simulation use:
 Some functionalities of scripts; initial interactions between Deployer and Prover: 
 <center><img src="img/interactionsScripts.png" width="75%" align="center"></center>
 
-[Without Factory Contract]: Performance evaluation with Ethereum (x: accounts, y: seconds):
+Performance evaluation with Ethereum Ropsten(x: accounts, y: seconds) -- **DEPRECATED**:
 <center><img src="img/ethPerf.png" width="75%" align="center"></center>
 Account 1° and 5° deploy new smart contract.
 
-Outcome [not correct | fixed with the new version]:
-<center><img src="img/terminalStartSimulation.png" width="75%" align="center"></center>
+Try with Polygon
+Polygon is fast ...
+<center><img src="img/polygon16Users.png" width="75%" align="center"></center>
+
+
 
 ## If issues comes ...
 Try with
