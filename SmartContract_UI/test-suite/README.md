@@ -44,9 +44,6 @@ Performance with 16 accounts:
 <center><img src="img/algoPer_16tx.png" width="75%" align="center"></center>
 
 
-Outcome [not correct | fixed with the new version]:
-<center><img src="img/terminalStartSimulation.png" width="75%" align="center"></center>
-
 ## If issues comes ...
 Try with
 - `./reach down`
