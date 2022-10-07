@@ -69,6 +69,7 @@ def generateProvers(n_users_to_generate):
         
         #update some attributes of the prover objects
         account_prov = prov.createAccount(i) #passing the number of prover to create
+        prover_list_account.append(account_prov)
         prov.account = account_prov
 
         prover_addresses.append(format_address(account_prov))
