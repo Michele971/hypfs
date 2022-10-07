@@ -1,9 +1,5 @@
 ## This script must be run on ALGORAND testnet
 
-### You have to run the project on Algorand Consensus Network
-
-### The final version of smart contract will not contains the location for privacy reasons. Instead hash of the proof and signed hash of the proof will be inserted by the provers
-
 ### Info
 
 At the moment, the following system contains 8 prover where 2 are creators and 6 are the neighbours.
@@ -56,8 +52,6 @@ Try with
 - `./reach down`
 - `./reach update`
 
-## Test on Ganache:
-- `REACH_CONNECTOR_MODE=ETH-live ETH_NODE_URI=http://host.docker.internal:7545 REACH_ISOLATED_NETWORK=1 ./reach rpc-run python3 -u startSimulation.py`
 
 # Author
 Michele Bonini
