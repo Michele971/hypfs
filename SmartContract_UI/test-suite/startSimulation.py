@@ -19,8 +19,8 @@ import random
 
 SMART_CONTRACT_MAX_USER = 3 # this is the same variable of index.rsh. They must be equals!
 
-LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J"]#, "7H368F5R+4V"] # list of Provers locatios. Used for build the prover object
-PROVER_NUMBER = 20 # number of provers for the entire system
+LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V"] # list of Provers locatios. Used for build the prover object
+PROVER_NUMBER = 24 # number of provers for the entire system
 
 assert(PROVER_NUMBER/len(LOCATION_LIST_PROV) == 4) #There must be (SMART_CONTRACT_MAX_USER+1) users for each location. So increase the number of locations in LOCATION_LIST_PROV, or decrease the PROVER_NUMBER
 
@@ -103,7 +103,7 @@ list_private_public_key = [
     '0x46fca04375b753148d711abd1f00e370d9a4da8d612b2d0e9f8799290028df90',
     '0x6f2467cf0dc2b02757ca25ab0c9e112971637e45249075fc78074c0a5cff6206',
     '0xbf39de3dfca255ecc39d786d1e74eb0ac7995db651258f061d1dbb56f7c62b1d',
-    '0xc5b48a5c9e0353f7f2a5cc249b6ffb704c2c4975e25b0a21b2a20f8f23619945',
+    '0xd1912941d3f6ecd9d55bd5fc7408790ae6cc3f2dfb7d037e867bac2707436cbf',
 
     '0x16e2f555ace3ac16266a406ce44484578a4a856cc94a9122828fb002e3588672',
     '0xb4180e90b27d9b6f0b49b7213f11dfaaa575b03ada1e68de0a4f3017f93cfc87',
@@ -343,12 +343,12 @@ def startSimulation():
         '0x3AC3A765E4669E0e124C8f1E5104F56a051F7F62',
         '0x605Ef12afC9912fE95A8B9b75b5e9E777AEb7107',
         '0xe61B884f7E7DEa7413c6d65889bC04632241f81d',
-        '0xee366FBffcFE70B50BbFD6ba3eD9563743ED33cb',
+        '0x38102a9Abc98EaCAFbd3a92271aB0B9456C3bCdC', 
 
-        # '0xA6657AE3cd2444d523408B3453cB4014eE6eA461',
-        # '0xf3feFd5613A47684A91246e5a9Fb5945983a86c0',
-        # '0xF13D193A1f808AF9a132C75D40B3934abdeA037e',
-        # '0x3d424297c1375222C4EafFF32a9aF8bD87eF1C34'
+        '0xA6657AE3cd2444d523408B3453cB4014eE6eA461',
+        '0xf3feFd5613A47684A91246e5a9Fb5945983a86c0',
+        '0xF13D193A1f808AF9a132C75D40B3934abdeA037e',
+        '0x3d424297c1375222C4EafFF32a9aF8bD87eF1C34'
     ]
 
     time_delta_list = []
