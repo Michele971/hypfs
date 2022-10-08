@@ -19,8 +19,8 @@ import random
 
 SMART_CONTRACT_MAX_USER = 3 # this is the same variable of index.rsh. They must be equals!
 
-LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6"]#, "7H367FWH+9J", "7H368F5R+4V"] # list of Provers locatios. Used for build the prover object
-PROVER_NUMBER = 16 # number of provers for the entire system
+LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J"]#, "7H368F5R+4V"] # list of Provers locatios. Used for build the prover object
+PROVER_NUMBER = 20 # number of provers for the entire system
 
 assert(PROVER_NUMBER/len(LOCATION_LIST_PROV) == 4) #There must be (SMART_CONTRACT_MAX_USER+1) users for each location. So increase the number of locations in LOCATION_LIST_PROV, or decrease the PROVER_NUMBER
 
@@ -68,7 +68,7 @@ def generateProvers(n_users_to_generate):
         account_prov = prov.createAccount(i) #passing the number of prover to create
         prover_list_account.append(account_prov)
         prov.account = account_prov
-        rpc("/acc/setGasLimit", account_prov, 5000000)
+        rpc("/acc/setGasLimit", account_prov, 8000000)
 
         prover_addresses.append(format_address(account_prov))
 
@@ -98,7 +98,17 @@ list_private_public_key = [
     '0x1cb11272fb93f95c3e1e1be4158732133350eba49df1e5fe13adb06a572066dd',
     '0xd35e2d01b9a22f00a84af71642aecf79ea9c7c84cbcba9171ba96a2555245ad7',
     '0x1aea64ed14d59cc0daf0f0a9df7f00ff0f5382bb548ca1b12e293b3e4ed6c638',
-    '0xa8f490477bdff610b4bc6ed10c6859e370c5d56c747253f7bfa8253b64b26840'
+    '0xa8f490477bdff610b4bc6ed10c6859e370c5d56c747253f7bfa8253b64b26840',
+
+    '0x46fca04375b753148d711abd1f00e370d9a4da8d612b2d0e9f8799290028df90',
+    '0x6f2467cf0dc2b02757ca25ab0c9e112971637e45249075fc78074c0a5cff6206',
+    '0xbf39de3dfca255ecc39d786d1e74eb0ac7995db651258f061d1dbb56f7c62b1d',
+    '0xc5b48a5c9e0353f7f2a5cc249b6ffb704c2c4975e25b0a21b2a20f8f23619945',
+
+    '0x16e2f555ace3ac16266a406ce44484578a4a856cc94a9122828fb002e3588672',
+    '0xb4180e90b27d9b6f0b49b7213f11dfaaa575b03ada1e68de0a4f3017f93cfc87',
+    '0x4237e0ad41e03dd26c40a6e9a3856161ef040cef4fc68beea788a8c4bbfd5b56',
+    '0x8ed2c32dffbd3fee83ae8dddef2e2cb33de835a6e891f3ff1d5a6a3a8c593c49'
 ]
 
 
@@ -112,9 +122,9 @@ contract_creator_deployed = None # contrat deployed, will have to be a list of c
 rpc, rpc_callbacks = mk_rpc()
 #rpc("/stdlib/setProviderByName","TestNet")
 rpc("/stdlib/setProviderByEnv",{
-    "ETH_NODE_URI":"https://tiniest-neat-field.matic-testnet.discover.quiknode.pro/6cf11cc8bcbdde3b18c83f183958f440ae58b33f/"
+    #"ETH_NODE_URI":"https://tiniest-neat-field.matic-testnet.discover.quiknode.pro/6cf11cc8bcbdde3b18c83f183958f440ae58b33f/"
     # "ETH_NODE_URI":"https://sepolia.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
-    #"ETH_NODE_URI":"https://goerli.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
+    "ETH_NODE_URI":"https://goerli.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
     }
 )
 
@@ -328,8 +338,17 @@ def startSimulation():
         '0x7b3180CFeBc06f78Cc55D2bA19cA24dfa2d1fe44',
         '0x9F81B843da3c2d66b08d7Af60c1FE7D79e20771E',
         '0xf71Fea9ED70597c365B5D8A2bD78e04E31654c5e',
-        '0x1aF193411dDf746C501459406e8f00f465E11433'
+        '0x1aF193411dDf746C501459406e8f00f465E11433',
 
+        '0x3AC3A765E4669E0e124C8f1E5104F56a051F7F62',
+        '0x605Ef12afC9912fE95A8B9b75b5e9E777AEb7107',
+        '0xe61B884f7E7DEa7413c6d65889bC04632241f81d',
+        '0xee366FBffcFE70B50BbFD6ba3eD9563743ED33cb',
+
+        # '0xA6657AE3cd2444d523408B3453cB4014eE6eA461',
+        # '0xf3feFd5613A47684A91246e5a9Fb5945983a86c0',
+        # '0xF13D193A1f808AF9a132C75D40B3934abdeA037e',
+        # '0x3d424297c1375222C4EafFF32a9aF8bD87eF1C34'
     ]
 
     time_delta_list = []
