@@ -39,14 +39,13 @@ def player(who):
         if lock.locked():
             lock.release() # This is the only the momente when someone release the lock
             print("release the lock AFTER INSERTING INFORMATION ")
-            
             #stop the timer
             end_list.append(time.time())
-
 
     def reportVerification(did, verifier):
         did_int = int(did.get('hex'), 16)
         print("DID ", did_int, " has been verified by Verifier ", verifier)
+
     return {'stdlib.hasConsoleLogger': True,
             'reportPosition': reportPosition,
             'reportVerification':reportVerification,
@@ -86,9 +85,8 @@ def play_bob(ctc_user_creator, accc, position, did, proof, tx_id_data):
 
     #print("Entering in play_bob, attaching to: ", ctc_user_creator,'\n')    
     ctc_bob = rpc("/acc/contract", accc, rpc("/ctc/getInfo", ctc_user_creator))
-    #print("Attaching Done")
+
     # Call the API
-    #print("\nCalling the API ...")
     result_counter = rpc('/ctc/apis/attacherAPI/insert_position', ctc_bob, pos_and_tx_id, did)
     counter_int = int(result_counter.get('hex'), 16)
     print("ATTACHER  📎 📎 \n Number of users that can still insert their position: ", counter_int," contract: ",ctc_user_creator )
