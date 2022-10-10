@@ -8,18 +8,79 @@ from threading import Thread
 import time
 import eth_new_account
 from typing import List
+import random
+
+SMART_CONTRACT_MAX_USER = 3 # this is the same variable of index.rsh. They must be equals!
+
+LOCATION_LIST_PROV = ["7H369F4W+Q8"]#, "7H369F4W+Q9"]#, "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V"] # list of Provers locatios. Used for build the prover object
+PROVER_NUMBER = 4 # number of provers for the entire system
+
+assert(PROVER_NUMBER/len(LOCATION_LIST_PROV) == 4) #There must be (SMART_CONTRACT_MAX_USER+1) users for each location. So increase the number of locations in LOCATION_LIST_PROV, or decrease the PROVER_NUMBER
+
+DID_list = [] #will be fill at runtime
+mapping_list_did = {} #will be fill at runtime
+
+'''
+    This method will generate n° prover objects setting their attribute such as DID, location or the consensus network account.
+    The DID created will be unique.
+    This method will create mapping_list_did dictionary, which will be used to check the users nearby.
+'''
+def generateProvers(n_users_to_generate):
+    proversObjectList = []
+    count = 0
+    for i in range(n_users_to_generate):
+        #use to assign each ID to the location
+        if count == len(LOCATION_LIST_PROV):
+            count = 0
+
+        # choose the location from the list of locations
+        chooseLocation = LOCATION_LIST_PROV[count] #there are SMART_CONTRACT_MAX_USER + 1 elements for each location. So: 0 < count <= (SMART_CONTRACT_MAX_USER+1)
+        goOn = True
+        #generate a random ID that does not still exists
+        while goOn == True:
+            DID_generated = random.randint(0, 100)
+            if DID_generated not in DID_list:
+                DID_list.append(DID_generated)
+                goOn = False
+            else:
+                goOn = True
+
+        # update the map that keep track of the locations and their users 
+        mapping_list_did.setdefault(chooseLocation,[]).append(DID_generated) #the dict will be used to find the neighbours and othe operations
+
+        #create a Prover object
+        prov = createProver(
+            did= DID_generated, 
+            account= "Noone",
+            private_key= "None",
+            proofs_array_computed= [],
+            location= chooseLocation, 
+            proofs_received_array=[])
+        
+        #update some attributes of the prover objects
+        account_prov = prov.createAccount(i) #passing the number of prover to create
+        prover_list_account.append(account_prov)
+        prov.account = account_prov
+        rpc("/acc/setGasLimit", account_prov, 8000000)
+
+        prover_addresses.append(format_address(account_prov))
+
+        proversObjectList.append(prov)
+
+        count += 1
+
+    return proversObjectList
 
 list_private_public_key = [
-    '0x8d10e8fb1aa289828f31914f581dbc39d9ed76b2e2d1247c49f5814349ff10c0', 
-    '0x9cf648f6aaa283e0c227f9047e735e1d604875ce735223c334f1c511a0dd2b1b',
-    '0xd1d2862447f71d78ab4d0b92800034c11cb7bd13ffe5d0a5bc2851e95ce719d7',
-    '0x0fcab881cf4b6d40fbf1473b908d9501524b0d84ac7fe44196e763b8bde9545a',
-    '0x18c78ad1e9447f077611e1945579c4215bb5551852e8b4957c89b783eb1aa3c8',
-    '0x3c5baad76449c59aa1cff6d27febaa201d5150b86b382451d3645d8afd919a63',
-    '0xc662ab78a9180104c1d20f9eb1f993794c093e98e7efe78e23d5ccb02fec637f',
-    '0xbd0c0a94a5998144da5a64c5ca9c67cc92d383762fa58b7e8017eed63de908b4',
-    '0x8ad4d716b3ed5c31cf4125fed2f9549259768482941f7ea3969d0fda93413e06',
-    '0x3888a91f2bae15a5c8df4545ecc2b2a50ea2f0034ec168df7ae429987eabf405'
+    '0xf641b77d995ebade72e5a96f065232d9057284581e6b3ef6cbc194896ce606fa',
+    '0x9de62bf46a345f949b6e2f07088a626f07e84f7ca4269917188573a0b1d0be4b',
+    '0x833170377ef9e0cac6ae75989fed851279b723d12cfa880023adff5f341c8ab0',
+    '0xc291f9aea360cc6d09a5bc071af3ee5e29a18bee02f4d39ed9f50633c7863eb1',
+
+    '0xb8b60ef412eeb95643e5701ec56b5fb11698d576e08127c33f893949386a5e45',  
+    '0xafe6f14b10d9a6693f04ebc1bf2090b406a89ffdb97713c9bf122e961b46c39d',  
+    '0x50e50c32c43bc3b55ed7cdffacc03780508fe20774f8255989ab971415271cf4',  
+    '0x8778e9ea55646607d276cc9ac858097e4b9ad3bb171b1d0a96d98b32f298c760'
 ]
 
 verifiers_private = [
@@ -27,18 +88,21 @@ verifiers_private = [
 ]
 
 
-prover_list_account = [] #list of prover account 
 prover_thread = [] #list of prover thread
+prover_list_account = [] #list of prover account 
 prover_addresses = [] # list of provers addresses
-
-verifier_addresses = [] #list of verifier thread
-verifier_list_account = [] #list of verifier account 
-
 contract_creator_deployed = None # contrat deployed, will have to be a list of contracts
 
-rpc, rpc_callbacks = mk_rpc()
-rpc("/stdlib/setProviderByName","TestNet")
+verifier_thread = []
 
+rpc, rpc_callbacks = mk_rpc()
+#rpc("/stdlib/setProviderByName","TestNet")
+rpc("/stdlib/setProviderByEnv",{
+        #"ETH_NODE_URI":"https://tiniest-neat-field.matic-testnet.discover.quiknode.pro/6cf11cc8bcbdde3b18c83f183958f440ae58b33f/"
+        #"ETH_NODE_URI":"https://sepolia.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
+        "ETH_NODE_URI":"https://goerli.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
+    }
+)
 print("\t\t The consesus network is: ", rpc('/stdlib/connector'))
 
 STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500) # use "parseCurrency" method when you send value TO backend
@@ -52,60 +116,10 @@ location_in_hypercube = False # simulate if the location is already stored in hy
     which consist in a range of 14m.
     We are aware that users in two different squares can be close althought the OLC is different, however we
     don't simulate that.
-    - Every Smart Contract must have 4 Provers: 1 Creator - 3 user-prover. So, the variable inside backend SMART_CONTRACT_MAX_USER is equal to 3 (number of user nearby)
 '''
-
-WITNESS_NUMBER = 4 # number of witnesses
-PROVER_NUMBER = 4 # number of provers for the entire system
-DID_LIST_WIT = [0, 3, 4, 5] # list of DID witnesses
-LOCATION_LIST_WIT = ["7H369FXP+FH", "7H369F4W+Q8", "7H369F4W+Q9"] # list of witnesses locations
-
-'''
-    ❗️❗️❗️❗️  WARNING: ❗️❗️❗️❗️
-    ---> len(DID_LIST_PROV) and len(LOCATION_LIST_PROV) MUST TO BE EQUALS !!! You can decrease the PROVER_NUMBER during the testing
-    ---> PROVER_NUMBER are all the provers of the system
-'''
-DID_LIST_PROV = [2, 6, 50, 51, 8, 9, 10, 11, 14, 19] # DID of provers that will ask for a Proof Of Location and a verify process
-LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q8", "7H369F4W+Q9", "7H369F4W+Q9", "7H369F4W+Q9", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6"] # list of Provers locatios. Used for build the prover object
 
 VERIFIER_NUMBER = 1 #number of verifiers
 DID_LIST_VER = [99] #list of DID associated to verifiers
-
-#### We know the position of every witness because it is stored in dictOfLocation. The position is the KEY, the values are the DID of user in that position
-dictOfLocation = {
-    "7H369FXP+FH":[
-        0, 
-        3,
-        4,
-        5
-    ],
-    "7H369F4W+Q8":[
-        2,
-        6,
-        50,
-        51
-    ],
-    "7H369F4W+Q9":[
-        8,
-        9,
-        10,
-        11
-    ],
-    "7H368FRV+FM":[ #Bologna
-        12,
-        13,
-        14
-    ],
-    "7H368FWV+X6": [ #Ice-cream Bologna
-        15,
-        16,
-        17,
-        18,
-        19
-    ],
-}
-
-NUMBER_OF_LOCATIONS = 5 #number of different locations. For each location there could be a smart contract
 
 
 class Witness:
@@ -190,34 +204,11 @@ class Prover(Witness):
         else: 
             print('No Neighbours found in your location: ', locationProver)
 
-    '''
-        This method allow to the prover to compute the distance from the witness.
-
-        In the real case we'll use the bluetooth range, so this function might not exists.
-    '''
-    def computed_distance_from_witness(self, olc_witness, olc_prover):
-        super(Prover, self).computed_distance_from_prover(olc_witness, olc_prover)
-        pass
-
-    ''' 
-        When a user want to send his location to the smart contract,
-        we have to check if the location is already sent (checking inside the
-        hypercube).
-        
-        If the location is still not sent, user will have to deploy the contract.
-    '''
-    def retrieve_position_hypercube(self):
-        # Check hypercube
-
-        # Deploy smart contract if location is not in the hypercube
-        pass
 
     def createAccount(self, i):
         # ########### #######  WORK WITH REACH DEVNET ##################
         #acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
-
-
-        
+    
         # ########### #######  WORK WITH ETHEREUM TESTNET ##################
         acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
       
@@ -275,6 +266,9 @@ def createVerifier(did, account):
 ''' 
     We'll use  Open Location Code format.
     This is ideally suited for people that live in rural areas and don’t have access to an address.
+
+    e.g. generateOLC(11.3474453,44.4930181)
+
 '''
 def generateOLC(latitude, longitude):
     location_encoded = olc.encode(latitude, longitude) #lat - long - N° digits. Default is 10 digits which allow 14m of precisions
@@ -282,47 +276,28 @@ def generateOLC(latitude, longitude):
     return location_encoded
 
 
-
-
-
 # START the simulation
 def startSimulation():
+    #generate N random provers
+    generate_prover_list = generateProvers(PROVER_NUMBER) # try with 8, 12, 16 etc.
+
+    print("\n\n----------- START -----------")
     dict_location_sc = {} # keep track if the smart contract is already associated to this particular location. Its lenght will be equal to NUMBER_OF_LOCATIONS
     
-    '''
-        TODO: here START the timer for the DEPLOYING and INSERTING phase
-    '''
-
     # Starting prover steps
     for i in range(0, PROVER_NUMBER): #for every prover of the entire system ...
-        ##### TODO: Generate random LATITUDE & LONGITUDE (for every user), Then convert them to Open Location code and add to LOCATION_LIST_PROV
-        #generateOLC(11.3474453,44.4930181 )#11.356988, 44.495888) # just for testing
-        #buildDict()
-
-        prov = createProver(
-            did= DID_LIST_PROV[i], # The Prover ID come from an default array that contains all the IDs
-            account= "FFFFFFFFF",
-            private_key= "xxxxxxx",
-            proofs_array_computed= [],
-            location= LOCATION_LIST_PROV[i], # The Prover Location come from an default array that contains all the Locations
-            proofs_received_array=[])
-
-        account_prov = prov.createAccount(i) #passing the number of prover to create
-        # TODO: create a list of object provers and remove the two line below. Refactoring
-       
-        prover_list_account.append(account_prov)
-        prover_addresses.append(format_address(account_prov)) #getting the wallet addresses for prover and appending to the list
-        prov.account = account_prov
-
-
-        print("BALANCE OF ",format_address(account_prov), " is ",get_balance(account_prov))
-
-        
-        #setting the gas limit
-        rpc("/acc/setGasLimit", account_prov, 5000000) # this line avoid the error displayed on etherscan which is: "out of gas"
-   
+        prov = generate_prover_list[i]
+        print("\n\t\t-------------------  DEBUG TEST -------------------")
+        print("\t\t\n mapping_list_did.get ",mapping_list_did.get('7H369F4W+Q8'))
+        print("\t\t\n mapping_list_did.get[0] ",mapping_list_did.get('7H369F4W+Q8')[0])
+        print("prov addr [0] ",prover_addresses[0])
+        print("\t\t\n mapping_list_did.get[1] ",mapping_list_did.get('7H369F4W+Q8')[1])
+        print("prov addr [1] ",prover_addresses[1])
+        print("now sleeping ...")
+        time.sleep(100)
+        print("\n\t\t-------------------  end DEBUG TEST -------------------")
         # Find neighbours
-        neighbours = prov.find_neighbours(prov.location, dictOfLocation)
+        neighbours = prov.find_neighbours(prov.location, mapping_list_did)
         if neighbours: 
 
             print('→ 🪪 Prover DID: ', prov.did,'\n 📍 Location: ', prov.location, '\n    Neighbours: ', neighbours,'\n',)
@@ -343,36 +318,24 @@ def startSimulation():
                 '''
                     TODO: insert the required data inside the hypercube 
                 '''
-
                 dict_location_sc[prov.location] = contract_creator_deployed #insert the contract_id inside the dict_location_sc which track the contract deployed
                 print("\n")
-                #print("startint the creato sleep ...")
-                #time.sleep(150)
+
             else:
                 #print("\n User is attaching to the Smart contract ",dict_location_sc.get(prov.location),  " 🟩 📎 📎 🟩 ")
                 retrieved_ctc = dict_location_sc[prov.location]
-                print("User: ",format_address(prov.account)," Preparing the Attaching to the contract ...", retrieved_ctc)
+                #print("User: ",format_address(prov.account)," Preparing the Attaching to the contract ...", retrieved_ctc)
                 proverThread = prov.attachToSmartContract(prov, retrieved_ctc)
-                #print("starting the sleep ...")
-                #time.sleep(60)
-                #print("Attach terminated")
                 proverThread.start()
                 prover_thread.append(proverThread)
                 
-    '''
-        TODO: here STOP the timer for the DEPLOYING and INSERTING phase
-    '''      
-
-
 
     # Starting Verifier steps
     '''
         ❗️  WARNING: ❗️
         ---> Check that SMART_CONTRACT_MAX_USER variable in index.rsh has been reached here: Everybody has to attach to the contract if you want going on with verifiers
     '''
-
-
-    time.sleep(600)
+    time.sleep(400)
     for i in range(0, VERIFIER_NUMBER):
     
     
@@ -389,12 +352,16 @@ def startSimulation():
         # is not mandatory, but the verifier can insert funds inside the smart contract
         print(" 💰💰  Verifier is going to insert funds inside the contract ", contract_creator_deployed, ' ...')
 
-        verifier.paySmartContract(verifier, contract_creator_deployed)
+        threadVer = verifier.paySmartContract(verifier, contract_creator_deployed)
+        verifier_thread.append(threadVer)
         
         print("WAITING 50")
         # verify some provers
         time.sleep(50)
-        didProverToVerify = DID_LIST_PROV[1]
+
+        ## FIX THIS: mapping_list_did.GET
+        print("\t\t\n mapping_list_did.get ",mapping_list_did.get('7H369F4W+Q8'))
+        didProverToVerify = mapping_list_did.get('7H369F4W+Q8')[1]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[1], didProverToVerify)
         print("Verifier is going to insert data in hypercube")
         #TODO: insert data inside the hypercube
@@ -402,11 +369,11 @@ def startSimulation():
 
         print("WAITING 50 ...")
         time.sleep(50)
-        didProverToVerify = DID_LIST_PROV[2]
+        didProverToVerify = mapping_list_did.get('7H369F4W+Q8')[2]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[2], didProverToVerify)
 
         time.sleep(50)
-        didProverToVerify = DID_LIST_PROV[3]
+        didProverToVerify = mapping_list_did.get('7H369F4W+Q8')[3]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[3], didProverToVerify)
         '''
             verify the second smart contract
@@ -421,15 +388,15 @@ def startSimulation():
 
         # verify some provers
         # time.sleep(70)
-        # didProverToVerify = DID_LIST_PROV[5]
+        # didProverToVerify = DID_list[5]
         # verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[5], didProverToVerify)
 
         # time.sleep(70)
-        # didProverToVerify = DID_LIST_PROV[6]
+        # didProverToVerify = DID_list[6]
         # verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[6], didProverToVerify)
 
         # time.sleep(70)
-        # didProverToVerify = DID_LIST_PROV[7]
+        # didProverToVerify = DID_list[7]
         # verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[7], didProverToVerify)
 
 
@@ -451,15 +418,15 @@ def startSimulation():
         provUser.join()
 
 
-    for verifierUser in verifier_addresses:
+    for verifierUser in verifier_thread:
         verifierUser.join()
 
 
     for provUser in prover_list_account:
         rpc("/forget/ctc", provUser)
 
-    for verifierUser in verifier_list_account:
-        rpc("/forget/ctc", verifierUser)
+    # for verifierUser in verifier_list_account:
+    #     rpc("/forget/ctc", verifierUser)
 
 
         
@@ -474,43 +441,3 @@ if __name__ == '__main__':
 
 
 
-
-
-#### this method should build the input DICT in an automatic way 
-# def buildDict():
-#     list_temp_id_wit = []
-#     list_temp_loc_wit = []
-#     for i in range(0,WITNESS_NUMBER):
-#         if wit[DID_LIST_WIT[i]]: #if exists
-#             list_temp_id_wit.append(wit.get(DID_LIST_WIT[i]))
-#         else:
-#             list_temp_id_wit.append(DID_LIST_WIT[i])
-#         wit = createWitness(  
-#             did= list_temp_id_wit,
-#             public_key= "SHJDAJAKRHAKD",
-#             private_key= "xxxxx",
-#             proofs_array_computed= [],
-#             location= LOCATION_LIST_WIT[round(random.uniform(0, 1))])
-      
-#         list_temp_id_wit = []
-
-       
-#         #insert the witness in the dict of neighbours
-#         dictOfLocation[list_temp_loc_wit[i]] = list_temp_id_wit[i] #TODO: FIX HERE --> THE VALUE MUST BE A LIST!!G
-        
-
-#     print(json.dumps(dictOfLocation, indent=4))
-
-#     for i in range(0, PROVER_NUMBER):
-#         prov = createProver(
-#             did= DID_LIST_PROV[i],
-#             public_key= "FFFFFFFFF",
-#             private_key= "xxxxxxx",
-#             proofs_array_computed= [],
-#             location= LOCATION_LIST_PROV[round(random.uniform(0, 1))],
-#             proofs_received_array=[])
-        
-#         # Find neighbours
-#         locationProver = prov.location
-#         neighbours = prov.find_neighbours(prov.location, dictOfLocation)
-#         print('Hi Prover, your DID is: ', prov.did,'\n Your location is: ', prov.location, '\n Your neighbours are: ', neighbours)

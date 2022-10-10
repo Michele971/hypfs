@@ -46,17 +46,14 @@ export const main = Reach.App(() => {
   setOptions({untrustworthyMaps: true});
   init();
 
-  Creator.publish() //we need that to use the MAP below
-  const easy_map = new Map(UInt,Bytes(128));
-  
-  commit();
+
   Creator.only(() => { 
     const proof_and_position = declassify(interact.position);
     const decentralized_identifier_creator = declassify(interact.decentralized_identifier);
   });
 
   Creator.publish(proof_and_position, decentralized_identifier_creator); //TODO: add the proof_received
-
+  const easy_map = new Map(UInt,Bytes(128));
   easy_map[decentralized_identifier_creator] = proof_and_position; //setting the first value of the map with Creator values
 
   commit();
@@ -137,10 +134,10 @@ export const main = Reach.App(() => {
 
         }
       )
-      // .timeout(relativeTime(700/5), () => { // timeout: function that executes code every amount of time decided by the first parameter
-      //   Anybody.publish(); // publish needed to finish the parallel reduce
-      //   return false; // set keepGoing to false to finish the campaign
-      // }); 
+      .timeout(relativeTime(700/5), () => { // timeout: function that executes code every amount of time decided by the first parameter
+        Anybody.publish(); // publish needed to finish the parallel reduce
+        return keepGoing2_counter; // set keepGoing to false to finish the campaign
+      }); 
 
 
   // TODO: the first received position has to be stored in a data structure, will be compared to the subsquent received positions
