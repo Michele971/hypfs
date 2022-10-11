@@ -364,7 +364,7 @@ def startSimulation():
         time.sleep(50)
 
         ## FIX THIS: mapping_list_did.GET
-        print("\t\t\n mapping_list_did.get ",mapping_list_did.get('7H369F4W+Q8'))
+        #print("\t\t\n mapping_list_did.get ",mapping_list_did.get('7H369F4W+Q8'))
         didProverToVerify = mapping_list_did.get('7H369F4W+Q8')[1]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[1], didProverToVerify)
         print("Verifier is going to insert data in hypercube")
