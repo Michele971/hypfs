@@ -287,15 +287,17 @@ def startSimulation():
     # Starting prover steps
     for i in range(0, PROVER_NUMBER): #for every prover of the entire system ...
         prov = generate_prover_list[i]
-        print("\n\t\t-------------------  DEBUG TEST -------------------")
-        print("\t\t\n mapping_list_did.get ",mapping_list_did.get('7H369F4W+Q8'))
-        print("\t\t\n mapping_list_did.get[0] ",mapping_list_did.get('7H369F4W+Q8')[0])
-        print("prov addr [0] ",prover_addresses[0])
-        print("\t\t\n mapping_list_did.get[1] ",mapping_list_did.get('7H369F4W+Q8')[1])
-        print("prov addr [1] ",prover_addresses[1])
-        print("now sleeping ...")
-        time.sleep(100)
-        print("\n\t\t-------------------  end DEBUG TEST -------------------")
+     
+        # print("\n\t\t-------------------  DEBUG TEST -------------------")
+        # print("\t\t\n mapping_list_did.get ",mapping_list_did.get('7H369F4W+Q8'))
+        # print("\t\t\n mapping_list_did.get[0] ",mapping_list_did.get('7H369F4W+Q8')[0])
+        # print("prov addr [0] ",prover_addresses[0])
+        # print("\t\t\n mapping_list_did.get[1] ",mapping_list_did.get('7H369F4W+Q8')[1])
+        # print("prov addr [1] ",prover_addresses[1])
+        # print("now sleeping ...")
+        # time.sleep(100)
+        # print("\n\t\t-------------------  end DEBUG TEST -------------------")
+       
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, mapping_list_did)
         if neighbours: 
@@ -335,10 +337,11 @@ def startSimulation():
         ❗️  WARNING: ❗️
         ---> Check that SMART_CONTRACT_MAX_USER variable in index.rsh has been reached here: Everybody has to attach to the contract if you want going on with verifiers
     '''
+    print("\n\t ----- sleeping before verification process")
     time.sleep(400)
+    print("Start the verification process")
     for i in range(0, VERIFIER_NUMBER):
-    
-    
+
         verifier = createVerifier(
             did= DID_LIST_VER[i],
             account= ""
