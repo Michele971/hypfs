@@ -11,7 +11,7 @@ lock = Lock()
 
 provers_addresses = [] # this address need to be verified
 rpc, rpc_callbacks = mk_rpc()
-SMART_CONTRAT_PAYMENT = rpc("/stdlib/parseCurrency", 1/100)
+SMART_CONTRAT_PAYMENT = rpc("/stdlib/parseCurrency", 4/100) # the Smart contract will contain: 0.04 ETH (the reward will be 0.001)
 
 def fmt(x):
     return rpc("/stdlib/formatCurrency", x, 4)

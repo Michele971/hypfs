@@ -1,7 +1,7 @@
 'reach 0.1';
 'use strict';
 
-const REWARD_FOR_PROVER = 10000000000000000000/100000//send by VERIFIER
+const REWARD_FOR_PROVER = 1000000000000000000/1000//send by VERIFIER. We have 1 ETH / 1000 which is = 0.001
 const SMART_CONTRACT_MAX_USER = 3
 //NOTES:
 // TODO: This smart contract is empower to validate if the positions of users are correct
@@ -123,12 +123,12 @@ export const main = Reach.App(() => {
             Creator.only(() => interact.reportVerification(did, this));
             delete easy_map[did]; //vector[0] is the did
             ret(walletAddress);
-            return keepGoing2_counter -1; //TODO: THIS HAS TO BE TRUEE, false only for testing
+            return keepGoing2_counter -1; 
        
           }else{
             Creator.only(() => interact.issueDuringVerification(did));
             ret(walletAddress);
-            return keepGoing2_counter ; //TODO: THIS HAS TO BE TRUEE, false only for testing  
+            return keepGoing2_counter -1; //replace with "keepGoing2_counter -1" during the testing 
           }
         
 

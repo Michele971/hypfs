@@ -36,7 +36,7 @@ def send_eth(sender_private_key, sender_addr, receiver_addr): #gas_increase
     nonce = web3.eth.getTransactionCount(from_address)
     #gas = int('50')+gas_increase*10
     gasPrice = web3.toWei('50', 'gwei') #str(gas)
-    value = web3.toWei(0.1, 'ether')
+    value = web3.toWei(0.3, 'ether')
 
     tx = {
         'nonce': nonce,
