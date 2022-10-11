@@ -228,7 +228,7 @@ class Prover(Witness):
 
     # this method will interact with index.py
     def attachToSmartContract(self, proverAttacherObject, ctc_creator):
-        print(" ⏳ Calling the api and starting the thread ...")
+        print(" ⏳ Calling the attach api and starting the thread ...")
         attacherThread = Thread(target=play_bob, args=(ctc_creator, proverAttacherObject.account, proverAttacherObject.location, proverAttacherObject.did, 'proof',))
         #attacherThread.start()
         #print("playbob called successfully")
@@ -337,6 +337,7 @@ def startSimulation():
         ❗️  WARNING: ❗️
         ---> Check that SMART_CONTRACT_MAX_USER variable in index.rsh has been reached here: Everybody has to attach to the contract if you want going on with verifiers
     '''
+    print("\n")
     print("\n\t ----- sleeping before verification process")
     time.sleep(400)
     print("Start the verification process")

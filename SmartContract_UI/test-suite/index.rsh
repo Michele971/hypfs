@@ -1,7 +1,7 @@
 'reach 0.1';
 'use strict';
 
-const REWARD_FOR_PROVER = 1000000000000000000//send by VERIFIER
+const REWARD_FOR_PROVER = 10000000000000000000/100000//send by VERIFIER
 const SMART_CONTRACT_MAX_USER = 3
 //NOTES:
 // TODO: This smart contract is empower to validate if the positions of users are correct

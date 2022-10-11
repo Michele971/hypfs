@@ -36,7 +36,7 @@ def send_eth(sender_private_key, sender_addr, receiver_addr): #gas_increase
     nonce = web3.eth.getTransactionCount(from_address)
     #gas = int('50')+gas_increase*10
     gasPrice = web3.toWei('50', 'gwei') #str(gas)
-    value = web3.toWei(3, 'ether')
+    value = web3.toWei(0.1, 'ether')
 
     tx = {
         'nonce': nonce,
@@ -58,7 +58,7 @@ def send_eth(sender_private_key, sender_addr, receiver_addr): #gas_increase
 #newAccount()
 
 #fund the verifier
-#send_eth("0xf641b77d995ebade72e5a96f065232d9057284581e6b3ef6cbc194896ce606fa", "0x34c17b647dDd4E38CDC2F5B38efd1F42681cB889","0x6636F7B4A4d9077DBa98F9A0237192B160277200")
+#send_eth("0xf641b77d995ebade72e5a96f065232d9057284581e6b3ef6cbc194896ce606fa", "0x34c17b647dDd4E38CDC2F5B38efd1F42681cB889","0xAc18Ec4c7f390663B179a7891f26247612654c8c")
 
 
 # create 10 new accounts (use only once if dict_private_public_key is empty)
