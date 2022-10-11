@@ -2,8 +2,6 @@
 
 ### You have to run the project on Ethereum Consensus Network
 
-### The final version of smart contract will not contains the location for privacy reasons. Instead hash of the proof and signed hash of the proof will be inserted by the provers
-
 ### Info
 
 At the moment, the following system contains 8 prover where 2 are creators and 6 are the neighbours.
