@@ -38,7 +38,18 @@ dict_private_public_key = {
     # '0xA6657AE3cd2444d523408B3453cB4014eE6eA461':'0x16e2f555ace3ac16266a406ce44484578a4a856cc94a9122828fb002e3588672', 
     # '0xf3feFd5613A47684A91246e5a9Fb5945983a86c0':'0xb4180e90b27d9b6f0b49b7213f11dfaaa575b03ada1e68de0a4f3017f93cfc87', 
     # '0xF13D193A1f808AF9a132C75D40B3934abdeA037e':'0x4237e0ad41e03dd26c40a6e9a3856161ef040cef4fc68beea788a8c4bbfd5b56', 
-    # '0x3d424297c1375222C4EafFF32a9aF8bD87eF1C34':'0x8ed2c32dffbd3fee83ae8dddef2e2cb33de835a6e891f3ff1d5a6a3a8c593c49'
+    # '0x3d424297c1375222C4EafFF32a9aF8bD87eF1C34':'0x8ed2c32dffbd3fee83ae8dddef2e2cb33de835a6e891f3ff1d5a6a3a8c593c49',
+
+    #'0x746ACeB2ceF19957F3d13523C9b030FBF69bdfCf':'0x5e77ab5b1e4906f34c71105ca643094bf334725de500ed9f27e0df67789570d8', 
+    #'0x647447d3265bf7F0969eDcef8F4DbeBFB54aaBAC':'0xd4df99e352af56e38ee7a52c69429156bd3f704d00af5a0240f1607343eaf0b6', 
+    #'0x6ea997Cff0e32d634d9a043553Cd465C7E9204D5':'0xc067778224511bf27e2b9434662e1a6e74444db4a709dea3a52ef9709d8856f9', 
+    #'0x53c6b740a464C5Ce3825a45AF39f9310381579A9':'0x8a27f845ad42d04624aa1e61af005f283864d6ffe3a61213adadb87689a36b5b', 
+    
+    #'0x52aD2B5f34a0e61c0D4594BA0524F58Fbd76a30d':'0xf4f9a7b34c361b24265e01089b97ffb2823cf51d996331bcbcff46f91083ea8c', 
+    #'0x872c0B06e9FcA7D822c4Ba3F66DE5AdF91bfa7a8':'0x953431fa1ee0b05e776cbeb14aed3b49f3775af2a4c5f2b938dcc2b59cbadb89', 
+    #'0x844fcEfB192f99997D707fa516EDaFd75868ae49':'0xede78b4f1106e022ac7c5af5d0cf0dc9c44d5a329386c071d32e995f1ecb7f9a', 
+    #'0x3587C8b93683b268952F4e62A0E0F0c37C791B9F':'0x190981c2ada6c6b20fe9c7aefbf04f3aaa6da47b8e6853a17a8680fb34da156d' 
+
 }
 
 def newAccount():
@@ -95,7 +106,7 @@ def send_eth(sender_private_key, sender_addr, receiver_addr, gas_increase): #gas
 # print(dict_private_public_key)
 #newAccount()
 #send the transactions
-#count = 0 #used to skip the first element in the dict, because it is the sender of transactions
+# count = 0 #used to skip the first element in the dict, because it is the sender of transactions
 # for i in dict_private_public_key:
 #     if count >= 1:
 #         time.sleep(20)

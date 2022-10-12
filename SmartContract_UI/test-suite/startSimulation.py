@@ -19,8 +19,8 @@ import random
 
 SMART_CONTRACT_MAX_USER = 3 # this is the same variable of index.rsh. They must be equals!
 
-LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9"]#, "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V"] # list of Provers locatios. Used for build the prover object
-PROVER_NUMBER = 8 # number of provers for the entire system
+LOCATION_LIST_PROV = ["7H369F4W+Q8"]#, "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V", "7H369FXP+FH", "7H369F2W+3R"] # list of Provers locatios. Used for build the prover object
+PROVER_NUMBER = 4 # number of provers for the entire system
 
 assert(PROVER_NUMBER/len(LOCATION_LIST_PROV) == 4) #There must be (SMART_CONTRACT_MAX_USER+1) users for each location. So increase the number of locations in LOCATION_LIST_PROV, or decrease the PROVER_NUMBER
 
@@ -108,7 +108,18 @@ list_private_public_key = [
     '0x16e2f555ace3ac16266a406ce44484578a4a856cc94a9122828fb002e3588672',
     '0xb4180e90b27d9b6f0b49b7213f11dfaaa575b03ada1e68de0a4f3017f93cfc87',
     '0x4237e0ad41e03dd26c40a6e9a3856161ef040cef4fc68beea788a8c4bbfd5b56',
-    '0x8ed2c32dffbd3fee83ae8dddef2e2cb33de835a6e891f3ff1d5a6a3a8c593c49'
+    '0x8ed2c32dffbd3fee83ae8dddef2e2cb33de835a6e891f3ff1d5a6a3a8c593c49',
+
+    '0x5e77ab5b1e4906f34c71105ca643094bf334725de500ed9f27e0df67789570d8',
+    '0xd4df99e352af56e38ee7a52c69429156bd3f704d00af5a0240f1607343eaf0b6',
+    '0xc067778224511bf27e2b9434662e1a6e74444db4a709dea3a52ef9709d8856f9',
+    '0x8a27f845ad42d04624aa1e61af005f283864d6ffe3a61213adadb87689a36b5b',
+
+    '0xf4f9a7b34c361b24265e01089b97ffb2823cf51d996331bcbcff46f91083ea8c',
+    '0x953431fa1ee0b05e776cbeb14aed3b49f3775af2a4c5f2b938dcc2b59cbadb89',
+    '0xede78b4f1106e022ac7c5af5d0cf0dc9c44d5a329386c071d32e995f1ecb7f9a',
+    '0x190981c2ada6c6b20fe9c7aefbf04f3aaa6da47b8e6853a17a8680fb34da156d'
+
 ]
 
 
@@ -277,7 +288,7 @@ def startSimulation():
         prov = generate_prover_list[i]
 
         print("BALANCE: ",get_balance(prov.account))
-
+       
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, mapping_list_did)
         if neighbours: 
@@ -312,7 +323,8 @@ def startSimulation():
                 proverThread.start()
                 prover_thread.append(proverThread)
                 
-
+            print("Address used: ",prover_addresses[i],"\n")
+            
     # Joining the thread of provers and verifiers
     print("num threads: ",len(prover_thread))
     print("end_list (time)", end_list)
@@ -325,10 +337,10 @@ def startSimulation():
         '0xAc18Ec4c7f390663B179a7891f26247612654c8c',
         '0x91EF6D0F7c12b5FF0c1F81DCFFAF1e30BF0F52D7',
 
-        '0x5381113B7b13c15af3a534065001EdeB2476802c',
-        '0xA6Abd9eB42aad1b98c2a9dF0B4E2E3c743162ba5',
-        '0x87985fC3dCE979C09E3c3e745A7A0B464540CA82',
-        '0x1fE37BD94109bA874a235B44fA79fC2d7710F1B0',
+        # '0x5381113B7b13c15af3a534065001EdeB2476802c',
+        # '0xA6Abd9eB42aad1b98c2a9dF0B4E2E3c743162ba5',
+        # '0x87985fC3dCE979C09E3c3e745A7A0B464540CA82',
+        # '0x1fE37BD94109bA874a235B44fA79fC2d7710F1B0',
 
         # '0xfbe72863099f8fCAFe6Df5626692013Ce2e83ec3',
         # '0x7e90fCc0B6a4459A2c47A2b015c37fB5340aCcb5',
@@ -348,7 +360,17 @@ def startSimulation():
         # '0xA6657AE3cd2444d523408B3453cB4014eE6eA461',
         # '0xf3feFd5613A47684A91246e5a9Fb5945983a86c0',
         # '0xF13D193A1f808AF9a132C75D40B3934abdeA037e',
-        # '0x3d424297c1375222C4EafFF32a9aF8bD87eF1C34'
+        # '0x3d424297c1375222C4EafFF32a9aF8bD87eF1C34',
+
+        # '0x746ACeB2ceF19957F3d13523C9b030FBF69bdfCf',
+        # '0x647447d3265bf7F0969eDcef8F4DbeBFB54aaBAC',
+        # '0x6ea997Cff0e32d634d9a043553Cd465C7E9204D5',
+        # '0x53c6b740a464C5Ce3825a45AF39f9310381579A9',
+
+        # '0x52aD2B5f34a0e61c0D4594BA0524F58Fbd76a30d',
+        # '0x872c0B06e9FcA7D822c4Ba3F66DE5AdF91bfa7a8',
+        # '0x844fcEfB192f99997D707fa516EDaFd75868ae49',
+        # '0x3587C8b93683b268952F4e62A0E0F0c37C791B9F'
     ]
 
     time_delta_list = []
@@ -386,6 +408,8 @@ def startSimulation():
 
 def main():
     startSimulation()
+    # generateOLC(11.3986586,44.4864416) # san lazzaro municipio
+    # generateOLC(11.3501333,44.4970137) # piazza scaravilli
 
 
 if __name__ == '__main__':
