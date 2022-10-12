@@ -19,8 +19,8 @@ import random
 
 SMART_CONTRACT_MAX_USER = 3 # this is the same variable of index.rsh. They must be equals!
 
-LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V"] # list of Provers locatios. Used for build the prover object
-PROVER_NUMBER = 24 # number of provers for the entire system
+LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9"]#, "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V"] # list of Provers locatios. Used for build the prover object
+PROVER_NUMBER = 8 # number of provers for the entire system
 
 assert(PROVER_NUMBER/len(LOCATION_LIST_PROV) == 4) #There must be (SMART_CONTRACT_MAX_USER+1) users for each location. So increase the number of locations in LOCATION_LIST_PROV, or decrease the PROVER_NUMBER
 
@@ -122,9 +122,9 @@ contract_creator_deployed = None # contrat deployed, will have to be a list of c
 rpc, rpc_callbacks = mk_rpc()
 #rpc("/stdlib/setProviderByName","TestNet")
 rpc("/stdlib/setProviderByEnv",{
-    #"ETH_NODE_URI":"https://tiniest-neat-field.matic-testnet.discover.quiknode.pro/6cf11cc8bcbdde3b18c83f183958f440ae58b33f/"
+    "ETH_NODE_URI":"https://tiniest-neat-field.matic-testnet.discover.quiknode.pro/6cf11cc8bcbdde3b18c83f183958f440ae58b33f/"
     # "ETH_NODE_URI":"https://sepolia.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
-    "ETH_NODE_URI":"https://goerli.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
+    #"ETH_NODE_URI":"https://goerli.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
     }
 )
 
@@ -330,25 +330,25 @@ def startSimulation():
         '0x87985fC3dCE979C09E3c3e745A7A0B464540CA82',
         '0x1fE37BD94109bA874a235B44fA79fC2d7710F1B0',
 
-        '0xfbe72863099f8fCAFe6Df5626692013Ce2e83ec3',
-        '0x7e90fCc0B6a4459A2c47A2b015c37fB5340aCcb5',
-        '0xC4A9067cE5542899510e6cB8A2Eb84A0a0953eDE',
-        '0x63d3e6E0d2E762570819086f3E6dEF5061a27890',
+        # '0xfbe72863099f8fCAFe6Df5626692013Ce2e83ec3',
+        # '0x7e90fCc0B6a4459A2c47A2b015c37fB5340aCcb5',
+        # '0xC4A9067cE5542899510e6cB8A2Eb84A0a0953eDE',
+        # '0x63d3e6E0d2E762570819086f3E6dEF5061a27890',
 
-        '0x7b3180CFeBc06f78Cc55D2bA19cA24dfa2d1fe44',
-        '0x9F81B843da3c2d66b08d7Af60c1FE7D79e20771E',
-        '0xf71Fea9ED70597c365B5D8A2bD78e04E31654c5e',
-        '0x1aF193411dDf746C501459406e8f00f465E11433',
+        # '0x7b3180CFeBc06f78Cc55D2bA19cA24dfa2d1fe44',
+        # '0x9F81B843da3c2d66b08d7Af60c1FE7D79e20771E',
+        # '0xf71Fea9ED70597c365B5D8A2bD78e04E31654c5e',
+        # '0x1aF193411dDf746C501459406e8f00f465E11433',
 
-        '0x3AC3A765E4669E0e124C8f1E5104F56a051F7F62',
-        '0x605Ef12afC9912fE95A8B9b75b5e9E777AEb7107',
-        '0xe61B884f7E7DEa7413c6d65889bC04632241f81d',
-        '0x38102a9Abc98EaCAFbd3a92271aB0B9456C3bCdC', 
+        # '0x3AC3A765E4669E0e124C8f1E5104F56a051F7F62',
+        # '0x605Ef12afC9912fE95A8B9b75b5e9E777AEb7107',
+        # '0xe61B884f7E7DEa7413c6d65889bC04632241f81d',
+        # '0x38102a9Abc98EaCAFbd3a92271aB0B9456C3bCdC', 
 
-        '0xA6657AE3cd2444d523408B3453cB4014eE6eA461',
-        '0xf3feFd5613A47684A91246e5a9Fb5945983a86c0',
-        '0xF13D193A1f808AF9a132C75D40B3934abdeA037e',
-        '0x3d424297c1375222C4EafFF32a9aF8bD87eF1C34'
+        # '0xA6657AE3cd2444d523408B3453cB4014eE6eA461',
+        # '0xf3feFd5613A47684A91246e5a9Fb5945983a86c0',
+        # '0xF13D193A1f808AF9a132C75D40B3934abdeA037e',
+        # '0x3d424297c1375222C4EafFF32a9aF8bD87eF1C34'
     ]
 
     time_delta_list = []
