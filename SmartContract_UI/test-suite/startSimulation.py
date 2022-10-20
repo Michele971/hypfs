@@ -11,6 +11,7 @@ from index import start_list, end_list
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+import numpy as np
 '''
     ---------------------------------------------------------------------------------------
     ------------------    THIS SCRIPT MUST BE RUN ON ETHEREUM TESTNET    ------------------
@@ -19,8 +20,8 @@ import random
 
 SMART_CONTRACT_MAX_USER = 3 # this is the same variable of index.rsh. They must be equals!
 
-LOCATION_LIST_PROV = ["7H369F4W+Q8"]#, "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V", "7H369FXP+FH", "7H369F2W+3R"] # list of Provers locatios. Used for build the prover object
-PROVER_NUMBER = 4 # number of provers for the entire system
+LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V", "7H369FXP+FH", "7H369F2W+3R"] # list of Provers locatios. Used for build the prover object
+PROVER_NUMBER = 32 # number of provers for the entire system
 
 assert(PROVER_NUMBER/len(LOCATION_LIST_PROV) == 4) #There must be (SMART_CONTRACT_MAX_USER+1) users for each location. So increase the number of locations in LOCATION_LIST_PROV, or decrease the PROVER_NUMBER
 
@@ -87,13 +88,14 @@ list_private_public_key = [
 
     '0xb8b60ef412eeb95643e5701ec56b5fb11698d576e08127c33f893949386a5e45', # 0x5381113B7b13c15af3a534065001EdeB2476802c
     '0xafe6f14b10d9a6693f04ebc1bf2090b406a89ffdb97713c9bf122e961b46c39d', # 0xA6Abd9eB42aad1b98c2a9dF0B4E2E3c743162ba5
-    '0x50e50c32c43bc3b55ed7cdffacc03780508fe20774f8255989ab971415271cf4', # 0x87985fC3dCE979C09E3c3e745A7A0B464540CA82
-    '0x8778e9ea55646607d276cc9ac858097e4b9ad3bb171b1d0a96d98b32f298c760', # 0x1fE37BD94109bA874a235B44fA79fC2d7710F1B0
+    '0xf285e21ad35d451453a0e11f1c2580316a66b74126528303f52d93dfa9d1dee3',
+    '0x31c2d8d88b2de858e6a76f35b410bf68f24d9033a6d549111e12a91974895f3e',
 
     '0x9e5cd974573308612579e29c2f1ba9899c5622cd273bcc00941acdb107260199',
     '0x12f576f887df544a76fbd88a79dafc852b9900e328b2a448450bc5fe4b60589a',
-    '0xf285e21ad35d451453a0e11f1c2580316a66b74126528303f52d93dfa9d1dee3',
-    '0x31c2d8d88b2de858e6a76f35b410bf68f24d9033a6d549111e12a91974895f3e',
+    '0x50e50c32c43bc3b55ed7cdffacc03780508fe20774f8255989ab971415271cf4', # 0x87985fC3dCE979C09E3c3e745A7A0B464540CA82
+    '0x8778e9ea55646607d276cc9ac858097e4b9ad3bb171b1d0a96d98b32f298c760', # 0x1fE37BD94109bA874a235B44fA79fC2d7710F1B0
+
 
     '0x1cb11272fb93f95c3e1e1be4158732133350eba49df1e5fe13adb06a572066dd',
     '0xd35e2d01b9a22f00a84af71642aecf79ea9c7c84cbcba9171ba96a2555245ad7',
@@ -133,9 +135,9 @@ contract_creator_deployed = None # contrat deployed, will have to be a list of c
 rpc, rpc_callbacks = mk_rpc()
 #rpc("/stdlib/setProviderByName","TestNet")
 rpc("/stdlib/setProviderByEnv",{
-    "ETH_NODE_URI":"https://tiniest-neat-field.matic-testnet.discover.quiknode.pro/6cf11cc8bcbdde3b18c83f183958f440ae58b33f/"
+    #"ETH_NODE_URI":"https://tiniest-neat-field.matic-testnet.discover.quiknode.pro/6cf11cc8bcbdde3b18c83f183958f440ae58b33f/"
     # "ETH_NODE_URI":"https://sepolia.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
-    #"ETH_NODE_URI":"https://goerli.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
+    "ETH_NODE_URI":"https://goerli.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
     }
 )
 
@@ -288,7 +290,7 @@ def startSimulation():
         prov = generate_prover_list[i]
 
         print("BALANCE: ",get_balance(prov.account))
-       
+        print("USING this Address: ",prover_addresses[i])
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, mapping_list_did)
         if neighbours: 
@@ -324,7 +326,8 @@ def startSimulation():
                 prover_thread.append(proverThread)
                 
             print("Address used: ",prover_addresses[i],"\n")
-            
+            # print("sleeping")
+            # time.sleep(15)
     # Joining the thread of provers and verifiers
     print("num threads: ",len(prover_thread))
     print("end_list (time)", end_list)
@@ -337,40 +340,41 @@ def startSimulation():
         '0xAc18Ec4c7f390663B179a7891f26247612654c8c',
         '0x91EF6D0F7c12b5FF0c1F81DCFFAF1e30BF0F52D7',
 
-        # '0x5381113B7b13c15af3a534065001EdeB2476802c',
-        # '0xA6Abd9eB42aad1b98c2a9dF0B4E2E3c743162ba5',
-        # '0x87985fC3dCE979C09E3c3e745A7A0B464540CA82',
-        # '0x1fE37BD94109bA874a235B44fA79fC2d7710F1B0',
+        '0x5381113B7b13c15af3a534065001EdeB2476802c',
+        '0xA6Abd9eB42aad1b98c2a9dF0B4E2E3c743162ba5',
+        '0xC4A9067cE5542899510e6cB8A2Eb84A0a0953eDE',
+        '0x63d3e6E0d2E762570819086f3E6dEF5061a27890',
 
-        # '0xfbe72863099f8fCAFe6Df5626692013Ce2e83ec3',
-        # '0x7e90fCc0B6a4459A2c47A2b015c37fB5340aCcb5',
-        # '0xC4A9067cE5542899510e6cB8A2Eb84A0a0953eDE',
-        # '0x63d3e6E0d2E762570819086f3E6dEF5061a27890',
+        '0xfbe72863099f8fCAFe6Df5626692013Ce2e83ec3',
+        '0x7e90fCc0B6a4459A2c47A2b015c37fB5340aCcb5',
+        '0x87985fC3dCE979C09E3c3e745A7A0B464540CA82',
+        '0x1fE37BD94109bA874a235B44fA79fC2d7710F1B0',
+  
 
-        # '0x7b3180CFeBc06f78Cc55D2bA19cA24dfa2d1fe44',
-        # '0x9F81B843da3c2d66b08d7Af60c1FE7D79e20771E',
-        # '0xf71Fea9ED70597c365B5D8A2bD78e04E31654c5e',
-        # '0x1aF193411dDf746C501459406e8f00f465E11433',
+        '0x7b3180CFeBc06f78Cc55D2bA19cA24dfa2d1fe44',
+        '0x9F81B843da3c2d66b08d7Af60c1FE7D79e20771E',
+        '0xf71Fea9ED70597c365B5D8A2bD78e04E31654c5e',
+        '0x1aF193411dDf746C501459406e8f00f465E11433',
 
-        # '0x3AC3A765E4669E0e124C8f1E5104F56a051F7F62',
-        # '0x605Ef12afC9912fE95A8B9b75b5e9E777AEb7107',
-        # '0xe61B884f7E7DEa7413c6d65889bC04632241f81d',
-        # '0x38102a9Abc98EaCAFbd3a92271aB0B9456C3bCdC', 
+        '0x3AC3A765E4669E0e124C8f1E5104F56a051F7F62',
+        '0x605Ef12afC9912fE95A8B9b75b5e9E777AEb7107',
+        '0xe61B884f7E7DEa7413c6d65889bC04632241f81d',
+        '0x38102a9Abc98EaCAFbd3a92271aB0B9456C3bCdC', 
 
-        # '0xA6657AE3cd2444d523408B3453cB4014eE6eA461',
-        # '0xf3feFd5613A47684A91246e5a9Fb5945983a86c0',
-        # '0xF13D193A1f808AF9a132C75D40B3934abdeA037e',
-        # '0x3d424297c1375222C4EafFF32a9aF8bD87eF1C34',
+        '0xA6657AE3cd2444d523408B3453cB4014eE6eA461',
+        '0xf3feFd5613A47684A91246e5a9Fb5945983a86c0',
+        '0xF13D193A1f808AF9a132C75D40B3934abdeA037e',
+        '0x3d424297c1375222C4EafFF32a9aF8bD87eF1C34',
 
-        # '0x746ACeB2ceF19957F3d13523C9b030FBF69bdfCf',
-        # '0x647447d3265bf7F0969eDcef8F4DbeBFB54aaBAC',
-        # '0x6ea997Cff0e32d634d9a043553Cd465C7E9204D5',
-        # '0x53c6b740a464C5Ce3825a45AF39f9310381579A9',
+        '0x746ACeB2ceF19957F3d13523C9b030FBF69bdfCf',
+        '0x647447d3265bf7F0969eDcef8F4DbeBFB54aaBAC',
+        '0x6ea997Cff0e32d634d9a043553Cd465C7E9204D5',
+        '0x53c6b740a464C5Ce3825a45AF39f9310381579A9',
 
-        # '0x52aD2B5f34a0e61c0D4594BA0524F58Fbd76a30d',
-        # '0x872c0B06e9FcA7D822c4Ba3F66DE5AdF91bfa7a8',
-        # '0x844fcEfB192f99997D707fa516EDaFd75868ae49',
-        # '0x3587C8b93683b268952F4e62A0E0F0c37C791B9F'
+        '0x52aD2B5f34a0e61c0D4594BA0524F58Fbd76a30d',
+        '0x872c0B06e9FcA7D822c4Ba3F66DE5AdF91bfa7a8',
+        '0x844fcEfB192f99997D707fa516EDaFd75868ae49',
+        '0x3587C8b93683b268952F4e62A0E0F0c37C791B9F'
     ]
 
     time_delta_list = []
@@ -386,12 +390,30 @@ def startSimulation():
     for provUser in prover_list_account:
         rpc("/forget/ctc", provUser)
 
+    build_chart(time_delta_list,wallet_pub_key[:PROVER_NUMBER])
+    writeResultsDeploy(time_delta_list[:len(LOCATION_LIST_PROV)])
+    num_attachers = PROVER_NUMBER-len(LOCATION_LIST_PROV)
+    writeResultsAttach(time_delta_list[num_attachers:])
+   
 
+
+def build_chart(time_delta_list,wallet_pub_key):
+    # time_delta_list = [4.3,2.3,2.1,1.4]
+    # wallet_pub_key = ["Aaaa","adddssf","dssdsds","ggkdk"]
     # plotting the time of deploy and transaction for each account
     height = time_delta_list
     bars = (wallet_pub_key)
     x_pos = np.arange(len(bars))
-    plt.bar(x_pos, height)
+    colorsList = ['orange'] * len(LOCATION_LIST_PROV)
+    n_attachers = PROVER_NUMBER-len(LOCATION_LIST_PROV)
+    for i in range(n_attachers):
+        colorsList.append('#7eb54e')
+    color_legend = {'Deploy':'orange', 'Attach':'#7eb54e'}         
+    labels = list(color_legend.keys())
+    handles = [plt.Rectangle((0,0),1,1, color=color_legend[label]) for label in labels]
+    assert(len(colorsList) ==  PROVER_NUMBER)
+    plt.legend(handles, labels)
+    plt.bar(x_pos, height, color= colorsList)
     plt.xticks(x_pos, bars, rotation=90)
     plt.xlabel('Accounts')
     plt.ylabel('Seconds')  
@@ -404,14 +426,42 @@ def startSimulation():
 
     plt.savefig('./outputPerformance.png')
     
+def writeResultsDeploy(time_delta_list):
+    meanList = round(np.mean(time_delta_list),2)
+    max_val = round(np.max(time_delta_list),2)
+    min_val = round(np.min(time_delta_list),2)
+    devStd = round(np.std(time_delta_list),2)
+    variance = round(np.var(time_delta_list),2)
+    f = open("resultsDeploy.txt", "w")
+    f.write("Deploy Performances")
+    f.write("mean: "+str(meanList)+"\n")
+    f.write("max: "+str(max_val)+"\n")
+    f.write("min: "+str(min_val)+"\n")
+    f.write("dev standard: "+str(devStd)+"\n")
+    f.write("variance: "+str(variance)+"\n")
+    f.close()
 
+def writeResultsAttach(time_delta_list):
+    meanList = round(np.mean(time_delta_list),2)
+    max_val = round(np.max(time_delta_list),2)
+    min_val = round(np.min(time_delta_list),2)
+    devStd = round(np.std(time_delta_list),2)
+    variance = round(np.var(time_delta_list),2)
+    f = open("resultAttach.txt", "w")
+    f.write("Attach Performances")
+    f.write("mean: "+str(meanList)+"\n")
+    f.write("max: "+str(max_val)+"\n")
+    f.write("min: "+str(min_val)+"\n")
+    f.write("dev standard: "+str(devStd)+"\n")
+    f.write("variance: "+str(variance)+"\n")
+    f.close()
 
 def main():
     startSimulation()
     # generateOLC(11.3986586,44.4864416) # san lazzaro municipio
     # generateOLC(11.3501333,44.4970137) # piazza scaravilli
-
-
+    
+    
 if __name__ == '__main__':
     main()
 
