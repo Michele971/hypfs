@@ -133,9 +133,9 @@ contract_creator_deployed = None # contrat deployed, will have to be a list of c
 rpc, rpc_callbacks = mk_rpc()
 #rpc("/stdlib/setProviderByName","TestNet")
 rpc("/stdlib/setProviderByEnv",{
-    #"ETH_NODE_URI":"https://tiniest-neat-field.matic-testnet.discover.quiknode.pro/6cf11cc8bcbdde3b18c83f183958f440ae58b33f/"
+    "ETH_NODE_URI":"https://tiniest-neat-field.matic-testnet.discover.quiknode.pro/6cf11cc8bcbdde3b18c83f183958f440ae58b33f/"
     # "ETH_NODE_URI":"https://sepolia.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
-    "ETH_NODE_URI":"https://goerli.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
+    #"ETH_NODE_URI":"https://goerli.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
     }
 )
 
