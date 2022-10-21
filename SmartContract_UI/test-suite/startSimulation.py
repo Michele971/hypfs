@@ -19,8 +19,8 @@ import random
 SMART_CONTRACT_MAX_USER = 3 # this is the same variable of index.rsh. They must be equals!
 
 # ❗️ Every location must contains 4 provers which corresponds to (SMART_CONTRACT_MAX_USER + 1) users
-LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9"]#, "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V"] # list of Provers locatios. Used for build the prover object
-PROVER_NUMBER = 8 # number of provers for the entire system
+LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6"]#, "7H367FWH+9J", "7H368F5R+4V"] # list of Provers locatios. Used for build the prover object
+PROVER_NUMBER = 16 # number of provers for the entire system
 
 assert(PROVER_NUMBER/len(LOCATION_LIST_PROV) == 4) #There must be (SMART_CONTRACT_MAX_USER+1) users for each location. So increase the number of locations in LOCATION_LIST_PROV, or decrease the PROVER_NUMBER
 
@@ -331,27 +331,27 @@ def startSimulation():
         "5RW4HL5YY6FMYSICN5LYCCWM4LRXGNGJPU3RYW3SVRKADB7N2Z7OOIKZ7E",
         "X56EISCBSSPAS75S2RZFJVBEXMGCVI2WG4QMIHRRCAHUGTCUGF7RE6643M",
         "2PDAQC47IFBJNU5AETJA2OV3I6NKDF4AAIZRG72ALDXMAUCEOO4KZPOO4E",
-        "BDFYNQR2I3YQR6WMTBYRYDJXCXDLIW5T22DVKT4IVL6R4ZQVI336E3VDNQ"
+        "BDFYNQR2I3YQR6WMTBYRYDJXCXDLIW5T22DVKT4IVL6R4ZQVI336E3VDNQ",
         
-        # "3YMI5U6ZKH3MZ3DNYWO3YL3SCH75KBBCWO2XOO2HEVFQSX3G2Y4UYPOWWA",
-        # "7TIHVKNIGJF5H37SJDWWKOOT4FRUE4XDUGCZ77HZVKAEAHAWKLSS2LXRUQ",
-        # "HKCHIEF5XKK6NYAYUBWHTX3JB7H62QQ36RWPUPNBGL75SXQB27ZWX5Q6DQ",
-        # "22X4O3I5FSGYK4XTMWL6OEPKX7FPBI3QH4BB42VIZ75J7GVUDJZYCJ56OA",
+        "3YMI5U6ZKH3MZ3DNYWO3YL3SCH75KBBCWO2XOO2HEVFQSX3G2Y4UYPOWWA",
+        "7TIHVKNIGJF5H37SJDWWKOOT4FRUE4XDUGCZ77HZVKAEAHAWKLSS2LXRUQ",
+        "HKCHIEF5XKK6NYAYUBWHTX3JB7H62QQ36RWPUPNBGL75SXQB27ZWX5Q6DQ",
+        "22X4O3I5FSGYK4XTMWL6OEPKX7FPBI3QH4BB42VIZ75J7GVUDJZYCJ56OA",
         
-        # "QF25BWUJIY3NDFS47EILAOV4DAAHIYC2PRVIGERSQVTJ7RXHY44QBA6KO4",
-        # "MJXSIP7ULI25QH3XJP7AVQT7ZYO3TARYVUYRD6ARR6L6HWGH22ECU5MHAE",
-        # "XSKXAH4SIWFOLFUWS6H73JUJ5HJOWUCBKTA6LFXFCYS6VDZMQL6RI5HGQM",
-        # "JI7VRGDIANFNABPJL6PWVGCP42NZGQVV7T3QVJD6P47EKQP2BXSFMPU7RA",
+        "QF25BWUJIY3NDFS47EILAOV4DAAHIYC2PRVIGERSQVTJ7RXHY44QBA6KO4",
+        "MJXSIP7ULI25QH3XJP7AVQT7ZYO3TARYVUYRD6ARR6L6HWGH22ECU5MHAE",
+        "XSKXAH4SIWFOLFUWS6H73JUJ5HJOWUCBKTA6LFXFCYS6VDZMQL6RI5HGQM",
+        "JI7VRGDIANFNABPJL6PWVGCP42NZGQVV7T3QVJD6P47EKQP2BXSFMPU7RA",
 
-        # "7QO73MI5LUZH4GJNXKUAYY2RFSB35IAY4ERSJAZAYZZRG3MYLW3BBXRQ4E",
-        # "HPNXA2SB3RM22SV2QL3LI6YGOQZ6RQCAG6ANZ27DL657EOFWTRJKFGOTN4",
-        # "ITJVBY6NAGIHNHUB2YUYATZZK5BSDDNSV43MZA7F675GO3QROB27UMRY44",
-        # "KYRUST4GUA4ZWSSXD6XS27IYMUTGRGQE4VRZNK3I77KFQLHFZI2VXUKPMA",
+        "7QO73MI5LUZH4GJNXKUAYY2RFSB35IAY4ERSJAZAYZZRG3MYLW3BBXRQ4E",
+        "HPNXA2SB3RM22SV2QL3LI6YGOQZ6RQCAG6ANZ27DL657EOFWTRJKFGOTN4",
+        "ITJVBY6NAGIHNHUB2YUYATZZK5BSDDNSV43MZA7F675GO3QROB27UMRY44",
+        "KYRUST4GUA4ZWSSXD6XS27IYMUTGRGQE4VRZNK3I77KFQLHFZI2VXUKPMA",
 
-        # "NCPVP7WVVZ6MKILOYQASO2AM26JIWVWSWJN4UTI3QBJBCKMZHGFMG7AG54",
-        # "WIXIIBVJIZTDKYDVLDATSWEHOOBQ27QHJEO2E76Q4YZ35E42L5FCE2G3L4",
-        # "HEWT2HVPM4GKUBBSOV4BSY3URKYYGLICPSSU4H43DWCSWCO3CXQT2IQPDY",
-        # "R3Z7QT5YLA2QISYKQOGQYDK7RHRKDSAVWS7IGXZNHERJ5GGIORFK7C6IYQ"
+        "NCPVP7WVVZ6MKILOYQASO2AM26JIWVWSWJN4UTI3QBJBCKMZHGFMG7AG54",
+        "WIXIIBVJIZTDKYDVLDATSWEHOOBQ27QHJEO2E76Q4YZ35E42L5FCE2G3L4",
+        "HEWT2HVPM4GKUBBSOV4BSY3URKYYGLICPSSU4H43DWCSWCO3CXQT2IQPDY",
+        "R3Z7QT5YLA2QISYKQOGQYDK7RHRKDSAVWS7IGXZNHERJ5GGIORFK7C6IYQ"
     ]
 
     time_delta_list = []
@@ -366,12 +366,30 @@ def startSimulation():
         rpc("/forget/ctc", provUser)
 
 
-    print(time_delta_list)
+    build_chart(time_delta_list,wallet_pub_key[:PROVER_NUMBER])
+    writeResultsDeploy(time_delta_list[:len(LOCATION_LIST_PROV)])
+    num_attachers = PROVER_NUMBER-len(LOCATION_LIST_PROV)
+    writeResultsAttach(time_delta_list[num_attachers:])
+   
+
+
+def build_chart(time_delta_list,wallet_pub_key):
+    # time_delta_list = [4.3,2.3,2.1,1.4]
+    # wallet_pub_key = ["Aaaa","adddssf","dssdsds","ggkdk"]
     # plotting the time of deploy and transaction for each account
     height = time_delta_list
     bars = (wallet_pub_key)
     x_pos = np.arange(len(bars))
-    plt.bar(x_pos, height)
+    colorsList = ['orange'] * len(LOCATION_LIST_PROV)
+    n_attachers = PROVER_NUMBER-len(LOCATION_LIST_PROV)
+    for i in range(n_attachers):
+        colorsList.append('#7eb54e')
+    color_legend = {'Deploy':'orange', 'Attach':'#7eb54e'}         
+    labels = list(color_legend.keys())
+    handles = [plt.Rectangle((0,0),1,1, color=color_legend[label]) for label in labels]
+    assert(len(colorsList) ==  PROVER_NUMBER)
+    plt.legend(handles, labels)
+    plt.bar(x_pos, height, color= colorsList)
     plt.xticks(x_pos, bars, rotation=90)
     plt.xlabel('Accounts')
     plt.ylabel('Seconds')  
@@ -384,7 +402,35 @@ def startSimulation():
 
     plt.savefig('./outputPerformance.png')
     
+def writeResultsDeploy(time_delta_list):
+    meanList = round(np.mean(time_delta_list),2)
+    max_val = round(np.max(time_delta_list),2)
+    min_val = round(np.min(time_delta_list),2)
+    devStd = round(np.std(time_delta_list),2)
+    variance = round(np.var(time_delta_list),2)
+    f = open("resultsDeploy.txt", "w")
+    f.write("Deploy Performances")
+    f.write("mean: "+str(meanList)+"\n")
+    f.write("max: "+str(max_val)+"\n")
+    f.write("min: "+str(min_val)+"\n")
+    f.write("dev standard: "+str(devStd)+"\n")
+    f.write("variance: "+str(variance)+"\n")
+    f.close()
 
+def writeResultsAttach(time_delta_list):
+    meanList = round(np.mean(time_delta_list),2)
+    max_val = round(np.max(time_delta_list),2)
+    min_val = round(np.min(time_delta_list),2)
+    devStd = round(np.std(time_delta_list),2)
+    variance = round(np.var(time_delta_list),2)
+    f = open("resultAttach.txt", "w")
+    f.write("Attach Performances")
+    f.write("mean: "+str(meanList)+"\n")
+    f.write("max: "+str(max_val)+"\n")
+    f.write("min: "+str(min_val)+"\n")
+    f.write("dev standard: "+str(devStd)+"\n")
+    f.write("variance: "+str(variance)+"\n")
+    f.close()
             
 def main():
     startSimulation()
