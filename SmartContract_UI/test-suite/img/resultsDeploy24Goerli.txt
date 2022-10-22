@@ -1,0 +1,5 @@
+Deploy Performancesmean: 54.99
+max: 84.14
+min: 35.63
+dev standard: 17.99
+variance: 323.7

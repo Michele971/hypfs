@@ -1,0 +1,5 @@
+Attach Performancesmean: 26.1
+max: 34.73
+min: 22.64
+dev standard: 3.99
+variance: 15.96
