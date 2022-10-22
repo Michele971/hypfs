@@ -19,8 +19,8 @@ import random
 SMART_CONTRACT_MAX_USER = 3 # this is the same variable of index.rsh. They must be equals!
 
 # ❗️ Every location must contains 4 provers which corresponds to (SMART_CONTRACT_MAX_USER + 1) users
-LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6"]#, "7H367FWH+9J", "7H368F5R+4V"] # list of Provers locatios. Used for build the prover object
-PROVER_NUMBER = 16 # number of provers for the entire system
+LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V", "7H369FXP+FH", "7H369F2W+3R"] # list of Provers locatios. Used for build the prover object
+PROVER_NUMBER = 32 # number of provers for the entire system
 
 assert(PROVER_NUMBER/len(LOCATION_LIST_PROV) == 4) #There must be (SMART_CONTRACT_MAX_USER+1) users for each location. So increase the number of locations in LOCATION_LIST_PROV, or decrease the PROVER_NUMBER
 
@@ -111,7 +111,17 @@ list_private_public_key = [
     'play drum afford elite promote refuse random twelve bright icon prosper chief boost cannon carbon monkey attack end better reward merit ride fit abandon find', # NCPVP7WVVZ6MKILOYQASO2AM26JIWVWSWJN4UTI3QBJBCKMZHGFMG7AG54
     'rhythm pole visual cart judge focus fiscal accident blame crouch aspect shiver refuse morning course midnight salmon toast rain desert imitate portion negative above glare', # WIXIIBVJIZTDKYDVLDATSWEHOOBQ27QHJEO2E76Q4YZ35E42L5FCE2G3L4
     'plate build physical type cruise bench sauce portion face dress dentist effort canyon faith tiger load flock polar cup merit push sister earth abstract taste', # HEWT2HVPM4GKUBBSOV4BSY3URKYYGLICPSSU4H43DWCSWCO3CXQT2IQPDY
-    'dutch assist faith scare modify equip detail exotic flee chronic journey session flight clarify able misery make mountain entry easily clap sign lock abandon taxi' # R3Z7QT5YLA2QISYKQOGQYDK7RHRKDSAVWS7IGXZNHERJ5GGIORFK7C6IYQ
+    'dutch assist faith scare modify equip detail exotic flee chronic journey session flight clarify able misery make mountain entry easily clap sign lock abandon taxi', # R3Z7QT5YLA2QISYKQOGQYDK7RHRKDSAVWS7IGXZNHERJ5GGIORFK7C6IYQ
+
+    'solution school lyrics mass hurt miracle family culture tourist sing wheel raven recycle question air devote inflict snack woman energy swing chapter plug ability mandate', # 2USVA6CFEPHG2TBNFK5A3GL6WLMOMET5SW6A57YVQ2JGBRB7YVMP4XFSXA
+    'crisp this install text salon early turtle foster bid weapon large about tomato inflict cupboard raven fire resist veteran hill inspire chat panel absorb jungle', # NOQ6ZM3RPEOFXVA5K4VOO5BLEOT5KUYENNM6GZD3FLUH7O7DPBWGFALXAM
+    'exchange veteran axis clap close brief merge shuffle tide birth draw width warrior caution crime tide adult invest orphan stage film horn spring absorb armor', # NP5OQPDB4OPEAV3UXSGEPWM7CMATFXXXA7436QD2DVSRGJCIMN3GMHTG7E
+    'drill marriage peasant exchange adult panic blast differ manual endless output silver else midnight winter clay fancy treat flat spy blanket lyrics afford absent glass', # 5XWP6SGUKE4KEJZZ76T35FQX5W7EN6YGPUCGZDULVOW4K3KNNFBSCOB3KI
+    'glass beauty armed flip museum hospital trash provide season humble number unhappy south beauty tail basket marriage sing conduct card festival unaware tattoo absorb order', # LMGA7YRP4B4QR3YMWPNGCOSWCMUMTF5FSIT5SSY2POIZSH7GKVHKCW6MFI
+    'world mutual foster husband gown minor mansion trigger stuff today palace dust retire bachelor sword spare stock usage split insect fence sauce club about dizzy', # KHF6VRW626XJITAZ32L2BEO5PTF77PDHJ46Y255U6ARPRMF6JPEHBUEPTY
+    'unfold tattoo above truly excuse connect napkin crouch fancy scheme ensure because pact always era airport make deposit salon canal debris section paper abstract cloth', # CB2N75VJMES3UFPRW5WQV4KHZYUADLIHJQ34Y4R532MVXB72AAXOHVPFKE
+    'sister medal before gather nose globe twenty sand office surge more exact elegant inside crucial valid only frozen law gravity uniform ankle melt able follow' # ED45XUALM6FOEIOPFVU2G7CFPZ6GHYZ22ELJSDDONIDVERHJ2E4TNYLPGA
+
 ]
 
 
@@ -351,7 +361,18 @@ def startSimulation():
         "NCPVP7WVVZ6MKILOYQASO2AM26JIWVWSWJN4UTI3QBJBCKMZHGFMG7AG54",
         "WIXIIBVJIZTDKYDVLDATSWEHOOBQ27QHJEO2E76Q4YZ35E42L5FCE2G3L4",
         "HEWT2HVPM4GKUBBSOV4BSY3URKYYGLICPSSU4H43DWCSWCO3CXQT2IQPDY",
-        "R3Z7QT5YLA2QISYKQOGQYDK7RHRKDSAVWS7IGXZNHERJ5GGIORFK7C6IYQ"
+        "R3Z7QT5YLA2QISYKQOGQYDK7RHRKDSAVWS7IGXZNHERJ5GGIORFK7C6IYQ",
+
+
+        "2USVA6CFEPHG2TBNFK5A3GL6WLMOMET5SW6A57YVQ2JGBRB7YVMP4XFSXA",
+        "NOQ6ZM3RPEOFXVA5K4VOO5BLEOT5KUYENNM6GZD3FLUH7O7DPBWGFALXAM",
+        "NP5OQPDB4OPEAV3UXSGEPWM7CMATFXXXA7436QD2DVSRGJCIMN3GMHTG7E",
+        "5XWP6SGUKE4KEJZZ76T35FQX5W7EN6YGPUCGZDULVOW4K3KNNFBSCOB3KI",
+
+        "LMGA7YRP4B4QR3YMWPNGCOSWCMUMTF5FSIT5SSY2POIZSH7GKVHKCW6MFI",
+        "KHF6VRW626XJITAZ32L2BEO5PTF77PDHJ46Y255U6ARPRMF6JPEHBUEPTY",
+        "CB2N75VJMES3UFPRW5WQV4KHZYUADLIHJQ34Y4R532MVXB72AAXOHVPFKE",
+        "ED45XUALM6FOEIOPFVU2G7CFPZ6GHYZ22ELJSDDONIDVERHJ2E4TNYLPGA"
     ]
 
     time_delta_list = []
