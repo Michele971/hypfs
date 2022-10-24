@@ -387,6 +387,7 @@ def startSimulation():
     for provUser in prover_list_account:
         rpc("/forget/ctc", provUser)
 
+    print(time_delta_list)
     build_chart(time_delta_list,wallet_pub_key[:PROVER_NUMBER])
     writeResultsDeploy(time_delta_list[:len(LOCATION_LIST_PROV)])
     num_attachers = PROVER_NUMBER-len(LOCATION_LIST_PROV)
