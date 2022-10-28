@@ -96,13 +96,15 @@ contract_creator_deployed = None # contrat deployed, will have to be a list of c
 verifier_thread = []
 
 rpc, rpc_callbacks = mk_rpc()
+#you can use the testnet
 #rpc("/stdlib/setProviderByName","TestNet")
-rpc("/stdlib/setProviderByEnv",{
-        #"ETH_NODE_URI":"https://tiniest-neat-field.matic-testnet.discover.quiknode.pro/6cf11cc8bcbdde3b18c83f183958f440ae58b33f/"
-        #"ETH_NODE_URI":"https://sepolia.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
-        "ETH_NODE_URI":"https://goerli.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
-    }
-)
+#or specify the URI
+# rpc("/stdlib/setProviderByEnv",{
+#         #"ETH_NODE_URI":"https://tiniest-neat-field.matic-testnet.discover.quiknode.pro/6cf11cc8bcbdde3b18c83f183958f440ae58b33f/"
+#         #"ETH_NODE_URI":"https://sepolia.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
+#         "ETH_NODE_URI":"https://goerli.infura.io/v3/9d7a8c9148c74ee194fd9f5da2ceb98e"
+#     }
+# )
 print("\t\t The consesus network is: ", rpc('/stdlib/connector'))
 
 STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500) # use "parseCurrency" method when you send value TO backend
@@ -165,12 +167,11 @@ class Verifier():
         print(" Verifier is going to verify some provers ")
         verifierThread = Thread(target=verifier_api_verify, args=(ctc_creator,verifierObject.account, didProver, proverToVerify)) 
         verifierThread.start()
-        # print(" ✅  ",proverToVerify," succesfully verified! ")
         return verifierThread
 
     def createAccount(self):
-        #acc_verifier = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
-        acc_verifier = rpc("/stdlib/newAccountFromSecret", verifiers_private[0])
+        acc_verifier = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        #acc_verifier = rpc("/stdlib/newAccountFromSecret", verifiers_private[0])
 
         return acc_verifier
 
@@ -207,10 +208,10 @@ class Prover(Witness):
 
     def createAccount(self, i):
         # ########### #######  WORK WITH REACH DEVNET ##################
-        #acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
+        acc_prover = rpc("/stdlib/newTestAccount", STARTING_BALANCE)
     
         # ########### #######  WORK WITH ETHEREUM TESTNET ##################
-        acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
+        #acc_prover = rpc("/stdlib/newAccountFromSecret", list_private_public_key[i])
       
             
         return acc_prover
@@ -219,10 +220,7 @@ class Prover(Witness):
     def deploySmartContract(self, proverObject):
         ctc_creator = rpc("/acc/contract", proverObject.account)
         print(" ⏳⏳ Calling the deploying and starting the thread ...")
-        #print("Smart contract deployed  🚀 :", ctc_creator)
-        #print("Inserting Creator's information into the contract ...")
         creatorThread = Thread(target=play_Creator, args=(ctc_creator, proverObject.location, proverObject.did, 'proof',))
-        #creatorThread.start()
         
         return creatorThread, ctc_creator
 
@@ -230,8 +228,6 @@ class Prover(Witness):
     def attachToSmartContract(self, proverAttacherObject, ctc_creator):
         print(" ⏳ Calling the attach api and starting the thread ...")
         attacherThread = Thread(target=play_bob, args=(ctc_creator, proverAttacherObject.account, proverAttacherObject.location, proverAttacherObject.did, 'proof',))
-        #attacherThread.start()
-        #print("playbob called successfully")
         return attacherThread
 
 
@@ -287,17 +283,6 @@ def startSimulation():
     # Starting prover steps
     for i in range(0, PROVER_NUMBER): #for every prover of the entire system ...
         prov = generate_prover_list[i]
-     
-        # print("\n\t\t-------------------  DEBUG TEST -------------------")
-        # print("\t\t\n mapping_list_did.get ",mapping_list_did.get('7H369F4W+Q8'))
-        # print("\t\t\n mapping_list_did.get[0] ",mapping_list_did.get('7H369F4W+Q8')[0])
-        # print("prov addr [0] ",prover_addresses[0])
-        # print("\t\t\n mapping_list_did.get[1] ",mapping_list_did.get('7H369F4W+Q8')[1])
-        # print("prov addr [1] ",prover_addresses[1])
-        # print("now sleeping ...")
-        # time.sleep(100)
-        # print("\n\t\t-------------------  end DEBUG TEST -------------------")
-       
         # Find neighbours
         neighbours = prov.find_neighbours(prov.location, mapping_list_did)
         if neighbours: 
@@ -324,9 +309,7 @@ def startSimulation():
                 print("\n")
 
             else:
-                #print("\n User is attaching to the Smart contract ",dict_location_sc.get(prov.location),  " 🟩 📎 📎 🟩 ")
                 retrieved_ctc = dict_location_sc[prov.location]
-                #print("User: ",format_address(prov.account)," Preparing the Attaching to the contract ...", retrieved_ctc)
                 proverThread = prov.attachToSmartContract(prov, retrieved_ctc)
                 proverThread.start()
                 prover_thread.append(proverThread)
@@ -339,7 +322,7 @@ def startSimulation():
     '''
     print("\n")
     print("\n\t ----- sleeping before verification process")
-    time.sleep(400)
+    time.sleep(30)
     print("Start the verification process")
     for i in range(0, VERIFIER_NUMBER):
 
@@ -361,10 +344,16 @@ def startSimulation():
         
         print("WAITING 50")
         # verify some provers
-        time.sleep(50)
+        time.sleep(20)
 
-        ## FIX THIS: mapping_list_did.GET
-        #print("\t\t\n mapping_list_did.get ",mapping_list_did.get('7H369F4W+Q8'))
+        didProverToVerify = mapping_list_did.get('7H369F4W+Q8')[0]
+        verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[0], didProverToVerify)
+        print("Verifier is going to insert data in hypercube")
+
+        print("WAITING 50")
+        # verify some provers
+        time.sleep(20)
+
         didProverToVerify = mapping_list_did.get('7H369F4W+Q8')[1]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[1], didProverToVerify)
         print("Verifier is going to insert data in hypercube")
@@ -372,11 +361,11 @@ def startSimulation():
 
 
         print("WAITING 50 ...")
-        time.sleep(50)
+        time.sleep(20)
         didProverToVerify = mapping_list_did.get('7H369F4W+Q8')[2]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[2], didProverToVerify)
 
-        time.sleep(50)
+        time.sleep(20)
         didProverToVerify = mapping_list_did.get('7H369F4W+Q8')[3]
         verifier.verifySmartContract(verifier, contract_creator_deployed, prover_addresses[3], didProverToVerify)
         '''
@@ -428,9 +417,6 @@ def startSimulation():
 
     for provUser in prover_list_account:
         rpc("/forget/ctc", provUser)
-
-    # for verifierUser in verifier_list_account:
-    #     rpc("/forget/ctc", verifierUser)
 
 
         
