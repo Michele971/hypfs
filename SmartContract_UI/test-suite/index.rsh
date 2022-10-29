@@ -4,16 +4,7 @@
 const REWARD_FOR_PROVER = 1000000000000000000/1000//send by VERIFIER. We have 1 ETH / 1000 which is =  0.001
 const SMART_CONTRACT_MAX_USER = 3
 //NOTES:
-// TODO: This smart contract is empower to validate if the positions of users are correct
-// There is a smart contract for every different position
-// TODO: The Smart Contract will expire after a specific amount of time
-// TODO: Add the geofence attribute to the smart contract (radius, etc etc ....). In this way 
-//       we can design more checks such as: the position received must be inside the geofence area.
-// TODO: The smart contract will know the verifier (?) ----> still to be decided. 
-//       Maybe using an unique password (for more verifiers) for memory reason
-// TODO: check that the proofs inserted unique and not already present
-// TODO: print balance of the contract() using the view
-// TODO: print the reward that will be assign to everyone that has a valid proof, after verify it
+// TODO: Maybe using an unique password (for more verifiers) for memory reason
 
 export const main = Reach.App(() => {
     const Creator = Participant('Creator',{ 
@@ -73,11 +64,6 @@ export const main = Reach.App(() => {
     .api(attacherAPI.insert_position, // the name of the api that is called 
       (pos, did, y) => { // the code to execute and the returning variable of the api (y)
         y(counter); //allow the frontend to retrieve the space available 
- 
-        //TODO: notify the attacher (not the creator) when the key is already used 
-        // if(easy_map[did] != Null){ //TODO: FIX THIS CHECK. CHECK if map contain THE ID INSERTED --------------> IMPORTANT
-        //   return true; //TODO: THIS HAS TO RETURN TRUE
-        // }
         /** 
          * The line below manages the case when the key is already 
          * assigned to a specific value 
@@ -142,7 +128,6 @@ export const main = Reach.App(() => {
 
   // TODO: the first received position has to be stored in a data structure, will be compared to the subsquent received positions
 
-  //for TESTING
   transfer(balance()).to(Creator);
   
   commit();
