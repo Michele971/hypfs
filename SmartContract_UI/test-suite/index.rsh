@@ -38,14 +38,14 @@ export const main = Reach.App(() => {
 
   Creator.publish(proof_and_position, decentralized_identifier_creator); //TODO: add the proof_received
 
-  const easy_map = new Map(Bytes(128));
-  easy_map[this] = proof_and_position; //setting the first value of the map with Creator values
+  const easy_map = new Map(UInt, Bytes(128));
+  easy_map[decentralized_identifier_creator] = proof_and_position; //setting the first value of the map with Creator values
 
   commit();
   Creator.publish();
 
   //logging a message with the DID inserted and the data passed (e.g. proof and position)
-  Creator.only(() => interact.reportPosition(decentralized_identifier_creator, easy_map[this]));
+  Creator.only(() => interact.reportPosition(decentralized_identifier_creator, easy_map[decentralized_identifier_creator]));
   
   // ************ INSERT POSITION API **************
   // the API terminated whe it reaches 3 users
@@ -59,9 +59,9 @@ export const main = Reach.App(() => {
       (pos, did, y) => { // the code to execute and the returning variable of the api (y)
         y(counter); //allow the frontend to retrieve the space available 
 
-        easy_map[this] = fromSome(easy_map[this],pos);
+        easy_map[did] = fromSome(easy_map[did],pos);
 
-        Creator.only(() => interact.reportPosition(did, easy_map[this]));
+        Creator.only(() => interact.reportPosition(did, easy_map[did]));
 
         return counter - 1; // the returning of the API for the parallel reduce necessary to update the initial variable 
       }
