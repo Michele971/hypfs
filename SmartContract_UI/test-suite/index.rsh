@@ -2,7 +2,7 @@
 'use strict';
 
 const REWARD_FOR_PROVER = 1000000000000000000/1000//send by VERIFIER. We have 1 ETH / 1000 which is =  0.001
-const SMART_CONTRACT_MAX_USER = 3
+const SMART_CONTRACT_MAX_USER = 4
 //NOTES:
 // TODO: Maybe using an unique password (for more verifiers) for memory reason
 
@@ -57,7 +57,7 @@ export const main = Reach.App(() => {
   // the API terminated whe it reaches 3 users
   //the attacher can insert their positions
   const counter = 
-  parallelReduce(SMART_CONTRACT_MAX_USER) 
+  parallelReduce(SMART_CONTRACT_MAX_USER-1) 
     .invariant(balance() == balance()) // invariant: the condition inside must be true for the all time that the while goes on
     //.define(() => {views.retrieve_results.set(did_user);}) // define: the code inside is executed when a function in the while is called (ex. the api call)
     .while(counter > 0)
@@ -105,7 +105,7 @@ export const main = Reach.App(() => {
         (did, walletAddress, ret) => { 
           // transfer some money to the Prover (attacher)
           if (balance()>=REWARD_FOR_PROVER){
-            transfer(REWARD_FOR_PROVER).to(walletAddress); //TODO: change amount transfered. THE TRANSFER DOES NOT WORKS.
+            transfer(REWARD_FOR_PROVER).to(walletAddress); 
             Creator.only(() => interact.reportVerification(did, this));
             delete easy_map[did]; //vector[0] is the did
             ret(walletAddress);
