@@ -57,7 +57,7 @@ export const main = Reach.App(() => {
     .while(counter > 0)
     .api(attacherAPI.insert_position, // the name of the api that is called 
       (pos, did, y) => { // the code to execute and the returning variable of the api (y)
-        y(counter); //allow the frontend to retrieve the space available 
+        y(counter-1); //allow the frontend to retrieve the space available 
 
         easy_map[did] = fromSome(easy_map[did],pos);
 
