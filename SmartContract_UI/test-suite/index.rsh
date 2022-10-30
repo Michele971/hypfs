@@ -11,15 +11,15 @@ export const main = Reach.App(() => {
     ...hasConsoleLogger,
     position: Bytes(128),
     decentralized_identifier: UInt,
-    proof_reveived: Bytes(128),
-    reportPosition: Fun([UInt, Maybe(Bytes(128))], Null),
+    data_inserted: Bytes(512),
+    reportPosition: Fun([UInt, Maybe(Bytes(512))], Null),
     reportVerification: Fun([UInt, Address], Null),
     issueDuringVerification: Fun([UInt], Null),
 
   });
 
   const attacherAPI = API('attacherAPI',{
-    insert_position: Fun([Bytes(128),UInt], UInt), //PositionAndProof - DID - ReturnField
+    insert_position: Fun([Bytes(512),UInt], UInt), //PositionAndProof - DID - ReturnField
   });
 
   const verifierAPI = API('verifierAPI',{
@@ -41,11 +41,12 @@ export const main = Reach.App(() => {
   Creator.only(() => { 
     const proof_and_position = declassify(interact.position);
     const decentralized_identifier_creator = declassify(interact.decentralized_identifier);
+    const data_ins = declassify(interact.data_inserted);
   });
 
-  Creator.publish(proof_and_position, decentralized_identifier_creator); //TODO: add the proof_received
-  const easy_map = new Map(UInt,Bytes(128));
-  easy_map[decentralized_identifier_creator] = proof_and_position; //setting the first value of the map with Creator values
+  Creator.publish(proof_and_position, decentralized_identifier_creator, data_ins); //TODO: add the proof_received
+  const easy_map = new Map(UInt,Bytes(512));
+  easy_map[decentralized_identifier_creator] = data_ins; //setting the first value of the map with Creator values
 
   commit();
   Creator.publish();
