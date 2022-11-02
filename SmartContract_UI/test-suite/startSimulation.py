@@ -61,7 +61,7 @@ def generateProvers(n_users_to_generate):
         account_prov = prov.createAccount(i) #passing the number of prover to create
         prover_list_account.append(account_prov)
         prov.account = account_prov
-        rpc("/acc/setGasLimit", account_prov, 9000000)
+        rpc("/acc/setGasLimit", account_prov, 9000000) #9.000.000
 
         prover_addresses.append(format_address(account_prov))
 
