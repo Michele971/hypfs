@@ -2,6 +2,8 @@
   "name": "@reach-sh/smartcontract-ui",
   "type": "module",
   "dependencies": {
+    "@reach-sh/rpc-client": "^0.0.3",
+    "@reach-sh/stdlib": "^0.1.12-rc.7"
   },
   "author": "reach.sh",
   "license": "Apache-2.0",

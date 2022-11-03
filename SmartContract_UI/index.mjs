@@ -1,6 +1,6 @@
 import { loadStdlib } from '@reach-sh/stdlib';
-//import * as backend from './build/index.main.mjs';
-import * as ethFactory from './build/index.main1.mjs';
+import * as backend from './build/index.main.mjs';
+//import * as ethFactory from './build/index.main1.mjs';
 import { ask } from '@reach-sh/stdlib';
 import { done } from '@reach-sh/stdlib/ask.mjs';
 
@@ -10,8 +10,8 @@ const stdlib = loadStdlib(process.env);
 
 //function that return a string which will be passed to the backend
 const getProof_Loc_Addr = ((params)=>{
-  const {proof, location, walletAddress} = params;
-  return `${proof}-${location}-${walletAddress}`;
+  const {proofHashed, proofSigned, walletAddress, nonce, cid} = params;
+  return `${proofHashed}-${proofSigned}-${walletAddress}-${nonce}-${cid}`;
 });
 
 
@@ -27,7 +27,6 @@ if (user_know_id){
   }else{
     role = "verifier"
   }
- 
 }
 
 //setting the call for reach api
@@ -75,8 +74,9 @@ console.log(`The atomic unit is ${stdlib.atomicUnit}`);
 
 // };
 const creatorInteract = {
-  reportPosition: (did,  proof_and_position) => console.log(`New position inserted \n DID: "${did}" \n proof_and_position: "${proof_and_position}"`),
-  report_results: (results) => console.log(`Results "${results}"`),
+  reportPosition: (did,  data) => console.log(`New position inserted \n DID: "${did}" \n data: "${data}"`),
+  reportVerification: (did, verifier) => console.log(`DID "${did}" has been verified by Verifier`),// "${verifier}"`), 
+  issueDuringVerification: (did) => console.log(`DID "${did}" has NOT been verified.`),
 };
 //implement the functions to log inside the backend
 creatorInteract.log = async (...args) => { //era commonInteract.log
@@ -86,40 +86,59 @@ creatorInteract.log = async (...args) => { //era commonInteract.log
 if (role === 'creator') { // ***** CREEATOR ******
 
 
-  var did = await ask.ask(
+  var did_inserted = await ask.ask(
     `What is your DID?`,
-    (did => did)
+    (did_inserted => did_inserted)
   );
   var location_creator = await ask.ask(
-    `What is your Location?`,
+    `What is your location?`,
     (x => x)
   );
-  var proof_creator = await ask.ask(
-    `What is your Proof?`,
+  var proof_creator_signed = await ask.ask(
+    `What is the signed proof?`,
     (proof => proof)
   );
 
-  const addrCreator = stdlib.formatAddress(acc.getAddress());
+  var hasProof = await ask.ask(
+    `What is the hashed proof?`,
+    (proofHashed => proofHashed)
+  );
 
-  var proof_and_location_creator = getProof_Loc_Addr({
-    proof: String(proof_creator),
-    location: String(location_creator),
-    walletAddress: addrCreator
+  var nonce_inserted = await ask.ask(
+    `What is the nonce?`,
+    (nonce_value => nonce_value)
+  );
+
+  var cid_declared = await ask.ask(
+    `What is the CID of your informations?`,
+    (cid_value => cid_value)
+  );
+
+
+  const addrCreator = stdlib.formatAddress(acc.getAddress());
+  var data_concat = getProof_Loc_Addr({
+    proofHashed: String(hasProof),
+    proofSigned: String(proof_creator_signed),
+    walletAddress: addrCreator,
+    nonce: String(nonce_inserted),
+    cid: String(cid_declared)
   });
 
-  console.log(proof_and_location_creator)
-  creatorInteract.decentralized_identifier = did;
-  creatorInteract.position = proof_and_location_creator;
+  console.log("Concatenation of data: ",data_concat);
+  console.log(parseInt(did_inserted));
+  creatorInteract.did = parseInt(did_inserted);
+  creatorInteract.position = location_creator;
+  creatorInteract.data_inserted = data_concat;
   
 
   // await showBalance(acc);
   //const ctc = acc.contract(backend); //OLD VERSION
+  console.log("Creating the contract...")
   ctc = acc.contract(backend); //creating the contract
+  console.log("Contract created...")
   ctc.getInfo().then((info) => {
     console.log(`The contract is deployed as = ${JSON.stringify(info)}`); //display the id of the contract. It was "parse" not "stringify"
   });
-
-
 
   const part = backend.Creator;
   await part(ctc, creatorInteract);
@@ -152,26 +171,39 @@ if (role === 'creator') { // ***** CREEATOR ******
     `What is your DID?`,
     (did => did)
   );
-  var location_attacher = await ask.ask(
-    `What is your Location?`,
-    (x => x)
-  );
-  var proof_attacher = await ask.ask(
+
+  var proof_creator_signed = await ask.ask(
     `What is your Proof?`,
     (proof_attacher => proof_attacher)
   );
+  var hasProof = await ask.ask(
+    `What is the hashed proof?`,
+    (proofHashed => proofHashed)
+  );
+  var nonce_inserted = await ask.ask(
+    `What is the nonce?`,
+    (nonce_value => nonce_value)
+  );
+  var cid_declared = await ask.ask(
+    `What is the CID of your informations?`,
+    (cid_value => cid_value)
+  );
 
-  const addrAttacher = stdlib.formatAddress(acc.getAddress());
   //Proof + Location + waletAddres e.g "jshsj2a9sjdja3ksl-G294A02-0x32idssdji2034"
-  var proof_and_location_attacher = getProof_Loc_Addr({
-    proof: String(proof_attacher),
-    location: String(location_attacher),
-    walletAddress: addrAttacher
+
+  const addrCreator = stdlib.formatAddress(acc.getAddress());
+  var data_concat = getProof_Loc_Addr({
+    proofHashed: String(hasProof),
+    proofSigned: String(proof_creator_signed),
+    walletAddress: addrCreator,
+    nonce: String(nonce_inserted),
+    cid: String(cid_declared)
   });
+
   const attacher_api = ctc.a.attacherAPI;
   
   await call(() => attacher_api.insert_position(
-        String(proof_and_location_attacher),
+        String(data_concat),
         String(did)
       )
     );
@@ -197,8 +229,8 @@ if (role === 'creator') { // ***** CREEATOR ******
   const addrVerifier = stdlib.formatAddress(acc.getAddress());
 
 
-  const retrieve_Data = await ctc.v.views.retrieve_results(parseInt(did));
-  console.log("retrieve data: ",retrieve_Data[1])
+  //const retrieve_Data = await ctc.v.views.retrieve_results(parseInt(did));
+  //console.log("retrieve data: ",retrieve_Data[1])
 
   const verify_response = await ask.ask(`Do you want to verify the user?`, ask.yesno);
   if (verify_response){
@@ -221,11 +253,6 @@ if (role === 'creator') { // ***** CREEATOR ******
 
     
   }
-
-
-
-
-
 
 }
 

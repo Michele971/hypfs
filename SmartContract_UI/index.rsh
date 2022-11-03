@@ -1,163 +1,138 @@
 'reach 0.1';
 'use strict';
 
-const REWARD_FOR_PROVER = 1000000000000000000//send by VERIFIER
+const REWARD_FOR_PROVER = 1000000000000000000/1000//send by VERIFIER. We have 1 ETH / 1000 which is =  0.001
+const SMART_CONTRACT_MAX_USER = 4
+//NOTES:
+// TODO: Maybe using an unique password (for more verifiers) for memory reason
 
-
-const make = (creationCode, isReach=false) => Reach.App(() => { 
-  const Creator = Participant('Creator',{ 
+export const main = Reach.App(() => {
+    const Creator = Participant('Creator',{ 
     ...hasConsoleLogger,
     position: Bytes(128),
-    decentralized_identifier: UInt,
-    proof_reveived: Bytes(128),
-    reportPosition: Fun([UInt, Maybe(Bytes(128))], Null),
+    did: UInt,
+    data_inserted: Bytes(512),
+    reportPosition: Fun([UInt, Maybe(Bytes(512))], Null),
+    reportVerification: Fun([UInt, Address], Null),
+    issueDuringVerification: Fun([UInt], Null),
 
-    //for testing
-    report_results: Fun([Bytes(128)], Null)
   });
 
-
-  //TODO: remove the Attacher participant and add the Verifier
-  //const A = Participant('Attacher', attacherInteract); 
-
   const attacherAPI = API('attacherAPI',{
-    insert_position: Fun([Bytes(128),UInt], Bytes(128)), //PositionAndProof - DID - ReturnField
+    insert_position: Fun([Bytes(512),UInt], UInt), //PositionAndProof - DID - ReturnField
   });
 
   const verifierAPI = API('verifierAPI',{
-    verify: Fun([UInt,Address], Bool),
     insert_money: Fun([UInt], UInt), 
+    verify: Fun([UInt,Address], Address),
   });
- 
+
   const views = View('views', { 
-    retrieve_results: Fun([UInt], Bytes(128)), // View that let Verifier checks the retrieve data
+    getCtcBalance: UInt, // Allow users to check the balance of the contract
+    getReward: UInt, // Allow the users and verifier to get the reward
+
   });
 
+ 
+  setOptions({untrustworthyMaps: true});
+  init();
 
-   
-    setOptions({untrustworthyMaps: true});
-    const ChildCode = ContractCode(creationCode);
-    init();
-   
-    Creator.publish();
 
-    const childNew = new Contract(ChildCode);
-      commit();
-      Creator.publish() //we need that to use the MAP below
-  const easy_map = new Map(UInt,Bytes(128));
-
-  commit();
   Creator.only(() => { 
     const proof_and_position = declassify(interact.position);
-    const decentralized_identifier_creator = declassify(interact.decentralized_identifier);
+    const decentralized_identifier_creator = declassify(interact.did);
+    const data_ins = declassify(interact.data_inserted);
   });
-  
-  Creator.publish(proof_and_position, decentralized_identifier_creator); //TODO: add the proof_received
 
-  easy_map[decentralized_identifier_creator] = proof_and_position; //setting the first value of the map with Creator values
+  Creator.publish(proof_and_position, decentralized_identifier_creator, data_ins); //TODO: add the proof_received
+  const easy_map = new Map(UInt,Bytes(512));
+  easy_map[decentralized_identifier_creator] = data_ins; //setting the first value of the map with Creator values
 
   commit();
   Creator.publish();
-  //setting the view
-  views.retrieve_results.set((m) => fromSome(easy_map[m], proof_and_position));//the default is proof_and_position
 
-
+  //logging a message with the DID inserted and the data passed (e.g. proof and position)
+  Creator.only(() => interact.reportPosition(decentralized_identifier_creator, easy_map[decentralized_identifier_creator]));
   
-  
-  Creator.interact.log("Before parallel reduce");
   // ************ INSERT POSITION API **************
+  // the API terminated whe it reaches 3 users
   //the attacher can insert their positions
-  const keepGoing = 
-  parallelReduce(true) 
+  const counter = 
+  parallelReduce(SMART_CONTRACT_MAX_USER-1) 
     .invariant(balance() == balance()) // invariant: the condition inside must be true for the all time that the while goes on
     //.define(() => {views.retrieve_results.set(did_user);}) // define: the code inside is executed when a function in the while is called (ex. the api call)
-    .while(keepGoing)
+    .while(counter > 0)
     .api(attacherAPI.insert_position, // the name of the api that is called 
       (pos, did, y) => { // the code to execute and the returning variable of the api (y)
-        y(pos);
-        
-        //TODO: notify the attacher (not the creator) when the key is already used 
-        if(easy_map[did] != Null){ //TODO: FIX THIS CHECK. CHECK if map contain THE ID INSERTED --------------> IMPORTANT
-          Creator.interact.log("The key is already used");
-          return false; //TODO: THIS HAS TO RETURN TRUE
-        }
+        y(counter); //allow the frontend to retrieve the space available 
         /** 
          * The line below manages the case when the key is already 
          * assigned to a specific value 
          * */
         easy_map[did] = fromSome(easy_map[did],pos);
 
-        Creator.interact.log("Somebody added a new position to the map");
         Creator.only(() => interact.reportPosition(did, easy_map[did]));
 
-        //TODO: ONLY for TESTING: terminate the parallel reduce
-  
-
-        return true; // the returning of the API for the parallel reduce necessary to update the initial variable 
+        return counter - 1; // the returning of the API for the parallel reduce necessary to update the initial variable 
       }
     )
     // TIMEOUT WORKS ONLY ON TESTNET
-    // .timeout(relativeTime(deadline), () => { // timeout: function that executes code every amount of time decided by the first parameter
-    //   Creator.interact.log("The campaign has finished") // log on the Creator cli to inform the end of the campaign
+    // .timeout(relativeTime(1260/5), () => { // timeout: function that executes code every amount of time decided by the first parameter
     //   Anybody.publish(); // publish needed to finish the parallel reduce
-    //   return [total_balance,false]; // set keepGoing to false to finish the campaign
+    //   return counter; // set keepGoing to false to finish the campaign
     // }); 
-  
-    Creator.interact.log("TIME TO VERIFY! SECOND PARALLEL REDUCE")
+    views.getCtcBalance.set(balance());
+    views.getReward.set(REWARD_FOR_PROVER);
+    commit();
+    Creator.publish();
 
-    const keepGoing2 = 
-    parallelReduce(true) 
+    const keepGoing2_counter = 
+    parallelReduce(SMART_CONTRACT_MAX_USER) 
       .invariant(balance() == balance())
-      .while(keepGoing2)
+      .define(() => {views.getCtcBalance.set(balance());})
+      .while(keepGoing2_counter > 0) 
       .api(verifierAPI.insert_money,
         (money) => { // the assume that have to be true to continue the execution of the API
           assume(money > 0);
         },      
         (money) => money, // the payment that the users have to do when call the api
-        (money,y) => { 
+        (money, y) => { 
           y(money);
-          
-          Creator.interact.log("Verifier inserted the following amount into smart contract: ", money);
-          Creator.interact.log("Balance is", balance());
-
-          return true;
+        
+          return keepGoing2_counter;
         }
       )
       .api(verifierAPI.verify, 
         (did, walletAddress, ret) => { 
-          Creator.interact.log("wallet address passed: ", walletAddress);
           // transfer some money to the Prover (attacher)
           if (balance()>=REWARD_FOR_PROVER){
-            transfer(REWARD_FOR_PROVER).to(walletAddress);
-            ret(true);
-
+            transfer(REWARD_FOR_PROVER).to(walletAddress); 
+            Creator.only(() => interact.reportVerification(did, this));
+            delete easy_map[did]; //vector[0] is the did
+            ret(walletAddress);
+            return keepGoing2_counter -1; 
+       
+          }else{
+            Creator.only(() => interact.issueDuringVerification(did));
+            ret(walletAddress);
+            return keepGoing2_counter -1; //replace with "keepGoing2_counter -1" during the testing 
           }
-          ret(false);
-          delete easy_map[did]; //vector[0] is the did
-  
-          return false; //TODO: THIS HAS TO BE TRUEE, false only for testing
+        
+
         }
       )
+      .timeout(relativeTime(700/5), () => { // timeout: function that executes code every amount of time decided by the first parameter
+        Anybody.publish(); // publish needed to finish the parallel reduce
+        return keepGoing2_counter; // set keepGoing to false to finish the campaign
+      }); 
 
 
   // TODO: the first received position has to be stored in a data structure, will be compared to the subsquent received positions
 
-  //for TESTING
-  Creator.interact.log("Smart contract is terminating")
   transfer(balance()).to(Creator);
   
   commit();
   
 
   exit();
- })
-
-
-// create the factory 
-export const main3 = make({
-  ETH: 'child.sol:ReachContract',
-  ALGO: {
-    approval: 'child.approve.teal',
-    clearState: 'child.clear.teal',
-  },
 });
