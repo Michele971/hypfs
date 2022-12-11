@@ -3,3 +3,5 @@ max: 15.35
 min: 14.18
 dev standard: 0.44
 variance: 0.19
+
+Int conf 95% [13.94, 15.35]
