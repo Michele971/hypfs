@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from makeTransaction import *
 import concurrent.futures
 import random
+from scipy.stats import t
 '''
     ---------------------------------------------------------------------------------------
     ------------------    THIS SCRIPT MUST BE RUN ON ALGORAND TESTNET    ------------------
@@ -429,6 +430,13 @@ def writeResultsDeploy(time_delta_list):
     min_val = round(np.min(time_delta_list),2)
     devStd = round(np.std(time_delta_list),2)
     variance = round(np.var(time_delta_list),2)
+
+    dof = len(time_delta_list)-1 
+    confidence = 0.95
+    t_crit = np.abs(t.ppf((1-confidence)/2,dof))
+    print(meanList-devStd*t_crit/np.sqrt(len(time_delta_list)), meanList+devStd*t_crit/np.sqrt(len(time_delta_list))) 
+
+
     f = open("resultsDeploy.txt", "w")
     f.write("Deploy Performances")
     f.write("mean: "+str(meanList)+"\n")
@@ -444,6 +452,12 @@ def writeResultsAttach(time_delta_list):
     min_val = round(np.min(time_delta_list),2)
     devStd = round(np.std(time_delta_list),2)
     variance = round(np.var(time_delta_list),2)
+
+    dof = len(time_delta_list)-1 
+    confidence = 0.95
+    t_crit = np.abs(t.ppf((1-confidence)/2,dof))
+    print(meanList-devStd*t_crit/np.sqrt(len(time_delta_list)), meanList+devStd*t_crit/np.sqrt(len(time_delta_list))) 
+
     f = open("resultAttach.txt", "w")
     f.write("Attach Performances")
     f.write("mean: "+str(meanList)+"\n")
