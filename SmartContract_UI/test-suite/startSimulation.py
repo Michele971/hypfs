@@ -6,9 +6,7 @@ from index import format_address
 from index import play_Creator, play_bob
 from threading import Thread
 import time
-import eth_new_account
 from index import start_list, end_list
-import numpy as np
 import matplotlib.pyplot as plt
 import random
 import numpy as np
@@ -20,8 +18,8 @@ import numpy as np
 
 SMART_CONTRACT_MAX_USER = 3 # this is the same variable of index.rsh. They must be equals!
 
-LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V", "7H369FXP+FH", "7H369F2W+3R"] # list of Provers locatios. Used for build the prover object
-PROVER_NUMBER = 32 # number of provers for the entire system
+LOCATION_LIST_PROV = ["7H369F4W+Q8", "7H369F4W+Q9"]#, "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V", "7H369FXP+FH", "7H369F2W+3R"] # list of Provers locatios. Used for build the prover object
+PROVER_NUMBER = 8 # number of provers for the entire system
 
 assert(PROVER_NUMBER/len(LOCATION_LIST_PROV) == 4) #There must be (SMART_CONTRACT_MAX_USER+1) users for each location. So increase the number of locations in LOCATION_LIST_PROV, or decrease the PROVER_NUMBER
 
@@ -33,16 +31,16 @@ mapping_list_did = {} #will be fill at runtime
     The DID created will be unique.
     This method will create mapping_list_did dictionary, which will be used to check the users nearby.
 '''
-def generateProvers(n_users_to_generate):
+def generateProvers(n_users_to_generate, list_loc,mapping_list_did):
     proversObjectList = []
     count = 0
     for i in range(n_users_to_generate):
         #use to assign each ID to the location
-        if count == len(LOCATION_LIST_PROV):
+        if count == len(list_loc):
             count = 0
 
         # choose the location from the list of locations
-        chooseLocation = LOCATION_LIST_PROV[count] #there are SMART_CONTRACT_MAX_USER + 1 elements for each location. So: 0 < count <= (SMART_CONTRACT_MAX_USER+1)
+        chooseLocation = list_loc[count] #there are SMART_CONTRACT_MAX_USER + 1 elements for each location. So: 0 < count <= (SMART_CONTRACT_MAX_USER+1)
         goOn = True
         #generate a random ID that does not still exists
         while goOn == True:
@@ -140,8 +138,7 @@ rpc("/stdlib/setProviderByEnv",{
 )
 
 print("\t\t The consesus network is: ", rpc('/stdlib/connector'))
-
-
+CONSENSUS_NETWORK = str(rpc('/stdlib/connector'))
 #STARTING_BALANCE = rpc("/stdlib/parseCurrency", 1500)  # only  for devnet
 
 class Witness:
@@ -170,7 +167,6 @@ class Witness:
         else:
             return False
         
-
 class Prover(Witness):
     def __init__(self, did, account, private_key, proofs_array_computed, location, proofs_received_array):
         super().__init__(did, account, private_key, proofs_array_computed, location)
@@ -240,9 +236,6 @@ class Prover(Witness):
         #print("playbob called successfully")
         return attacherThread
 
-
-
-
 def createProver(did, account, private_key, proofs_array_computed, location, proofs_received_array):
     prov = Prover(
         did= did,
@@ -271,9 +264,9 @@ def get_balance(w):
     return fmt(rpc("/stdlib/balanceOf", w))
 
 # START the simulation
-def startSimulation():
+def startSimulation(num_p, list_loc, mapping_list_did):
     #generate N random provers
-    generate_prover_list = generateProvers(PROVER_NUMBER) # try with 8, 12, 16 etc.
+    generate_prover_list = generateProvers(num_p,list_loc,mapping_list_did) # try with 8, 12, 16 etc.
 
     first_test = 0
 
@@ -281,7 +274,7 @@ def startSimulation():
     dict_location_sc = {} # keep track if the smart contract is newAccountFromMnemonicalready associated to this particular location. Its lenght will be equal to NUMBER_OF_LOCATIONS
 
     # Starting prover steps
-    for i in range(0, PROVER_NUMBER): #for every prover of the entire system ...
+    for i in range(0, num_p): #for every prover of the entire system ...
         ##### TODO: Generate random LATITUDE & LONGITUDE (for every user), Then convert them to Open Location code and add to LOCATION_LIST_PROV
         #generateOLC(11.3474453,44.4930181 )#11.356988, 44.495888) # just for testing
 
@@ -329,8 +322,6 @@ def startSimulation():
     # Joining the thread of provers and verifiers
     print("num threads: ",len(prover_thread))
     print("end_list (time)", end_list)
-
-
 
     wallet_pub_key = [
         '0x34c17b647dDd4E38CDC2F5B38efd1F42681cB889',
@@ -382,55 +373,100 @@ def startSimulation():
         time_delta_list.insert(i, delta)
         print("new delta: ", delta)
         
-
-
     for provUser in prover_list_account:
         rpc("/forget/ctc", provUser)
+    # ---------- BOX PLOT ----------
+    # fig = plt.figure(figsize =(10, 7))
+    # # Creating plot
+    # plt.boxplot(times_deploy)
+    # print("mean deploy times: ", np.mean(times_deploy))
+    # max_val = round(np.max(time_delta_list),2)
+    # min_val = round(np.min(time_delta_list),2)
+    # print("max deploy times: ", max_val)
+    # print("min_val deploy times: ", min_val)
+    # # show plot
+    # plt.show()
+    # -------------- END BOX PLOT --------------
 
-    print(time_delta_list)
-    build_chart(time_delta_list,wallet_pub_key[:PROVER_NUMBER])
-    writeResultsDeploy(time_delta_list[:len(LOCATION_LIST_PROV)])
-    num_attachers = PROVER_NUMBER-len(LOCATION_LIST_PROV)
-    writeResultsAttach(time_delta_list[num_attachers:])
-   
+    num_attachers = num_p - len(list_loc)
+
+    times_deploy = time_delta_list[0:len(list_loc)]
+    print("time_delta_list: ", time_delta_list)
+    print("times_deploy: ", times_deploy)
+    times_attach = time_delta_list[len(list_loc):num_p]
+    print("times_attach: ", times_attach)
+
+    print("\nlista totale di times: ", len(time_delta_list))
+    print("list di deploy times: ", len(times_deploy))
+    print("lista di attach times: ", len(times_attach))
+    print("\nlista di wallet pub key deployer: ", len(wallet_pub_key[0:len(list_loc)]))
+    print("\n lista di wallet pub key attacher: ", len(wallet_pub_key[len(list_loc):num_p]))
+
+    
+    build_chart(times_deploy, wallet_pub_key[0:len(list_loc)],"deploy", num_p, list_loc)
+    f = open("time_delta_list_deploy_eth.txt", "w")
+    deployTimes_list1 = str(times_deploy) + "\n"
+    f.write(deployTimes_list1)
+    
+    build_chart(times_attach, wallet_pub_key[len(list_loc):num_p], "attach", num_p, list_loc)
+
+    f = open("time_delta_list_attach_eth.txt", "w")
+    deployTimes_list2 = str(time_delta_list[len(list_loc):num_p]) + "\n"
+    f.write(deployTimes_list2)
+
+    #build_chart(time_delta_list,wallet_pub_key[len(list_loc):num_p],"deploy_attach", num_p, list_loc)
+    writeResultsDeploy(times_deploy, "Eth")
+    writeResultsAttach(times_attach, "Eth")
+
+    return times_deploy, times_attach, time_delta_list
 
 
-def build_chart(time_delta_list,wallet_pub_key):
+def build_chart(time_delta_list,wallet_pub_key,nameChart, num_p, list_loc):
     # time_delta_list = [4.3,2.3,2.1,1.4]
     # wallet_pub_key = ["Aaaa","adddssf","dssdsds","ggkdk"]
     # plotting the time of deploy and transaction for each account
+    legend = False
+    if nameChart == 'attach' or nameChart == 'deploy':
+        legend = False # I don't want the legend
+    else:
+        legend = True
     height = time_delta_list
     bars = (wallet_pub_key)
     x_pos = np.arange(len(bars))
-    colorsList = ['orange'] * len(LOCATION_LIST_PROV)
-    n_attachers = PROVER_NUMBER-len(LOCATION_LIST_PROV)
-    for i in range(n_attachers):
-        colorsList.append('#7eb54e')
-    color_legend = {'Deploy':'orange', 'Attach':'#7eb54e'}         
-    labels = list(color_legend.keys())
-    handles = [plt.Rectangle((0,0),1,1, color=color_legend[label]) for label in labels]
-    assert(len(colorsList) ==  PROVER_NUMBER)
-    plt.legend(handles, labels)
-    plt.bar(x_pos, height, color= colorsList)
+    
+    if legend:
+        colorsList = ['orange'] * len(list_loc)
+        n_attachers = num_p-len(list_loc)
+        for i in range(n_attachers):
+            colorsList.append('#7eb54e')
+        color_legend = {'Deploy':'orange', 'Attach':'#7eb54e'}         
+        labels = list(color_legend.keys())
+        handles = [plt.Rectangle((0,0),1,1, color=color_legend[label]) for label in labels]
+        assert(len(colorsList) ==  num_p)
+        plt.legend(handles, labels)
+        plt.bar(x_pos, height, color= colorsList)
+    else:
+        plt.bar(x_pos, height, color='orange')
     plt.xticks(x_pos, bars, rotation=90)
     plt.xlabel('Accounts')
     plt.ylabel('Seconds')  
 
     # Create names on the x-axis
-    plt.xticks(x_pos, bars)
+    #plt.xticks(x_pos, bars)
 
     # Show graphic
     #plt.show()
 
-    plt.savefig('./outputPerformance.png')
+    plt.savefig('./outputPerformance'+nameChart+'.png')
+    plt.figure()
     
-def writeResultsDeploy(time_delta_list):
+def writeResultsDeploy(time_delta_list, name):
     meanList = round(np.mean(time_delta_list),2)
     max_val = round(np.max(time_delta_list),2)
     min_val = round(np.min(time_delta_list),2)
     devStd = round(np.std(time_delta_list),2)
     variance = round(np.var(time_delta_list),2)
-    f = open("resultsDeploy.txt", "w")
+    f = open("resultsDeploy_"+name+".txt", "w")
     f.write("Deploy Performances")
     f.write("mean: "+str(meanList)+"\n")
     f.write("max: "+str(max_val)+"\n")
@@ -439,13 +475,13 @@ def writeResultsDeploy(time_delta_list):
     f.write("variance: "+str(variance)+"\n")
     f.close()
 
-def writeResultsAttach(time_delta_list):
+def writeResultsAttach(time_delta_list, name):
     meanList = round(np.mean(time_delta_list),2)
     max_val = round(np.max(time_delta_list),2)
     min_val = round(np.min(time_delta_list),2)
     devStd = round(np.std(time_delta_list),2)
     variance = round(np.var(time_delta_list),2)
-    f = open("resultAttach.txt", "w")
+    f = open("resultAttach_"+name+".txt", "w")
     f.write("Attach Performances")
     f.write("mean: "+str(meanList)+"\n")
     f.write("max: "+str(max_val)+"\n")
@@ -455,10 +491,43 @@ def writeResultsAttach(time_delta_list):
     f.close()
 
 def main():
-    startSimulation()
-    # generateOLC(11.3986586,44.4864416) # san lazzaro municipio
-    # generateOLC(11.3501333,44.4970137) # piazza scaravilli
+    number_provers = [8, 16, 24] #8, 16
+    list_locations = [
+                ["7H369F4W+Q8", "7H369F4W+Q9"],
+                ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6"],
+                ["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V"],
+                #["7H369F4W+Q8", "7H369F4W+Q9", "7H368FRV+FM", "7H368FWV+X6", "7H367FWH+9J", "7H368F5R+4V", "7H369FXP+FH", "7H369F2W+3R"]
+            ]
+    mean_list_deploy = []
+    mean_list_attach = []
+    for num_p in range(0,len(number_provers)):
+        print("urlo 1")
+        mapping_list_did = {}
+        deploy_times = []
+        attach_times = []
+        time_delta_list = []
+        deploy_times, attach_times, time_delta_list = startSimulation(number_provers[num_p], list_locations[num_p],mapping_list_did)
+        print("urlo 2")
+        mean_deploy_times = np.mean(deploy_times)
+        mean_attach_times = np.mean(attach_times)
+        mean_list_deploy.append(mean_deploy_times)
+        mean_list_attach.append(mean_attach_times)
+        print("urlo 3")
+    print("urlo 4")
+    # ---------- PLOT LINES ----------
+    f = open("ValoriPerPlot_Eth_Line.txt", "w")
+    valoriDaPlottareLineD = "\nDEPLOY LINE PLOT: " + str(number_provers) +"  -  "+ str(mean_list_deploy) +"\n"
+    valoriDaPlottareLineA = "ATTACH LINE PLOT: " + str(number_provers) +"  -  "+ str(mean_list_attach) +"\n"
     
+    f.write(str(time_delta_list))
+    f.write(valoriDaPlottareLineD)
+    f.write(valoriDaPlottareLineA)
+    # plt.plot(number_provers, mean_list, label = "Goerli")
+    # plt.legend()
+    # plt.show()
+    # ---------- END LINES ----------
+
+
     
 if __name__ == '__main__':
     main()

@@ -6,13 +6,14 @@ const REWARD_FOR_PROVER = 10000//send by VERIFIER
 const SMART_CONTRACT_MAX_USER = 3
 
 export const main = Reach.App(() => {
-  //setOptions({ALGOExitMode: 'DeleteAndCloseOutASAs'});
-  const Creator = Participant('Creator',{ 
+    const Creator = Participant('Creator',{ 
     ...hasConsoleLogger,
-    proof_and_tx_id: Bytes(128),
+    position: Bytes(128),
     decentralized_identifier: UInt,
-    reportPosition: Fun([UInt, Maybe(Bytes(128))], Null), // report the data stored inside the map: proofs, tx_id, etc.
-    reportVerification: Fun([UInt, Address], Null), //report the output of verification 
+    proof_reveived: Bytes(128),
+    reportPosition: Fun([UInt, Maybe(Bytes(128))], Null),
+    reportVerification: Fun([UInt, Address], Null),
+
   });
 
   const attacherAPI = API('attacherAPI',{
@@ -22,28 +23,29 @@ export const main = Reach.App(() => {
   const views = View('views', { 
     getCtcBalance: UInt, // Allow users to check the balance of the contract
     getReward: UInt, // Allow the users and verifier to get the reward
+
   });
 
  
-  //setOptions({untrustworthyMaps: true});
+  setOptions({untrustworthyMaps: true});
   init();
-  
+
 
   Creator.only(() => { 
-    const proof_and_position = declassify(interact.proof_and_tx_id);
+    const proof_and_position = declassify(interact.position);
     const decentralized_identifier_creator = declassify(interact.decentralized_identifier);
   });
 
   Creator.publish(proof_and_position, decentralized_identifier_creator); //TODO: add the proof_received
- 
-  const easy_map = new Map(Bytes(128));
-  easy_map[this] = proof_and_position; //setting the first value of the map with Creator values
-  delete easy_map[this];
+
+  const easy_map = new Map(UInt, Bytes(128));
+  easy_map[decentralized_identifier_creator] = proof_and_position; //setting the first value of the map with Creator values
+
   commit();
   Creator.publish();
 
   //logging a message with the DID inserted and the data passed (e.g. proof and position)
-  Creator.only(() => interact.reportPosition(decentralized_identifier_creator, easy_map[this]));
+  Creator.only(() => interact.reportPosition(decentralized_identifier_creator, easy_map[decentralized_identifier_creator]));
   
   // ************ INSERT POSITION API **************
   // the API terminated whe it reaches 3 users
@@ -54,13 +56,12 @@ export const main = Reach.App(() => {
     //.define(() => {views.retrieve_results.set(did_user);}) // define: the code inside is executed when a function in the while is called (ex. the api call)
     .while(counter > 0)
     .api(attacherAPI.insert_position, // the name of the api that is called 
-      (pos_and_tx_id, did, y) => { // the code to execute and the returning variable of the api (y)
-        y(counter); //allow the frontend to retrieve the space available 
+      (pos, did, y) => { // the code to execute and the returning variable of the api (y)
+        y(counter-1); //allow the frontend to retrieve the space available 
 
-        easy_map[this] = fromSome(easy_map[this],pos_and_tx_id);
-        delete easy_map[this];
+        easy_map[did] = fromSome(easy_map[did],pos);
 
-        Creator.only(() => interact.reportPosition(did, easy_map[this]));
+        Creator.only(() => interact.reportPosition(did, easy_map[did]));
 
         return counter - 1; // the returning of the API for the parallel reduce necessary to update the initial variable 
       }
